@@ -154,35 +154,90 @@
     
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"YYYY.MM.dd"];
+
+    NSDateFormatter *hourFormatter = [[NSDateFormatter alloc] init];
+    [hourFormatter setDateFormat:@"HH"];
     
     for (id obj in log) {
         if ([obj isKindOfClass:[NSArray class]]) {
             NSArray *item = obj;
+            
             int total = [item[1] intValue];
             int time  = [item[2] intValue];
             float speed = (float)total / (float)time;
             NSDate *date = item[0];
+            
+            NSString *totalKey = [NSString stringWithFormat:@"%d", total];
+            NSString *dayKey = [formatter stringFromDate:date];
+            NSString *hourKey = [hourFormatter stringFromDate:date];
+            
+            /*
+             dayLog [
+             //   year  = ...
+             //   month = ...
+             //   day   = ...
+             
+                hours = [
+                    00 = ...
+                    05 = ...
+                    12 = ...
+                ]
+                avg   = ...
+                max   = ...
+                min   = ...
+             ]
+             
+             */
+            
+            NSMutableDictionary *totalLog = [stats objectForKey:totalKey];
+            if (nil == totalLog) {
+                totalLog = [[NSMutableDictionary alloc] init];
+                stats[totalKey] = totalLog;
+            }
 
-            NSMutableDictionary *part = [stats objectForKey:[NSString stringWithFormat:@"%d", total]];
-            NSString *key;
-            if (nil == part) {
-                part = [[NSMutableDictionary alloc] init];
-                key = [NSString stringWithFormat:@"%d", total];
-                stats[key] = part;
+            NSMutableDictionary *dayLog = [totalLog objectForKey:dayKey];
+            if (nil == dayLog) {
+                dayLog = [[NSMutableDictionary alloc] initWithDictionary: @{@"hours" : [[NSMutableDictionary alloc] init]}];
+                totalLog[dayKey] = dayLog;
             }
             
-            key = [formatter stringFromDate:date];
-            NSNumber *val = [part objectForKey:key];
-            if (nil == val) {
-
-                [part setObject:[NSNumber numberWithFloat:speed] forKey:key];
+            NSNumber *dayAvg = [dayLog objectForKey:@"avg"];
+            NSNumber *dayMax = [dayLog objectForKey:@"max"];
+            NSNumber *dayMin = [dayLog objectForKey:@"min"];
+            
+            if (nil == dayAvg) {
+                dayAvg = [NSNumber numberWithFloat:speed];
             } else {
-                [part setObject:[NSNumber numberWithFloat:(([val floatValue] + speed) / 2.)] forKey:key];
+                dayAvg = [NSNumber numberWithFloat:([dayAvg floatValue] + speed) / 2.];
             }
+            
+            if (nil == dayMax || [dayMax floatValue] < speed) {
+                dayMax = [NSNumber numberWithFloat:speed];
+            }
+ 
+            if (nil == dayMin || [dayMin floatValue] > speed) {
+                dayMin = [NSNumber numberWithFloat:speed];
+            }
+            
+            [dayLog setObject:dayAvg forKey:@"avg"];
+            [dayLog setObject:dayMax forKey:@"max"];
+            [dayLog setObject:dayMin forKey:@"min"];
+            
+            NSMutableDictionary *hoursLog = [dayLog objectForKey:@"hours"];
+            
+            NSNumber *hourAvg = [hoursLog objectForKey:hourKey];
+            
+            if (nil == hourAvg) {
+                hourAvg = [NSNumber numberWithFloat:speed];
+            } else {
+                hourAvg = [NSNumber numberWithFloat:([hourAvg floatValue] + speed) / 2.];
+            }
+            
+            hoursLog[hourKey] = hourAvg;
             
         }
     }
-    
+    NSLog(@"%@", stats[@"4"]);
     return stats;
 }
 
@@ -204,21 +259,21 @@
             
             //            NSLog(@"%d", total);
             
-            NSMutableDictionary *part = [stats objectForKey:[NSString stringWithFormat:@"%d", total]];
-            NSString *key;
-            if (nil == part) {
-                part = [[NSMutableDictionary alloc] init];
-                key = [NSString stringWithFormat:@"%d", total];
-                stats[key] = part;
+            NSMutableDictionary *dayLog = [stats objectForKey:[NSString stringWithFormat:@"%d", total]];
+            NSString *dayKey;
+            if (nil == dayLog) {
+                dayLog = [[NSMutableDictionary alloc] init];
+                dayKey = [NSString stringWithFormat:@"%d", total];
+                stats[dayKey] = dayLog;
             }
             
-            key = [formatter stringFromDate:date];
-            NSNumber *val = [part objectForKey:key];
+            dayKey = [formatter stringFromDate:date];
+            NSNumber *val = [dayLog objectForKey:dayKey];
             if (nil == val) {
                 //                NSLog(@"%f", speed);
-                [part setObject:[NSNumber numberWithFloat:speed] forKey:key];
+                [dayLog setObject:[NSNumber numberWithFloat:speed] forKey:dayKey];
             } else {
-                [part setObject:[NSNumber numberWithFloat:(([val floatValue] + speed) / 2.)] forKey:key];
+                [dayLog setObject:[NSNumber numberWithFloat:(([val floatValue] + speed) / 2.)] forKey:dayKey];
             }
             
         }

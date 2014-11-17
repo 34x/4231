@@ -12,13 +12,30 @@
 @interface NCStatsViewController ()
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *statsSelector;
+@property (weak, nonatomic) IBOutlet UIScrollView *hourSelectorScroll;
 @end
 
 @implementation NCStatsViewController
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+//    self.scrollView.backgroundColor = [UIColor redColor];
     [[self navigationController] setNavigationBarHidden:NO animated:YES];
+
+}
+
+- (void) tapOnHourSelector:(id)sender{
+    if ([sender isKindOfClass:[UITapGestureRecognizer class]]) {
+        UITapGestureRecognizer *tap = sender;
+
+        [self drawDaysStats:[NSNumber numberWithLong: tap.view.tag]];
+        
+        // TODO: fix it and optimize
+        for (UIView *v in [self.hourSelectorScroll subviews]) {
+            v.backgroundColor = nil;
+        }
+        tap.view.backgroundColor = [UIColor colorWithRed:90./100. green:95./100. blue:255./100. alpha:1];
+    }
 }
 
 - (IBAction)selectStats:(id)sender {
@@ -33,6 +50,17 @@
     [super viewDidAppear:animated];
     [self drawDaysStats];
     [self.statsSelector addTarget:self action:@selector(selectStats:) forControlEvents:UIControlEventValueChanged];
+    
+    
+//    for (int i = 0; i < 24; i++) {
+//        UIView *hourSelect = [[UIView alloc] initWithFrame:CGRectMake(xCord, (hourSelectHeight + 2)*(i-1) + 120., hourSelectWidth,   hourSelectHeight)];
+//        [self.view addSubview:hourSelect];
+//        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, hourSelectWidth, hourSelectHeight)];
+//        label.text = [NSString stringWithFormat:@"%d", i];
+//        label.textAlignment = NSTextAlignmentCenter;
+//        [hourSelect addSubview:label];
+////        hourSelect.backgroundColor = [UIColor blueColor];
+//    }
 }
 
 - (void) clearStats {
@@ -46,7 +74,7 @@
     if (0 == [stats count]) {
         return;
     }
-    
+    [self.hourSelectorScroll setHidden:YES];
     [self clearStats];
     float rowHeight = 24;
     NSString *font = @"Helvetica";
@@ -129,7 +157,7 @@
     }
     
     
-    [self.scrollView setContentSize:CGSizeMake(self.view.bounds.size.width, rowHeight*row)];
+    [self.scrollView setContentSize:CGSizeMake(self.scrollView.bounds.size.width, rowHeight*row)];
     
     float width = self.scrollView.bounds.size.width;
     // can be faster!
@@ -150,10 +178,22 @@
     }
 }
 
-- (void) drawDaysStats {
+- (void) drawDaysStats{
+    [self drawDaysStats:nil];
+}
+
+- (void) drawDaysStats:(NSNumber*)hour {
     NSDictionary *stats = [NCGame stats];
     if (0 == [stats count]) {
         return;
+    }
+    [self.hourSelectorScroll setHidden:NO];
+    
+    NSMutableDictionary *hoursEnabled = [[NSMutableDictionary alloc] init];
+    
+    NSString *selectedHourKey;
+    if (nil != hour) {
+        selectedHourKey = [NSString stringWithFormat:@"%02ld", [hour integerValue]];
     }
     
     [self clearStats];
@@ -162,9 +202,6 @@
     float smallFont = 12.;
     int row = 0;
     self.view.backgroundColor = [UIColor whiteColor];
-    
-
-//    NSLog(@"log items count: %lu", [stats count]);
 
 
     
@@ -181,20 +218,20 @@
     }];
     
     for (NSString *total in totals) {
-        NSDictionary *days = stats[total];
-//        NSLog(@"total: %@", total);
-//        NSLog(@"days: %@", [days allKeys]);
+        bool totalTitleDrawed = NO;
         
-        //TODO: fix this ugly
+        NSDictionary *days = stats[total];
+        
         float max = 0;
-        for (NSString *day in days) {
-            if ([days[day] floatValue] > max) {
-                max = [days[day] floatValue];
+        for (NSString *dayKey in days) {
+            NSMutableDictionary *day = days[dayKey];
+            if (max < [day[@"max"] floatValue]) {
+                max = [day[@"max"] floatValue];
             }
         }
-        
+
         NSArray *sorted = [[days allKeys] sortedArrayUsingComparator:^(id obj1, id obj2) {
-//            NSLog(@"%@", obj1);
+
             NSInteger i1 = [[obj1 stringByReplacingOccurrencesOfString:@"." withString:@""] integerValue];
             NSInteger i2 = [[obj2 stringByReplacingOccurrencesOfString:@"." withString:@""] integerValue];
             
@@ -209,30 +246,52 @@
             return (NSComparisonResult)NSOrderedSame;
         }];
 
-        UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(4, row*rowHeight, self.scrollView.frame.size.width, rowHeight)];
-        l.text = total;
-        l.textAlignment = NSTextAlignmentCenter;
-        [self.scrollView addSubview:l];
-        row++;
         NSString *month;
         for (NSString *day in sorted) {
-            NSArray *date = [day componentsSeparatedByString:@"."];
-            if (nil == month || ![month isEqualToString:date[1]]) {
-                UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(4, row*rowHeight, self.scrollView.frame.size.width-10, rowHeight)];
-                l.text = [NSString stringWithFormat:@"%@.%@", date[0], date[1]];
-//                l.textColor = [UIColor blackColor];
-//                l.textAlignment = NSTextAlignmentRight;
-                l.font = [UIFont fontWithName:font size:smallFont];
-                [self.scrollView addSubview:l];
-                month = date[1];
-                row++;
+            float speed;
+            if (nil == selectedHourKey) {
+                speed = [days[day][@"avg"] floatValue];
+                
+                for (NSString *enabledHour in days[day][@"hours"]) {
+                    if (nil == hoursEnabled[enabledHour]) {
+                        hoursEnabled[enabledHour] = [NSNumber numberWithInt:0];
+                    }
+                }
+
+            } else {
+                speed = [days[day][@"hours"][selectedHourKey] floatValue];
             }
             
-            float speed = [days[day] floatValue];
-            float percent = speed / max;
+            if (0. == speed) {
+                continue;
+            }
             
+            /*
+             * TOTAL LABEL DRAW
+             */
+            if(!totalTitleDrawed) {
+                UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(4, row*rowHeight, self.scrollView.frame.size.width, rowHeight)];
+                l.text = total;
+                l.textAlignment = NSTextAlignmentCenter;
+                [self.scrollView addSubview:l];
+                row++;
+                totalTitleDrawed = YES;
+            }
+            
+            NSArray *date = [day componentsSeparatedByString:@"."];
+            
+            float percent = speed / max;
+//            NSLog(@"p: %f max: %f", percent, max);
+            /*
+             * SPEED LABEL DRAW
+             */
             UILabel *dayLabel = [[UILabel alloc] initWithFrame:CGRectMake(4, row*rowHeight, self.scrollView.frame.size.width, rowHeight)];
-            dayLabel.text = [NSString stringWithFormat:@"%@", date[2]];
+            if (nil == month || ![month isEqualToString:date[1]]) {
+                dayLabel.text = [NSString stringWithFormat:@"%@.%@.%@", date[2], date[1], date[0]];
+                month = date[1];
+            } else {
+                dayLabel.text = [NSString stringWithFormat:@"%@", date[2]];
+            }
             dayLabel.textColor = [UIColor whiteColor];
             dayLabel.font = [UIFont fontWithName:font size:smallFont];
             UIView *v = [[UIView alloc] initWithFrame:CGRectMake(0, row*rowHeight, percent, rowHeight)];
@@ -249,104 +308,92 @@
             
             row++;
         }
-        
-        row++;
-        
-        
-        
-//        NSArray *dayValues = [[days allKeys] sortedArrayUsingComparator:^(id obj1, id obj2) {
-//            
-//            NSString *s1 = obj1;
-//            NSArray *s1a = [s1 componentsSeparatedByString:@"."];
-//
-//            
-//            NSString *s2 = obj2;
-//            NSArray *s2a = [s2 componentsSeparatedByString:@"."];
-//            
-//            NSInteger i1 = [s1a[0] integerValue] + [s1a[1] integerValue] + [s1a[2] integerValue];
-//            
-//            NSLog(@"%@", s1a);
-//            
-//            if ([s1 integerValue] > [s2 integerValue]) {
-//                return (NSComparisonResult)NSOrderedDescending;
-//            }
-//            
-//            if ([s1 integerValue] < [s2 integerValue]) {
-//                return (NSComparisonResult)NSOrderedAscending;
-//            }
-//            
-//            return (NSComparisonResult)NSOrderedSame;
-//        }];
-////        NSLog(@"%@", dayValues);
-//
-//        for (NSString *day in dayValues){
-////            NSLog(@"%@", day);
-//        }
-        
-        
     }
     
-//    NSString *day = [dateFormatter stringFromDate:items[0][0]];
-//    float avg = 0.0;
-//    int row = 0;
-//    //    [items enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop){
-//    
-//    NSInteger idx = 0;
-//    for(id obj in items) {
-//        
-//        if ([obj isKindOfClass:[NSArray class]]) {
-//            NSArray *item = (NSArray*)obj;
-//            float speed = [item[1] floatValue] / [item[2] floatValue];
-//
-//            if (0 == avg) {
-//                avg = speed;
-//            } else {
-//                avg = (avg + speed) / 2.;
-//            }
-//
-//            if (![[dateFormatter stringFromDate:item[0]] isEqualToString:day] || idx + 1 == [items count]) {
-//
-//                UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(8, row*rowHeight, self.view.bounds.size.width, rowHeight)];
-//                l.textColor = [UIColor whiteColor];
-//                
-//                float percent = avg / max;
-//                
-//                l.text = [NSString stringWithFormat:@"%@ %.2f", day, avg];
-//                
-//                UIView *bar = [[UIView alloc] initWithFrame:CGRectMake(0, row*rowHeight, percent, rowHeight)];
-//                bar.backgroundColor = [UIColor colorWithRed:100. / 255. * 61. / 100. green:100. / 255. * 112. / 100. blue:100. / 255. * 232. / 100. alpha:.9];
-//                [self.scrollView addSubview:bar];
-//                
-//                [self.scrollView addSubview:l];
-//                
-//                row++;
-//                avg = 0.;
-//                day = [dateFormatter stringFromDate:item[0]];
-//            }
-//        }
-//        idx++;
-//    }
+    [self.scrollView setContentSize:CGSizeMake(self.scrollView.bounds.size.width, rowHeight*row)];
     
-//
-    [self.scrollView setContentSize:CGSizeMake(self.view.bounds.size.width, rowHeight*row)];
     
-    float width = self.scrollView.bounds.size.width;
+    /*
+     width for digit | percent
+     
+     
+     */
+    
+    float frameWidth = self.scrollView.bounds.size.width;
+    float paddingWidth = 110.;
     // can be faster!
-    width = width - width * 0.2;
+    float widthForPercentage = frameWidth - paddingWidth - frameWidth * 0.1;
     for (UIView *view in [self.scrollView subviews]) {
         if (![view isKindOfClass:[UILabel class]]) {
             CGRect rect = view.frame;
+            float percentageWidth = rect.size.width * widthForPercentage;
             [UIView animateWithDuration:0.9
                              animations:^{
-                                 view.frame = CGRectMake(rect.origin.x, rect.origin.y, rect.size.width * width + 40, rect.size.height);
+                                 view.frame = CGRectMake(rect.origin.x, rect.origin.y, paddingWidth + percentageWidth, rect.size.height);
                                  
                                  UIView *l = [view subviews][0];
                                  CGRect lrect = l.frame;
-                                 l.frame = CGRectMake(rect.size.width * width - 4, lrect.origin.y
+                                 l.frame = CGRectMake(view.frame.size.width - 44., lrect.origin.y
                                                       , lrect.size.width, lrect.size.height);
                              }];
         }
     }
+    
+    if (nil == selectedHourKey) {
+        for (UIView *v in [self.hourSelectorScroll subviews]) {
+            [v removeFromSuperview];
+        }
+        
+        float hourSelectWidth = 44.;
+        float hourSelectHeight = 38.;
+
+        NSArray *hoursEnabledSorted = [[hoursEnabled allKeys] sortedArrayUsingComparator:^(id obj1, id obj2) {
+            NSInteger i1 = [obj1 integerValue];
+            NSInteger i2 = [obj2 integerValue];
+            
+            if (i1 > i2) {
+                return (NSComparisonResult)NSOrderedDescending;
+            }
+            
+            if (i1 < i2) {
+                return (NSComparisonResult)NSOrderedAscending;
+            }
+            
+            return (NSComparisonResult)NSOrderedSame;
+
+        }];
+        
+        int idx = 0;
+        for (NSString *hour in hoursEnabledSorted) {
+
+            UIView *hourSelect = [[UIView alloc] initWithFrame:CGRectMake(0, hourSelectHeight*idx, hourSelectWidth,   hourSelectHeight)];
+            hourSelect.tag = [hour intValue];
+            UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, hourSelectWidth, hourSelectHeight)];
+            label.text = [NSString stringWithFormat:@"%@", hour];
+            label.textAlignment = NSTextAlignmentCenter;
+            //        label.textColor = [UIColor blueColor];
+            [hourSelect addSubview:label];
+            
+            [self.hourSelectorScroll addSubview:hourSelect];
+            hourSelect.alpha =0.;
+            
+            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapOnHourSelector:)];
+            [hourSelect addGestureRecognizer:tap];
+            idx++;
+        }
+        
+        [self.hourSelectorScroll setContentSize:CGSizeMake(hourSelectWidth, hourSelectHeight*idx)];
+        
+        idx = 1;
+        for (UIView *view in [self.hourSelectorScroll subviews]) {
+            [UIView animateWithDuration:.9 + (idx / 10.)
+                             animations:^{
+                                 view.alpha = 1.;
+                             }];
+            idx++;
+        }
+    }
+    
 }
 
 - (void) drawStats:(NSArray*)stats fitHeight:(BOOL)fitHeight{

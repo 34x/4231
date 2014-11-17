@@ -53,6 +53,9 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    [self.navigationController.interactivePopGestureRecognizer setEnabled:NO];
+//    NSLog(@"%@", [self.navigationController.view gestureRecognizers]);
+
     NCSettings *settings = [[NCSettings alloc] init];
     self.cols = settings.cols;
     self.rows = settings.rows;

@@ -200,7 +200,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="0jh-zo-QUj">
-                                <rect key="frame" x="256" y="72" width="183" height="29"/>
+                                <rect key="frame" x="16" y="72" width="568" height="29"/>
                                 <segments>
                                     <segment title="Progress"/>
                                     <segment title="Performance"/>
@@ -209,17 +209,27 @@
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LB2-FA-xRk">
                                 <rect key="frame" x="180" y="114" width="240" height="250"/>
                             </scrollView>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="McF-jS-xgJ">
+                                <rect key="frame" x="453" y="114" width="131" height="250"/>
+                            </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="LB2-FA-xRk" secondAttribute="trailing" id="N0X-8z-Pl3"/>
+                            <constraint firstItem="McF-jS-xgJ" firstAttribute="leading" secondItem="LB2-FA-xRk" secondAttribute="trailing" id="470-QB-svv"/>
+                            <constraint firstItem="0jh-zo-QUj" firstAttribute="leading" secondItem="4ge-P5-JTL" secondAttribute="leading" constant="20" id="B8r-lp-q9j"/>
+                            <constraint firstAttribute="trailing" secondItem="LB2-FA-xRk" secondAttribute="trailing" constant="44" id="N0X-8z-Pl3"/>
                             <constraint firstItem="LB2-FA-xRk" firstAttribute="leading" secondItem="4ge-P5-JTL" secondAttribute="leading" id="Pgp-Be-d5G"/>
+                            <constraint firstAttribute="trailing" secondItem="McF-jS-xgJ" secondAttribute="trailing" id="U7X-du-3ff"/>
+                            <constraint firstItem="McF-jS-xgJ" firstAttribute="top" secondItem="0jh-zo-QUj" secondAttribute="bottom" constant="8" id="YPu-XV-y4n"/>
                             <constraint firstAttribute="centerX" secondItem="0jh-zo-QUj" secondAttribute="centerX" id="eeB-tD-XPg"/>
                             <constraint firstItem="mKF-xR-WZP" firstAttribute="top" secondItem="LB2-FA-xRk" secondAttribute="bottom" id="gh3-Yx-dPS"/>
+                            <constraint firstItem="mKF-xR-WZP" firstAttribute="top" secondItem="McF-jS-xgJ" secondAttribute="bottom" id="o3K-yT-JK6"/>
+                            <constraint firstAttribute="trailing" secondItem="0jh-zo-QUj" secondAttribute="trailing" constant="20" id="pOP-y9-ixP"/>
                             <constraint firstItem="LB2-FA-xRk" firstAttribute="top" secondItem="0jh-zo-QUj" secondAttribute="bottom" constant="8" id="ruB-bY-d9U"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="hourSelectorScroll" destination="McF-jS-xgJ" id="FEw-hh-nAR"/>
                         <outlet property="scrollView" destination="LB2-FA-xRk" id="ueH-Rg-yvT"/>
                         <outlet property="statsSelector" destination="0jh-zo-QUj" id="eDk-nV-bIC"/>
                     </connections>
