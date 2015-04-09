@@ -28,6 +28,30 @@
     
 //    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"bg2.jpg"]];
     
+    [self setupLocalNotifications];
+}
+
+- (void)setupLocalNotifications {
+    [[UIApplication sharedApplication] cancelAllLocalNotifications];
+    
+    UILocalNotification *localNotification = [[UILocalNotification alloc] init];
+    
+    // current time plus 10 secs
+    NSDate *now = [NSDate date];
+    NSDate *dateToFire = [now dateByAddingTimeInterval:12];
+    
+    NSLog(@"now time: %@", now);
+    NSLog(@"fire time: %@", dateToFire);
+    
+    localNotification.fireDate = dateToFire;
+    localNotification.alertBody = @"Time to get up!";
+    localNotification.soundName = UILocalNotificationDefaultSoundName;
+    localNotification.applicationIconBadgeNumber = 1; // increment
+    
+    NSDictionary *infoDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Object 1", @"Key 1", @"Object 2", @"Key 2", nil];
+    localNotification.userInfo = infoDict;
+    
+//    [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
 }
 
 - (void) numbersCountClick:(id)sender {

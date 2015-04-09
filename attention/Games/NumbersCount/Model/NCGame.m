@@ -8,7 +8,6 @@
 
 #import "NCGame.h"
 #import "NCCell.h"
-
 @interface NCGame()
 @property (readwrite, nonatomic) NSUInteger total;
 @property (strong, nonatomic) NSMutableArray *items;
@@ -20,40 +19,27 @@
 @property (nonatomic, readwrite) NSUInteger fontsCount;
 @property (nonatomic, readwrite) BOOL isDone;
 @property (nonatomic, readwrite) BOOL isComplete;
+@property (nonatomic, readwrite) BOOL isStarted;
+@property (nonatomic, readwrite) NSUInteger clicked;
+@property (nonatomic, readwrite) NSMutableArray *randomizedSequence;
 @end
 
 @implementation NCGame
+
 - (instancetype) initWithTotal:(NSUInteger)total
 {
     self = [super init];
     
     if (self) {
         self.total = total;
+        self.timeLimit = 30;
+        self.difficultyLevel = 0;
+        self.sequenceLevel = 0;
+        self.clicked = 0;
+        
+        self.isStarted = NO;
         self.isDone = NO;
         self.isComplete = NO;
-        
-        // filling up
-        for (NSUInteger i = 1; i <= total; i++) {
-            NCCell *cell = [[NCCell alloc] init];
-            cell.value = i;
-//            cell.color = arc4random() % self.colorsCount;
-//            cell.fontSize = arc4random() % self.fontsCount;
-            
-            [self.items addObject:cell];
-        }
-        
-        
-        //randomizing
-        for (int i = 0; i < [self.items count]; i++) {
-            NCCell *cell = [self.items objectAtIndex:i];
-            int newIndex = arc4random() % [self.items count];
-
-            if (newIndex != i) {
-                self.items[i] = self.items[newIndex];
-                self.items[newIndex] = cell;
-            }
-        }
-
     }
 
     return self;
@@ -65,13 +51,14 @@
     return _items;
 }
 
-- (BOOL)select:(NSUInteger)index
+- (BOOL)select:(NSUInteger)index value:(NSString*)value
 {
     NCCell *cell = self.items[index];
-    
-    if (self.currentNumber + 1 == cell.value) {
+
+    if (self.currentNumber == index || [cell.text isEqualToString:value]) {
         self.currentNumber++;
         self.currentIndex++;
+        self.clicked++;
         
         if (self.currentIndex >= [self.items count]) {
             self.isComplete = YES;
@@ -87,14 +74,202 @@
 - (void)timerTick
 {
     self.duration++;
+    if (self.duration >= self.timeLimit) {
+        [self finish];
+    }
+}
+
++ (NSArray*)getSymbols:(NSString*)key {
+    //    @[@"А", @"Б", @"В", @"Г", @"Д", @"Е", @"Ж", @"З", @"И", @"К", @"Л", @"М", @"Н", @"О", @"П", @"Р", @"С", @"Т", @"У", @"Ф", @"Х", @"Ц", @"Ч", @"Ш", @"Щ", @"Ъ", @"Ы", @"Ь", @"Э", @"Ю", @"Я"];
     
-//    NSLog(@"tick %lu", (unsigned long)self.duration);
+    NSMutableArray *numbersFrom1 = [[NSMutableArray alloc] init];
+    for (NSUInteger i = 1; i < 100; i++) {
+        [numbersFrom1 addObject:[NSString stringWithFormat:@"%lu", (unsigned long)i]];
+    }
+    NSDictionary *symbols = @{
+                              @"numbersFrom1" : numbersFrom1,
+                              @"numbers" : @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"],
+                              @"numbersLetters" : @[
+                                                    @"A", @"B", @"C", @"D", @"E", @"F", @"G", @"H", @"I", @"J", @"K", @"L", @"M", @"N",
+                                                    @"O", @"P", @"Q", @"R", @"S", @"T", @"U", @"V", @"W", @"X", @"Y", @"Z",
+                                                    @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9",
+                                                    @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9",
+                                                    ],
+                              
+                              @"letters" : @[@"A", @"B", @"C", @"D", @"E", @"F", @"G", @"H", @"I",
+                                             @"J", @"K", @"L", @"M", @"N", @"O", @"P", @"Q", @"R", @"S", @"T", @"U", @"V", @"W",
+                                             @"X", @"Y", @"Z"],
+                              @"emoji" : @[@"🌳", @"🎄", @"🎼", @"🎭", @"🏁", @"🍄", @"🍀", @"🌍", @"🌚", @"🍍", @"🍒", @"🍴", @"🎃", @"🚲", @"🚧", @"🚀", @"📖", @"👣", @"👻", @"👽", @"🌴", @"🐲", @"🐬", @"☔️", @"🎸", @"⚽️", @"😱", @"🌻", @"⛅️", @"❄️", @"🍉", @"🎁", @"🎯", @"🚜", @"🏠", @"📱", @"⌚️", @"🎥", @"💾", @"💿", @"📡", @"💰", @"🔑"],
+                              @"katakana" : @[@"ア",@"イ",@"ウ",@"エ",@"オ",@"カ",@"キ",@"ク",@"ケ",@"コ",@"サ",@"シ",@"ス",@"セ",@"ソ"]
+                              };
+
+    return symbols[key];
+}
+
++ (NSArray*)getSequencesParams {
+
+    NSArray *sequencesSettings = @[
+                     @{
+                         @"symbols" : @"numbersFrom1",
+                         @"label" : @"Numbers"
+                         },
+                     @{
+                         @"symbols" : @"letters",
+                         @"label" : @"Letters"
+                         },
+                     @{
+                         @"symbols" : @"emoji",
+                         @"label" : @"Random Emoji",
+                         @"generator" : @"getRandomizedSequence:"
+                         },
+                     @{
+                         @"symbols" : @"numbers",
+                         @"label"   : @"Random numbers",
+                         @"generator" : @"getRandomizedSequence:"
+                         },
+                     @{
+                         @"symbols" : @"numbersLetters",
+                         @"label"   : @"Random numbers & letters",
+                         @"generator" : @"getRandomizedSequence:"
+                         },
+                     @{
+                         @"symbols" : @"katakana",
+                         @"label" : @"Katakana (don't be scared)"
+                         },
+                     @{
+                         @"symbols" : @"katakana",
+                         @"label"   : @"Random Katakana %)",
+                         @"generator" : @"getRandomizedSequence:"
+                         },
+                     ];
+    
+    return sequencesSettings;
+}
+
+- (NSMutableArray*)getSequence:(NSUInteger)sequenceLevel difficultyLevel:(NSUInteger)difficultyLevel {
+    NSMutableArray *sequence;
+
+    NSArray *sequencesSettings = [NCGame getSequencesParams];
+    
+    if (sequenceLevel > [sequencesSettings count]) {
+        sequenceLevel = 0;
+    }
+    
+    NSDictionary *settings = [sequencesSettings objectAtIndex:sequenceLevel];
+    NSArray *symbols = [NCGame getSymbols:[settings objectForKey:@"symbols"]];
+    
+    if (nil == [settings objectForKey:@"generator"]) {
+        sequence = [NCGame createLimitSequence:self.total symbols:symbols];
+    } else {
+        SEL selector = NSSelectorFromString([settings objectForKey:@"generator"]);
+        sequence = [self performSelector:selector withObject:symbols];
+        sequence = [NCGame createLimitSequence:self.total symbols:sequence];
+    }
+    
+    return sequence;
+}
+
++ (NSMutableArray*)createLimitSequence:(NSUInteger)total symbols:(NSArray*)symbols {
+    NSMutableArray *sequence = [[NSMutableArray alloc] init];
+    
+    NSString *val;
+    NSUInteger symbolsCount = [symbols count];
+
+    for (NSUInteger i = 0; i < total; i++) {
+
+        if (i < symbolsCount) {
+            val = [NSString stringWithFormat:@"%@", [symbols objectAtIndex:i]];
+        } else if (i < symbolsCount * 2){
+            val = [NSString stringWithFormat:@"%@%@",
+                   [symbols objectAtIndex:0],
+                   [symbols objectAtIndex:i - symbolsCount]
+                   ];
+        } else {
+            break;
+        }
+
+        [sequence addObject:[NSString stringWithFormat:@"%@", val]];
+    }
+
+    return sequence;
+}
+
+- (void)generateItems:(BOOL)reverse {
+    [self.sequence enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop){
+        NCCell *cell = [[NCCell alloc] init];
+        
+        cell.value = idx;
+        cell.text = obj;
+        [self.items addObject:cell];
+    }];
+}
+
++ (NSMutableArray*)randomizeArray:(NSMutableArray*)itemsOriginal {
+    NSMutableArray *items = itemsOriginal.mutableCopy;
+    
+    for (int i = 0; i < [items count]; i++) {
+        NCCell *cell = [items objectAtIndex:i];
+        int newIndex = arc4random() % [items count];
+        
+        if (newIndex != i) {
+            items[i] = items[newIndex];
+            items[newIndex] = cell;
+        }
+    }
+    
+    return items;
+}
+
+
++ (NSMutableArray*)randomize:(NSMutableArray*)itemsOriginal {
+    NSMutableArray *items = itemsOriginal.mutableCopy;
+    
+    for (int i = 0; i < [items count]; i++) {
+        NCCell *cell = [items objectAtIndex:i];
+        int newIndex = arc4random() % [items count];
+        
+        if (newIndex != i) {
+            items[i] = items[newIndex];
+            items[newIndex] = cell;
+        }
+    }
+    
+    return items;
+}
+
+- (NSArray*)getRandomizedSequence:(NSArray*)sequenceOriginal {
+    NSMutableArray *items = sequenceOriginal.mutableCopy;
+    
+    for (int i = 0; i < [items count]; i++) {
+        NCCell *cell = [items objectAtIndex:i];
+        int newIndex = arc4random() % [items count];
+        
+        if (newIndex != i) {
+            items[i] = items[newIndex];
+            items[newIndex] = cell;
+        }
+    }
+    
+    return items;
+}
+
+- (NSArray*)getItems {
+
+    // filling up
+    self.sequence = [self getSequence:self.sequenceLevel difficultyLevel:self.difficultyLevel];
+
+    [self generateItems:NO];
+    
+    //randomizing
+    self.items = [NCGame randomize:self.items];
+    
+    return self.items;
 }
 
 - (void) start
 {
+    self.isStarted = YES;
     self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerTick) userInfo:nil repeats:YES];
-    
 }
 - (void) finish
 {
@@ -113,7 +288,6 @@
         NSDate *date = [NSDate date];
         
         NSUserDefaults *def = [[NSUserDefaults alloc] init];
-//        [def removeObjectForKey:@"log"];
         // seems like a hack
         id obj = [def objectForKey:@"log"];
         NSMutableArray *log;
@@ -123,9 +297,11 @@
             log = [obj mutableCopy];
         }
         
-//        NSLog(@"%@", [NSMutableArray class]);
-        
-        [log addObject:@[date, [NSNumber numberWithUnsignedInteger:self.total], [NSNumber numberWithUnsignedInteger:self.duration]]];
+        [log addObject:@[date,
+                         [NSNumber numberWithUnsignedInteger:self.total],
+                         [NSNumber numberWithUnsignedInteger:self.duration],
+                ]
+         ];
         
         [def setObject:log forKey:@"log"];
         [def synchronize];
@@ -136,7 +312,7 @@
 }
 
 - (float)getSpeed {
-    return (float)self.total / (float)self.duration;
+    return (float)self.clicked / (float)self.duration;
 }
 
 + (NSMutableArray*)log {
@@ -167,9 +343,13 @@
             float speed = (float)total / (float)time;
             NSDate *date = item[0];
             
-            NSString *totalKey = [NSString stringWithFormat:@"%d", total];
+//            NSString *totalKey = [NSString stringWithFormat:@"%d", total];
+            NSString *totalKey = @"42";
             NSString *dayKey = [formatter stringFromDate:date];
             NSString *hourKey = [hourFormatter stringFromDate:date];
+            
+            // calculate all, not split by totals
+            speed = speed * total;
             
             /*
              dayLog [
@@ -237,12 +417,15 @@
             
         }
     }
-    NSLog(@"%@", stats[@"4"]);
+
     return stats;
 }
 
 + (NSMutableDictionary*)statsForDay {
     
+    // TODO: не делить на totalsб среднее считать из всех записей за час, только данное количество есть в каждом часу
+    // напрмиер, если в каждом часу считали 15 и 42, а в одном или в нескольких, но не во всех, 24, то среднее берется только
+    // из 15 и 42,  24 исключается
     NSMutableDictionary *stats = [[NSMutableDictionary alloc] init];
     NSMutableArray *log = [self log];
     
@@ -255,6 +438,9 @@
             int total = [item[1] intValue];
             int time  = [item[2] intValue];
             float speed = (float)total / (float)time;
+            
+            speed = speed * total;
+
             NSDate *date = item[0];
             
             //            NSLog(@"%d", total);
@@ -263,7 +449,7 @@
             NSString *dayKey;
             if (nil == dayLog) {
                 dayLog = [[NSMutableDictionary alloc] init];
-                dayKey = [NSString stringWithFormat:@"%d", total];
+                dayKey = [NSString stringWithFormat:@"%d", 42];
                 stats[dayKey] = dayLog;
             }
             

@@ -13,9 +13,10 @@
 		503AAD4F1A027F5B00602F0D /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AAD471A027F5B00602F0D /* SettingsViewController.m */; };
 		503AAD501A027F5B00602F0D /* NCStatsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AAD491A027F5B00602F0D /* NCStatsViewController.m */; };
 		503AAD511A027F5B00602F0D /* NCGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AAD4B1A027F5B00602F0D /* NCGameViewController.m */; };
-		503AAD561A04E7B300602F0D /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 503AAD551A04E7B300602F0D /* icon.png */; };
+		503AAD561A04E7B300602F0D /* AppIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 503AAD551A04E7B300602F0D /* AppIcon.png */; };
 		504F859119FC131700DAC9FF /* MainMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 504F859019FC131700DAC9FF /* MainMenuViewController.m */; };
 		50724A3819F277AC00590BC0 /* Universal.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 50724A3719F277AC00590BC0 /* Universal.storyboard */; };
+		507EBF8D1AD14B5C00AC8E5C /* AppIcon29.png in Resources */ = {isa = PBXBuildFile; fileRef = 507EBF8C1AD14B5C00AC8E5C /* AppIcon29.png */; };
 		50B0CF3919CDFB0200CCB9AB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 50B0CF3819CDFB0200CCB9AB /* main.m */; };
 		50B0CF3C19CDFB0200CCB9AB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 50B0CF3B19CDFB0200CCB9AB /* AppDelegate.m */; };
 		50B0CF3F19CDFB0200CCB9AB /* attention.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 50B0CF3D19CDFB0200CCB9AB /* attention.xcdatamodeld */; };
@@ -47,10 +48,11 @@
 		503AAD491A027F5B00602F0D /* NCStatsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NCStatsViewController.m; sourceTree = "<group>"; };
 		503AAD4A1A027F5B00602F0D /* NCGameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NCGameViewController.h; sourceTree = "<group>"; };
 		503AAD4B1A027F5B00602F0D /* NCGameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NCGameViewController.m; sourceTree = "<group>"; };
-		503AAD551A04E7B300602F0D /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = Images/icon.png; sourceTree = "<group>"; };
+		503AAD551A04E7B300602F0D /* AppIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon.png; path = Images/AppIcon.png; sourceTree = "<group>"; };
 		504F858F19FC131700DAC9FF /* MainMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainMenuViewController.h; sourceTree = "<group>"; };
 		504F859019FC131700DAC9FF /* MainMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainMenuViewController.m; sourceTree = "<group>"; };
 		50724A3719F277AC00590BC0 /* Universal.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Universal.storyboard; sourceTree = "<group>"; };
+		507EBF8C1AD14B5C00AC8E5C /* AppIcon29.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon29.png; path = Images/AppIcon29.png; sourceTree = "<group>"; };
 		50B0CF3319CDFB0200CCB9AB /* attention.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = attention.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50B0CF3719CDFB0200CCB9AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B0CF3819CDFB0200CCB9AB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -120,7 +122,8 @@
 		503AAD541A04E74300602F0D /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				503AAD551A04E7B300602F0D /* icon.png */,
+				507EBF8C1AD14B5C00AC8E5C /* AppIcon29.png */,
+				503AAD551A04E7B300602F0D /* AppIcon.png */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -279,8 +282,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				503AAD561A04E7B300602F0D /* icon.png in Resources */,
+				503AAD561A04E7B300602F0D /* AppIcon.png in Resources */,
 				50724A3819F277AC00590BC0 /* Universal.storyboard in Resources */,
+				507EBF8D1AD14B5C00AC8E5C /* AppIcon29.png in Resources */,
 				50B0CF4A19CDFB0200CCB9AB /* LaunchScreen.xib in Resources */,
 				50B0CF4719CDFB0200CCB9AB /* Images.xcassets in Resources */,
 			);
@@ -360,6 +364,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=*]" = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;

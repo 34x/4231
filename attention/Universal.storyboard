@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="14A388b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="2sX-hZ-jje">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="14D127a" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="2sX-hZ-jje">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
     </dependencies>
     <scenes>
         <!--4231 Game-->
@@ -54,13 +54,16 @@
                             <view contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Is-LX-XJd">
                                 <rect key="frame" x="130" y="243" width="180" height="113"/>
                                 <subviews>
-                                    <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Iz6-ba-grF">
+                                    <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Iz6-ba-grF">
                                         <rect key="frame" x="58" y="42" width="64" height="30"/>
                                         <state key="normal" title="Statistics">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                     </button>
                                 </subviews>
+                                <constraints>
+                                    <constraint firstItem="Iz6-ba-grF" firstAttribute="leading" secondItem="6Is-LX-XJd" secondAttribute="leading" constant="58" id="Lcy-qh-Qeb"/>
+                                </constraints>
                             </view>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -225,7 +228,7 @@
                             <constraint firstItem="mKF-xR-WZP" firstAttribute="top" secondItem="LB2-FA-xRk" secondAttribute="bottom" id="gh3-Yx-dPS"/>
                             <constraint firstItem="mKF-xR-WZP" firstAttribute="top" secondItem="McF-jS-xgJ" secondAttribute="bottom" id="o3K-yT-JK6"/>
                             <constraint firstAttribute="trailing" secondItem="0jh-zo-QUj" secondAttribute="trailing" constant="20" id="pOP-y9-ixP"/>
-                            <constraint firstItem="LB2-FA-xRk" firstAttribute="top" secondItem="0jh-zo-QUj" secondAttribute="bottom" constant="8" id="ruB-bY-d9U"/>
+                            <constraint firstItem="LB2-FA-xRk" firstAttribute="top" secondItem="0jh-zo-QUj" secondAttribute="bottom" constant="14" id="ruB-bY-d9U"/>
                         </constraints>
                     </view>
                     <connections>
@@ -259,6 +262,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="Xyo-nP-3EO"/>
+        <segue reference="gIk-5p-cXS"/>
     </inferredMetricsTieBreakers>
 </document>

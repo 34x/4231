@@ -11,41 +11,69 @@
 #import "NCGameViewController.h"
 
 @interface AppDelegate ()
-
+- (void)showAlarm:(NSString *)text;
 @end
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+//    UIUserNotificationSettings *ns = [UIUserNotificationSettings ]
+//    [application registerUserNotificationSettings:UIUserNotificationTypeAlert];
+//    UILocalNotification *notification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
+//    
+//    if (notification) {
+//        [self showAlarm:notification.alertBody];
+//        NSLog(@"AppDelegate didFinishLaunchingWithOptions");
+//        application.applicationIconBadgeNumber = 0;
+//    }
+//    
+//    [self.window makeKeyAndVisible];
+    
     return YES;
+}
+
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
+//    [self showAlarm:notification.alertBody];
+//    application.applicationIconBadgeNumber = 0;
+//    NSLog(@"AppDelegate didReceiveLocalNotification %@", notification.userInfo);
+}
+
+- (void)showAlarm:(NSString *)text {
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Alarm"
+                                                        message:text delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+    [alertView show];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-    NSLog(@"bg");
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        NSLog(@"Will resign active");
     NSArray *controllers = self.window.rootViewController.childViewControllers;
     for (id controller in controllers) {
         if ([controller isKindOfClass:[NCGameViewController class]]) {
             NCGameViewController *c = controller;
-            [c.game finish];
+            [c endGame:NO];
         }
     }
+
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    NSLog(@"Go to background");
+    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
+    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-        NSLog(@"fg");
+    NSLog(@"Go to foreground (open)");
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-        NSLog(@"active");
+    NSLog(@"Became active");
     
     NSArray *controllers = self.window.rootViewController.childViewControllers;
     for (id controller in controllers) {

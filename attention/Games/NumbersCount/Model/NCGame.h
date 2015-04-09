@@ -17,14 +17,27 @@
 @property (readonly, nonatomic) NSUInteger currentNumber;
 @property (readonly, nonatomic) NSUInteger colorsCount;
 @property (readonly, nonatomic) BOOL isComplete;
+@property (readonly, nonatomic) BOOL isDone;
+@property (readonly, nonatomic) BOOL isStarted;
+@property (readwrite, nonatomic) NSUInteger timeLimit;
+@property (nonatomic, readwrite) NSUInteger difficultyLevel;
+@property (nonatomic, readwrite) NSUInteger sequenceLevel;
+@property (nonatomic, readwrite) NSMutableArray *sequence;
+
 
 - (instancetype) initWithTotal:(NSUInteger)total;
-- (BOOL)select:(NSUInteger)index;
+- (BOOL)select:(NSUInteger)index value:(NSString*)value;
 - (void)start;
 - (void)finish;
 - (float)getSpeed;
 + (NSMutableArray*)log;
 + (NSMutableDictionary*)stats;
 + (NSMutableDictionary*)statsForDay;
++ (NSMutableArray*)createLimitSequence:(NSUInteger)total symbols:(NSArray*)symbols;
++ (NSMutableArray*)randomize:(NSMutableArray*)itemsOriginal;
++ (NSArray*)getSequencesParams;
++ (NSArray*)getSymbols:(NSString*)key;
+- (NSArray*)getRandomizedSequence:(NSArray*)sequenceOriginal;
+- (NSArray*)getItems;
 
 @end

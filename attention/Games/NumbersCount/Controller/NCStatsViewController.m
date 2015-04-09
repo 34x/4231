@@ -123,14 +123,15 @@
             return (NSComparisonResult)NSOrderedSame;
         }];
         
+        
+        
         UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(4, row*rowHeight, self.scrollView.frame.size.width, rowHeight)];
         l.text = total;
         l.textAlignment = NSTextAlignmentCenter;
-        [self.scrollView addSubview:l];
-        row++;
+//        [self.scrollView addSubview:l];
+//        row++;
 
         for (NSString *hour in sorted) {
-            
             float speed = [days[hour] floatValue];
             float percent = speed / max;
             
@@ -197,7 +198,7 @@
     }
     
     [self clearStats];
-    float rowHeight = 24;
+    float rowHeight = 24.;
     NSString *font = @"Helvetica";
     float smallFont = 12.;
     int row = 0;
@@ -218,7 +219,8 @@
     }];
     
     for (NSString *total in totals) {
-        bool totalTitleDrawed = NO;
+        // because we show totals not splitted, remove header
+        bool totalTitleDrawed = YES;
         
         NSDictionary *days = stats[total];
         
@@ -338,7 +340,7 @@
                              }];
         }
     }
-    
+
     if (nil == selectedHourKey) {
         for (UIView *v in [self.hourSelectorScroll subviews]) {
             [v removeFromSuperview];

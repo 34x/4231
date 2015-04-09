@@ -10,6 +10,7 @@
 
 @interface NCCell : NSObject
 @property (nonatomic) NSUInteger value;
+@property (nonatomic) NSString *text;
 @property (nonatomic) NSUInteger fontSize;
 @property (nonatomic) NSUInteger color;
 @end

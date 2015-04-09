@@ -13,6 +13,7 @@
 @property (weak, nonatomic) IBOutlet UIPickerView *colsPicker;
 @property (weak, nonatomic) IBOutlet UILabel *sizeLabel;
 @property (nonatomic) NSArray *numbers;
+@property (nonatomic) NSMutableArray *labels;
 @property (nonatomic) NCSettings *settings;
 
 @end
@@ -25,9 +26,16 @@
     
     
     self.numbers = @[
-        @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"10", @"11"
+        @[@2, @2], @[@2, @3], @[@2, @4], @[@3, @3], @[@3, @4], @[@3, @5], @[@4, @4], @[@4, @5], @[@5, @5], @[@6, @7]
     ];
+    self.labels = [[NSMutableArray alloc] init];
+    for (NSUInteger i = 0; i < [self.numbers count]; i++) {
+        NSArray *cr = [self.numbers objectAtIndex:i];
+        [self.labels addObject:[NSString stringWithFormat:@"%@x%@", [cr objectAtIndex:0], [cr objectAtIndex:1]]];
+
+    }
     
+    NSLog(@"%@", self.labels);
     self.colsPicker.delegate = self;
     
     self.colsPicker.tag = 0;
@@ -40,15 +48,15 @@
     
     self.settings = [[NCSettings alloc] init];
     
-    NSInteger colsIndex = [self.numbers indexOfObject:[NSString stringWithFormat:@"%d", self.settings.cols]];
+//    NSInteger colsIndex = [self.numbers indexOfObject:[NSString stringWithFormat:@"%d", self.settings.cols]];
     
-    if (colsIndex > [self.numbers count]) {
-        colsIndex = 0;
-    }
+//    if (colsIndex > [self.numbers count]) {
+//        colsIndex = 0;
+//    }
     
-    [self.sizeLabel setText:[NSString stringWithFormat:@"Grid size: %@ x %d", [self.numbers objectAtIndex:colsIndex], self.settings.rows]];
+//    [self.sizeLabel setText:[NSString stringWithFormat:@"Grid size: %@", [self.numbers objectAtIndex:colsIndex]]];
     
-    [self.colsPicker selectRow:colsIndex inComponent:0 animated:YES];
+//    [self.colsPicker selectRow:colsIndex inComponent:0 animated:YES];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -59,7 +67,7 @@
 - (NSInteger)pickerView:(UIPickerView *)pickerView
 numberOfRowsInComponent:(NSInteger)component
 {
-    return [self.numbers count];
+    return [self.labels count];
 }
 // returns the number of 'columns' to display.
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
@@ -72,7 +80,7 @@ numberOfRowsInComponent:(NSInteger)component
              titleForRow:(NSInteger)row
             forComponent:(NSInteger)component
 {
-    return [self.numbers objectAtIndex:row];
+    return [self.labels objectAtIndex:row];
 }
 
 - (void) pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
@@ -82,13 +90,10 @@ numberOfRowsInComponent:(NSInteger)component
 //        self.settings.rows = [[self.numbers objectAtIndex:row] intValue];
 //    }
     
-    int cols = [[self.numbers objectAtIndex:row] intValue];
-    int rows;
-    if (6 == cols) {
-        rows = 7;
-    } else {
-        rows = cols + 2;
-    }
+    NSArray *colsRows = [self.numbers objectAtIndex:row];
+    int cols = [[colsRows objectAtIndex:0] intValue];
+    int rows = [[colsRows objectAtIndex:1] intValue];
+    
     [self.sizeLabel setText:[NSString stringWithFormat:@"Grid size: %d x %d", cols, rows]];
     
     self.settings.rows = rows;
