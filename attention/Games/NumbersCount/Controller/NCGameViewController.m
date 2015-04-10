@@ -62,7 +62,7 @@
     self.gameTimeLimit = 30;
     self.difficultyLevel = 0;
     self.sequenceLevel = 0;
-    self.nextLevelLimit = 20.;
+    self.nextLevelLimit = 50.;
     [super viewWillAppear:animated];
 //    [[self navigationController] setNavigationBarHidden:YES animated:NO];
     
@@ -121,12 +121,6 @@
         if (self.game.isComplete) {
             [self endGame:YES];
         }
-        sender.alpha = 0.01;
-        [UIView animateWithDuration:1.
-                         animations:^{
-                             // do first animation
-                             sender.alpha = 1.0;
-                         }];
         
         if (3 == self.difficultyLevel) {
             self.cellItems = [NCGame randomize:self.cellItems];
@@ -139,6 +133,24 @@
         // vibrate only if support
         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
     }
+    
+    UIView *cellView = [sender superview];
+    UIView *bgv = [[cellView subviews] objectAtIndex:0];
+
+    if (result) {
+        cellView.alpha = 0;
+//        bgv.alpha = 1;
+    } else {
+//        bgv.alpha = 0.1;
+    }
+    [UIView animateWithDuration:.8
+                     animations:^{
+                         // do first animation
+//                         sender.backgroundColor = nil;
+//                         bgv.alpha = 0.6;
+                         cellView.alpha = 1;
+                     }];
+
 
 }
 
@@ -150,7 +162,7 @@
 //        [self.headerCenterLabel setText:[NSString stringWithFormat:@"%lu", self.game.currentNumber]];
 //    }
     
-    NSUInteger left = self.game.timeLimit - self.game.duration;
+    NSUInteger left = self.game.timeLimit - [[self.game getDuration] floatValue];
     [self.headerCenterLabel setText:[NSString stringWithFormat:@"%lu", left]];
     
     float diff = [self percentWithPrevious];
@@ -167,16 +179,16 @@
     if (!self.game) {
         return;
     }
-    if (self.game.isDone) {
+    if ([self.game getIsDone]) {
         [self endGame:YES];
     }
     [self updateHeaderLabel];
 }
 
 - (NSString*)durationString {
-    
-    NSUInteger minutes = self.game.duration / 60;
-    NSUInteger seconds = self.game.duration - minutes*60;
+
+    NSUInteger minutes = [[self.game getDuration] intValue] / 60;
+    NSUInteger seconds = [[self.game getDuration] intValue] - minutes*60;
 
     return [NSString stringWithFormat:@"%02lu:%02lu", minutes, seconds];
 }
@@ -200,7 +212,7 @@
     // Do any additional setup after loading the view, typically from a nib.
 
     self.game = [[NCGame alloc] initWithTotal:self.cols*self.rows];
-    self.game.timeLimit = 30;
+    self.game.timeLimit = self.gameTimeLimit;
     self.game.difficultyLevel = self.difficultyLevel;
     self.game.sequenceLevel = self.sequenceLevel;
     
@@ -245,17 +257,37 @@
     float x = 0.0;
     float size = width + width / 10.;
 
-    NSArray *colors = [[NSArray alloc] initWithObjects:
+//    [UIColor colorWithRed:1. green:.49 blue:.16 alpha:1],
+//    [UIColor colorWithRed:1. green:.69 blue:.16 alpha:1],
+//    [UIColor colorWithRed:.984 green:.157 blue:.271 alpha:1],
+//    [UIColor colorWithRed:.141 green:.882 blue:.73 alpha:1],
+//    
+//    [UIColor colorWithRed:.965 green:.624 blue:.40 alpha:1],
+//    [UIColor colorWithRed:.965 green:.757 blue:.40 alpha:1],
+//    [UIColor colorWithRed:.918 green:.38 blue:.455 alpha:1],
+//    [UIColor colorWithRed:.255 green:.616 blue:.545 alpha:1],
+
+//    [UIColor colorWithRed:.714 green:.302 blue:.0 alpha:1],
+//    [UIColor colorWithRed:.0 green:.506 blue:.235 alpha:1],
+//    [UIColor colorWithRed:.714 green:.161 blue:.0 alpha:.8],
+//    [UIColor colorWithRed:.0 green:.443 blue:.396 alpha:1],
+//    
+//    [UIColor colorWithRed:.992 green:.576 blue:.271 alpha:1],
+
+    
+    NSArray *colors = @[
                        [UIColor redColor],
                        [UIColor orangeColor],
                        [UIColor yellowColor],
                        [UIColor greenColor],
-                       [UIColor purpleColor],
                        [UIColor blueColor],
-                       [UIColor magentaColor],
+                       [UIColor purpleColor],
+                       [UIColor brownColor],
                        [UIColor cyanColor],
-                       
-                       nil];
+                       [UIColor magentaColor]
+                    ];
+    
+
     NSArray *darkColors = @[[UIColor blueColor], [UIColor purpleColor]];
     
     
@@ -301,9 +333,19 @@
             x = 0.0;
         }
         
-        UIButton *v = [[UIButton alloc] initWithFrame:CGRectMake(x, y, width, height)];
+        UIView *cellView = [[UIView alloc] initWithFrame:CGRectMake(x, y, width, height)];
+        
+        UIButton *v = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, width, height)];
+
+        UIView *vbg = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
+
+        [vbg setBackgroundColor:[UIColor whiteColor]];
+
+        [cellView addSubview:vbg];
+        [cellView addSubview:v];
+        
         UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(0, 2, width, height)];
-        [v setBackgroundColor:[UIColor whiteColor]];
+        
         [l setTextAlignment:NSTextAlignmentCenter];
         [l setText: cell.text];
         if ([cell.text length] > 1) {
@@ -319,18 +361,20 @@
             
             for (int r = 0; r < 100; r++) {
                 randomColor = colors[(arc4random() % [colors count])];
-                
-                if (i > 0 && randomColor == ((UIView*)[self.board subviews][i - 1]).backgroundColor) {
+
+                if (i > 0 && randomColor == ((NCCell*)self.cellItems[i - 1]).color) {
                     continue;
                 }
                 
-                if (i >= self.cols && randomColor == ((UIView*)[self.board subviews][i - self.cols]).backgroundColor) {
+                if (i >= self.cols && randomColor == ((NCCell*)self.cellItems[i - self.cols]).color) {
                     continue;
                 }
                 break;
             }
             
-            [v setBackgroundColor:randomColor];
+            cell.color = randomColor;
+            [vbg setBackgroundColor:randomColor];
+            vbg.alpha = 0.6;
             
             if ([darkColors containsObject:v.backgroundColor]) {
                 l.textColor = [UIColor whiteColor];
@@ -363,9 +407,9 @@
         [v addTarget:self action:@selector(onCellTouchDown:) forControlEvents:UIControlEventTouchDown];
         [v addTarget:self action:@selector(onCellTouchUp:) forControlEvents:UIControlEventTouchUpInside];
         
-        v.tag = cell.value;
+        v.tag = i;
         
-        [self.board addSubview:v];
+        [self.board addSubview:cellView];
     }
 }
 
@@ -397,9 +441,8 @@
     if (showResult) {
         
         float diff = [self percentWithPrevious];
-        NSString *buttonText;
         
-        if (diff > self.nextLevelLimit || .0 == diff) {
+        if ([self.game getSpeed] > 0. && (diff > self.nextLevelLimit || .0 == diff)) {
             nextLevel = @"Next level!";
             self.lastResult = [self.game getSpeed];
             if (self.difficultyLevel < 3) {
@@ -410,10 +453,8 @@
                 self.sequenceLevel++;
                 NSLog(@"Next sequence %lu", self.sequenceLevel);
             }
-            buttonText = @"Next!";
         } else {
             nextLevel = @"Try hard for next level!";
-            buttonText = @"Again!";
         }
 
         NSString *nextLevelLimit = @"";
@@ -435,7 +476,7 @@
             self.alertResult = [[UIAlertView alloc] initWithTitle:alertTitle
                                                     message:alertMessage
                                                     delegate:self
-                                                    cancelButtonTitle:buttonText
+                                                    cancelButtonTitle:@"Go!"
                                                     otherButtonTitles:nil];
             self.alertResult.tag = 0;
         } else {
@@ -467,9 +508,8 @@
         
         [self.game start];
         if (!self.timer) {
-            self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerTick) userInfo:nil repeats:YES];
+            self.timer = [NSTimer scheduledTimerWithTimeInterval:.1 target:self selector:@selector(timerTick) userInfo:nil repeats:YES];
         }
-        
     }
     
 }
@@ -480,7 +520,7 @@
     if (!self.alertSequenceSelect) {
         
         self.alertSequenceSelect = [[UIAlertView alloc]
-                                    initWithTitle:@"Wich one?"
+                                    initWithTitle:@"Which one?"
                                     message: @""
                                     delegate:self
                                     cancelButtonTitle:@"?"

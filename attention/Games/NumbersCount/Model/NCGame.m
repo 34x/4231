@@ -14,14 +14,16 @@
 @property (nonatomic, readwrite) NSUInteger currentNumber;
 @property (nonatomic, readwrite) NSUInteger currentIndex;
 @property (strong, nonatomic) NSTimer *timer;
-@property (nonatomic, readwrite) NSUInteger duration;
+@property (nonatomic, readwrite) NSNumber *duration;
 @property (nonatomic, readwrite) NSUInteger colorsCount;
 @property (nonatomic, readwrite) NSUInteger fontsCount;
 @property (nonatomic, readwrite) BOOL isDone;
 @property (nonatomic, readwrite) BOOL isComplete;
 @property (nonatomic, readwrite) BOOL isStarted;
 @property (nonatomic, readwrite) NSUInteger clicked;
+@property (nonatomic, readwrite) NSUInteger clickedWrong;
 @property (nonatomic, readwrite) NSMutableArray *randomizedSequence;
+@property (nonatomic, readwrite) NSDate *startTime;
 @end
 
 @implementation NCGame
@@ -36,10 +38,13 @@
         self.difficultyLevel = 0;
         self.sequenceLevel = 0;
         self.clicked = 0;
+        self.clickedWrong = 0;
+        self.currentIndex = 0;
         
         self.isStarted = NO;
         self.isDone = NO;
         self.isComplete = NO;
+        self.duration = [NSNumber numberWithFloat:.0];
     }
 
     return self;
@@ -53,10 +58,11 @@
 
 - (BOOL)select:(NSUInteger)index value:(NSString*)value
 {
-    NCCell *cell = self.items[index];
-
-    if (self.currentNumber == index || [cell.text isEqualToString:value]) {
-        self.currentNumber++;
+    NCCell *cell = self.items[self.currentIndex];
+    
+    NSString *current = self.sequence[self.currentIndex];
+    
+    if ([current isEqualToString:value]) {
         self.currentIndex++;
         self.clicked++;
         
@@ -67,16 +73,28 @@
 
         return YES;
     } else {
+        self.clickedWrong++;
         return NO;
     }
 }
 
-- (void)timerTick
-{
-    self.duration++;
-    if (self.duration >= self.timeLimit) {
-        [self finish];
+- (NSNumber*)getDuration {
+
+    if (self.isStarted && !self.isDone) {
+        NSDate *currentTime = [NSDate date];
+        NSTimeInterval timeDifference =  [currentTime timeIntervalSinceDate:self.startTime];
+        self.duration = [NSNumber numberWithDouble:timeDifference];
     }
+    
+    return self.duration;
+}
+
+- (BOOL)getIsDone {
+    if ([[self getDuration] floatValue] >= [[NSNumber numberWithInteger:self.timeLimit] floatValue]) {
+        self.isDone = YES;
+    }
+    
+    return self.isDone;
 }
 
 + (NSArray*)getSymbols:(NSString*)key {
@@ -88,7 +106,7 @@
     }
     NSDictionary *symbols = @{
                               @"numbersFrom1" : numbersFrom1,
-                              @"numbers" : @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"],
+                              @"numbers" : @[@"0", @"0",@"0", @"0"],// @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"],
                               @"numbersLetters" : @[
                                                     @"A", @"B", @"C", @"D", @"E", @"F", @"G", @"H", @"I", @"J", @"K", @"L", @"M", @"N",
                                                     @"O", @"P", @"Q", @"R", @"S", @"T", @"U", @"V", @"W", @"X", @"Y", @"Z",
@@ -110,33 +128,40 @@
 
     NSArray *sequencesSettings = @[
                      @{
+                         @"id" : @"numbers",
                          @"symbols" : @"numbersFrom1",
                          @"label" : @"Numbers"
                          },
                      @{
+                         @"id" : @"letters",
                          @"symbols" : @"letters",
                          @"label" : @"Letters"
                          },
                      @{
+                         @"id" : @"emoji",
                          @"symbols" : @"emoji",
                          @"label" : @"Random Emoji",
                          @"generator" : @"getRandomizedSequence:"
                          },
                      @{
+                         @"id" : @"randomNumbers",
                          @"symbols" : @"numbers",
                          @"label"   : @"Random numbers",
                          @"generator" : @"getRandomizedSequence:"
                          },
                      @{
+                         @"id" : @"randomNumbersLetters",
                          @"symbols" : @"numbersLetters",
                          @"label"   : @"Random numbers & letters",
                          @"generator" : @"getRandomizedSequence:"
                          },
                      @{
+                         @"id" : @"katakana",
                          @"symbols" : @"katakana",
                          @"label" : @"Katakana (don't be scared)"
                          },
                      @{
+                         @"id" : @"randomKatakana",
                          @"symbols" : @"katakana",
                          @"label"   : @"Random Katakana %)",
                          @"generator" : @"getRandomizedSequence:"
@@ -146,16 +171,23 @@
     return sequencesSettings;
 }
 
++ (NSDictionary*)getSequenceParams:(NSUInteger)level {
+    NSArray *sequencesSettings = [NCGame getSequencesParams];
+    
+    if (level > [sequencesSettings count]) {
+        level = 0;
+    }
+    
+    NSDictionary *settings = [sequencesSettings objectAtIndex:level];
+    
+    return settings;
+}
+
 - (NSMutableArray*)getSequence:(NSUInteger)sequenceLevel difficultyLevel:(NSUInteger)difficultyLevel {
     NSMutableArray *sequence;
 
-    NSArray *sequencesSettings = [NCGame getSequencesParams];
+    NSDictionary *settings = [NCGame getSequenceParams:sequenceLevel];
     
-    if (sequenceLevel > [sequencesSettings count]) {
-        sequenceLevel = 0;
-    }
-    
-    NSDictionary *settings = [sequencesSettings objectAtIndex:sequenceLevel];
     NSArray *symbols = [NCGame getSymbols:[settings objectForKey:@"symbols"]];
     
     if (nil == [settings objectForKey:@"generator"]) {
@@ -268,8 +300,8 @@
 
 - (void) start
 {
+    self.startTime = [NSDate date];
     self.isStarted = YES;
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerTick) userInfo:nil repeats:YES];
 }
 - (void) finish
 {
@@ -295,13 +327,27 @@
             log = [[NSMutableArray alloc] init];
         } else {
             log = [obj mutableCopy];
+            for (NSUInteger i = 0; i < [log count]; i++) {
+                id obj = [log objectAtIndex:i];
+                if (![obj isKindOfClass:[NSDictionary class]]) {
+                    [log removeObjectAtIndex:i];
+                }
+            }
         }
         
-        [log addObject:@[date,
-                         [NSNumber numberWithUnsignedInteger:self.total],
-                         [NSNumber numberWithUnsignedInteger:self.duration],
-                ]
-         ];
+        NSDictionary *settings = [NCGame getSequenceParams:self.sequenceLevel];
+
+        NSDictionary *entry = @{
+                                @"date" : date,
+                                @"total" : [NSString stringWithFormat:@"%lu", self.total],
+                                @"id" : [settings objectForKey:@"id"],
+                                @"difficulty" : [NSString stringWithFormat:@"%lu", self.difficultyLevel],
+                                @"duration" : self.duration,
+                                @"clicked" : [NSString stringWithFormat:@"%lu", self.clicked],
+                                @"clickedWrong" : [NSString stringWithFormat:@"%lu", self.clickedWrong],
+                             };
+        
+        [log addObject:entry];
         
         [def setObject:log forKey:@"log"];
         [def synchronize];
@@ -312,7 +358,7 @@
 }
 
 - (float)getSpeed {
-    return (float)self.clicked / (float)self.duration;
+    return (float)self.clicked / ([[self getDuration] floatValue]);
 }
 
 + (NSMutableArray*)log {
@@ -324,105 +370,116 @@
     return log;
 }
 
-+ (NSMutableDictionary*)stats {
++ (NSMutableDictionary*)stats:(NSString*)keyFormat {
     NSMutableDictionary *stats = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *days = [[NSMutableDictionary alloc] init];
     NSMutableArray *log = [self log];
-    
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"YYYY.MM.dd"];
 
-    NSDateFormatter *hourFormatter = [[NSDateFormatter alloc] init];
-    [hourFormatter setDateFormat:@"HH"];
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:keyFormat];
     
+    NSNumber *totalMax;
+    NSNumber *totalAvg;
+    NSNumber *totalMin;
+
     for (id obj in log) {
-        if ([obj isKindOfClass:[NSArray class]]) {
-            NSArray *item = obj;
-            
-            int total = [item[1] intValue];
-            int time  = [item[2] intValue];
-            float speed = (float)total / (float)time;
-            NSDate *date = item[0];
-            
-//            NSString *totalKey = [NSString stringWithFormat:@"%d", total];
-            NSString *totalKey = @"42";
-            NSString *dayKey = [formatter stringFromDate:date];
-            NSString *hourKey = [hourFormatter stringFromDate:date];
-            
-            // calculate all, not split by totals
-            speed = speed * total;
-            
-            /*
-             dayLog [
-             //   year  = ...
-             //   month = ...
-             //   day   = ...
-             
-                hours = [
-                    00 = ...
-                    05 = ...
-                    12 = ...
-                ]
+        if (![obj isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        
+        NSDictionary *item = obj;
+        float gameScore;
+        NSDate *date = [item objectForKey:@"date"];
+        // calculate item value
+        float total = [[item objectForKey:@"total"] floatValue];
+        float time  = [[item objectForKey:@"duration"] floatValue];
+        
+        if (!time || time > 1000000) {
+            continue;
+        }
+
+        float speed = total / time;
+
+        gameScore = speed * total;
+        
+        float percent = gameScore / 100.;
+        
+        gameScore = gameScore - percent * [[item objectForKey:@"clickedWrong"] floatValue];
+        gameScore = gameScore + (percent*10.) * [[item objectForKey:@"difficulty"] floatValue];
+
+        NSString *dayKey = [formatter stringFromDate:date];
+        
+        /*
+         
+         dayLog [
+            date = [
                 avg   = ...
                 max   = ...
                 min   = ...
-             ]
-             
-             */
-            
-            NSMutableDictionary *totalLog = [stats objectForKey:totalKey];
-            if (nil == totalLog) {
-                totalLog = [[NSMutableDictionary alloc] init];
-                stats[totalKey] = totalLog;
-            }
+            ],
+            avg = ...
+            max = ...
+            min = ...
+         ]
+         
+         */
+        
+        NSMutableDictionary *dayLog = [days objectForKey:dayKey];
+        if (nil == dayLog) {
+            dayLog = [[NSMutableDictionary alloc] init];
+            days[dayKey] = dayLog;
+        }
 
-            NSMutableDictionary *dayLog = [totalLog objectForKey:dayKey];
-            if (nil == dayLog) {
-                dayLog = [[NSMutableDictionary alloc] initWithDictionary: @{@"hours" : [[NSMutableDictionary alloc] init]}];
-                totalLog[dayKey] = dayLog;
-            }
-            
-            NSNumber *dayAvg = [dayLog objectForKey:@"avg"];
-            NSNumber *dayMax = [dayLog objectForKey:@"max"];
-            NSNumber *dayMin = [dayLog objectForKey:@"min"];
-            
-            if (nil == dayAvg) {
-                dayAvg = [NSNumber numberWithFloat:speed];
-            } else {
-                dayAvg = [NSNumber numberWithFloat:([dayAvg floatValue] + speed) / 2.];
-            }
-            
-            if (nil == dayMax || [dayMax floatValue] < speed) {
-                dayMax = [NSNumber numberWithFloat:speed];
-            }
- 
-            if (nil == dayMin || [dayMin floatValue] > speed) {
-                dayMin = [NSNumber numberWithFloat:speed];
-            }
-            
-            [dayLog setObject:dayAvg forKey:@"avg"];
-            [dayLog setObject:dayMax forKey:@"max"];
-            [dayLog setObject:dayMin forKey:@"min"];
-            
-            NSMutableDictionary *hoursLog = [dayLog objectForKey:@"hours"];
-            
-            NSNumber *hourAvg = [hoursLog objectForKey:hourKey];
-            
-            if (nil == hourAvg) {
-                hourAvg = [NSNumber numberWithFloat:speed];
-            } else {
-                hourAvg = [NSNumber numberWithFloat:([hourAvg floatValue] + speed) / 2.];
-            }
-            
-            hoursLog[hourKey] = hourAvg;
-            
+        
+        NSNumber *dayAvg = [dayLog objectForKey:@"avg"];
+        NSNumber *dayMax = [dayLog objectForKey:@"max"];
+        NSNumber *dayMin = [dayLog objectForKey:@"min"];
+        
+        if (nil == dayAvg) {
+            dayAvg = [NSNumber numberWithFloat:gameScore];
+        } else {
+            dayAvg = [NSNumber numberWithFloat:([dayAvg floatValue] + gameScore) / 2.];
+        }
+        
+        if (nil == dayMax || [dayMax floatValue] < gameScore) {
+            dayMax = [NSNumber numberWithFloat:gameScore];
+        }
+
+        if (nil == dayMin || [dayMin floatValue] > gameScore) {
+            dayMin = [NSNumber numberWithFloat:gameScore];
+        }
+        
+        [dayLog setObject:dayAvg forKey:@"avg"];
+        [dayLog setObject:dayMax forKey:@"max"];
+        [dayLog setObject:dayMin forKey:@"min"];
+
+        if (nil == totalAvg) {
+            totalAvg = [NSNumber numberWithFloat:gameScore];
+        } else {
+            totalAvg = [NSNumber numberWithFloat:([totalAvg floatValue] + gameScore) / 2.];
+        }
+        
+        if (nil == totalMax || [totalMax floatValue] < gameScore) {
+            totalMax = [NSNumber numberWithFloat:gameScore];
+        }
+        
+        if (nil == totalMin || [totalMin floatValue] > gameScore) {
+            totalMin = [NSNumber numberWithFloat:gameScore];
         }
     }
-
+    
+    [stats setObject:totalMax forKey:@"max"];
+    [stats setObject:totalAvg forKey:@"avg"];
+    [stats setObject:totalMin forKey:@"min"];
+    [stats setObject:days forKey:@"days"];
+    
     return stats;
 }
 
 + (NSMutableDictionary*)statsForDay {
+    NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
     
+    return result;
     // TODO: не делить на totalsб среднее считать из всех записей за час, только данное количество есть в каждом часу
     // напрмиер, если в каждом часу считали 15 и 42, а в одном или в нескольких, но не во всех, 24, то среднее берется только
     // из 15 и 42,  24 исключается

@@ -207,6 +207,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 50B0CF5919CDFB0200CCB9AB /* Build configuration list for PBXNativeTarget "attention" */;
 			buildPhases = (
+				5008D4DF1AD887BB00747DE3 /* ShellScript */,
 				50B0CF2F19CDFB0200CCB9AB /* Sources */,
 				50B0CF3019CDFB0200CCB9AB /* Frameworks */,
 				50B0CF3119CDFB0200CCB9AB /* Resources */,
@@ -298,6 +299,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		5008D4DF1AD887BB00747DE3 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "buildNumber=`/bin/date +%Y%m%d%H%M%S`\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		50B0CF2F19CDFB0200CCB9AB /* Sources */ = {

@@ -11,7 +11,7 @@
 @interface NCGame : NSObject
 @property (readonly, nonatomic) NSUInteger cols;
 @property (readonly, nonatomic) NSUInteger rows;
-@property (readonly, nonatomic) NSUInteger duration;
+@property (readonly, nonatomic) NSNumber *duration;
 @property (readonly, nonatomic) NSMutableArray *items;
 @property (readonly, nonatomic) NSUInteger currentIndex;
 @property (readonly, nonatomic) NSUInteger currentNumber;
@@ -19,6 +19,7 @@
 @property (readonly, nonatomic) BOOL isComplete;
 @property (readonly, nonatomic) BOOL isDone;
 @property (readonly, nonatomic) BOOL isStarted;
+@property (nonatomic, readonly) NSUInteger clicked;
 @property (readwrite, nonatomic) NSUInteger timeLimit;
 @property (nonatomic, readwrite) NSUInteger difficultyLevel;
 @property (nonatomic, readwrite) NSUInteger sequenceLevel;
@@ -30,8 +31,10 @@
 - (void)start;
 - (void)finish;
 - (float)getSpeed;
+- (NSNumber*)getDuration;
+- (BOOL)getIsDone;
 + (NSMutableArray*)log;
-+ (NSMutableDictionary*)stats;
++ (NSMutableDictionary*)stats:(NSString*)keyFormat;
 + (NSMutableDictionary*)statsForDay;
 + (NSMutableArray*)createLimitSequence:(NSUInteger)total symbols:(NSArray*)symbols;
 + (NSMutableArray*)randomize:(NSMutableArray*)itemsOriginal;

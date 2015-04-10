@@ -7,10 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface NCCell : NSObject
 @property (nonatomic) NSUInteger value;
 @property (nonatomic) NSString *text;
 @property (nonatomic) NSUInteger fontSize;
-@property (nonatomic) NSUInteger color;
+@property (nonatomic) UIColor* color;
 @end
