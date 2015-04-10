@@ -62,7 +62,7 @@
     }
     
     [self clearStats];
-    float rowHeight = 16.;
+    float rowHeight = 28.;
     NSString *font = @"Helvetica";
     float smallFont = 14.;
 
@@ -105,8 +105,6 @@
             float percentMax = dayMax / max;
             float percentMin = dayMin / max;
             
-            NSLog(@"%f, %f, %f", dayMin, dayAvg, dayMax);
-            
             /*
              * SPEED LABEL DRAW
              */
@@ -140,7 +138,11 @@
             vavg.backgroundColor = [NCStatsViewController getColor:114. green:164. blue:222. alpha:1.];
             
             UILabel *speedLabel = [[UILabel alloc] initWithFrame:CGRectMake(-40., 0., 40., rowHeight)];
-            speedLabel.text = [NSString stringWithFormat:@"%.2f", dayAvg];
+            if ([format isEqualToString:@"HH"]) {
+                speedLabel.text = [NSString stringWithFormat:@"%.2f", dayMax];
+            } else {
+                speedLabel.text = [NSString stringWithFormat:@"%.2f", dayAvg];
+            }
             speedLabel.alpha = .7;
             speedLabel.textAlignment = NSTextAlignmentLeft;
             speedLabel.font = [UIFont fontWithName:font size:smallFont];
