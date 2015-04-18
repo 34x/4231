@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14D127a" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="2sX-hZ-jje">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14D131" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="2sX-hZ-jje">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
@@ -65,6 +65,10 @@
                                     <constraint firstItem="Iz6-ba-grF" firstAttribute="leading" secondItem="6Is-LX-XJd" secondAttribute="leading" constant="58" id="Lcy-qh-Qeb"/>
                                 </constraints>
                             </view>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OcL-59-dcS">
+                                <rect key="frame" x="0.0" y="64" width="303" height="73"/>
+                                <color key="backgroundColor" red="0.5" green="0.0" blue="0.5" alpha="1" colorSpace="calibratedRGB"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
@@ -91,6 +95,7 @@
                     <connections>
                         <outlet property="numbersCount" destination="5Go-WW-9r0" id="uiD-mQ-apr"/>
                         <outlet property="numbersCountStats" destination="6Is-LX-XJd" id="iKA-rE-cwD"/>
+                        <outlet property="plot" destination="OcL-59-dcS" id="y0Q-OK-W2g"/>
                         <segue destination="7yN-ug-mPQ" kind="show" identifier="numbers_count_stats" id="Xyo-nP-3EO"/>
                         <segue destination="clp-CL-WOY" kind="show" identifier="numbers_count_game" id="fas-L3-zLt"/>
                     </connections>
@@ -121,15 +126,44 @@
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iEf-gJ-JDs">
                                 <rect key="frame" x="0.0" y="64" width="600" height="2"/>
                             </progressView>
+                            <view contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dyg-Nh-nEB" userLabel="popup">
+                                <rect key="frame" x="0.0" y="64" width="600" height="503"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Kh-tF-Jl0">
+                                        <rect key="frame" x="180" y="298" width="240" height="73"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="48"/>
+                                        <state key="normal" title="GO!">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                    </button>
+                                    <button opaque="NO" contentMode="center" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="characterWrap" translatesAutoresizingMaskIntoConstraints="NO" id="qWR-3U-b3k">
+                                        <rect key="frame" x="134" y="96" width="333" height="133"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="38"/>
+                                        <state key="normal" title="-">
+                                            <color key="titleColor" red="0.29803922772407532" green="0.29803922772407532" blue="0.29803922772407532" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstItem="qWR-3U-b3k" firstAttribute="leading" secondItem="Dyg-Nh-nEB" secondAttribute="leading" constant="8" id="2lt-8P-ZHg"/>
+                                    <constraint firstAttribute="centerX" secondItem="qWR-3U-b3k" secondAttribute="centerX" id="aOG-du-2zS"/>
+                                    <constraint firstAttribute="trailing" secondItem="qWR-3U-b3k" secondAttribute="trailing" constant="8" id="fJi-yT-fSU"/>
+                                    <constraint firstAttribute="centerX" secondItem="3Kh-tF-Jl0" secondAttribute="centerX" id="ndx-es-Evu"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="1aY-uP-8hl" firstAttribute="top" secondItem="bJg-FC-e7I" secondAttribute="bottom" id="68x-Um-Ryh"/>
                             <constraint firstItem="bJg-FC-e7I" firstAttribute="leading" secondItem="Qn7-YF-FSb" secondAttribute="leading" id="6Qn-Jf-nh6"/>
+                            <constraint firstItem="Dyg-Nh-nEB" firstAttribute="leading" secondItem="Qn7-YF-FSb" secondAttribute="leading" id="PPp-8q-Q51"/>
                             <constraint firstAttribute="trailing" secondItem="iEf-gJ-JDs" secondAttribute="trailing" id="UjS-9N-6fu"/>
                             <constraint firstItem="bJg-FC-e7I" firstAttribute="top" secondItem="iEf-gJ-JDs" secondAttribute="bottom" id="ecj-k9-RPL"/>
                             <constraint firstItem="iEf-gJ-JDs" firstAttribute="leading" secondItem="Qn7-YF-FSb" secondAttribute="leading" id="frG-f1-GcM"/>
                             <constraint firstItem="iEf-gJ-JDs" firstAttribute="top" secondItem="sPA-KP-DQs" secondAttribute="bottom" id="r7I-1X-79n"/>
+                            <constraint firstAttribute="trailing" secondItem="Dyg-Nh-nEB" secondAttribute="trailing" id="vqe-kg-GNm"/>
                             <constraint firstAttribute="trailing" secondItem="bJg-FC-e7I" secondAttribute="trailing" id="ylJ-2h-d4J"/>
                         </constraints>
                     </view>
@@ -142,10 +176,13 @@
                         <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="DZs-xb-rAQ"/>
                     </navigationItem>
                     <connections>
+                        <outlet property="beginGameButton" destination="3Kh-tF-Jl0" id="ljg-fL-Il8"/>
                         <outlet property="board" destination="bJg-FC-e7I" id="4M4-Fn-Cvv"/>
                         <outlet property="headerCenter" destination="xzH-6t-Hz1" id="F4D-wW-fNg"/>
                         <outlet property="headerRightButton" destination="DZs-xb-rAQ" id="yyH-uc-RFE"/>
                         <outlet property="progressBar" destination="iEf-gJ-JDs" id="fou-Di-1Yu"/>
+                        <outlet property="restartGameAlert" destination="Dyg-Nh-nEB" id="B6B-Ht-NyP"/>
+                        <outlet property="sequencePreviewButton" destination="qWR-3U-b3k" id="R6r-Hw-nSi"/>
                         <segue destination="7yN-ug-mPQ" kind="show" identifier="stats" id="gIk-5p-cXS"/>
                     </connections>
                 </viewController>
@@ -174,7 +211,7 @@
                                 <rect key="frame" x="190" y="101" width="220" height="162"/>
                             </pickerView>
                         </subviews>
-                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="0Wb-59-TmF" firstAttribute="leading" secondItem="9Cj-1Y-mga" secondAttribute="leading" id="AXQ-P0-cMp"/>
                             <constraint firstAttribute="centerX" secondItem="0Wb-59-TmF" secondAttribute="centerX" id="UyU-D1-KZp"/>
@@ -346,6 +383,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="gIk-5p-cXS"/>
+        <segue reference="Xyo-nP-3EO"/>
     </inferredMetricsTieBreakers>
 </document>

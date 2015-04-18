@@ -20,6 +20,7 @@
 @property (readonly, nonatomic) BOOL isDone;
 @property (readonly, nonatomic) BOOL isStarted;
 @property (nonatomic, readonly) NSUInteger clicked;
+@property (nonatomic, readonly) NSUInteger clickedWrong;
 @property (readwrite, nonatomic) NSUInteger timeLimit;
 @property (nonatomic, readwrite) NSUInteger difficultyLevel;
 @property (nonatomic, readwrite) NSUInteger sequenceLevel;
@@ -29,7 +30,7 @@
 - (instancetype) initWithTotal:(NSUInteger)total;
 - (BOOL)select:(NSUInteger)index value:(NSString*)value;
 - (void)start;
-- (void)finish;
+- (NSDictionary*)finish;
 - (float)getSpeed;
 - (NSNumber*)getDuration;
 - (BOOL)getIsDone;
@@ -40,6 +41,7 @@
 + (NSMutableArray*)randomize:(NSMutableArray*)itemsOriginal;
 + (NSArray*)getSequencesParams;
 + (NSArray*)getSymbols:(NSString*)key;
++ (NSNumber*)getScore:(NSDictionary*)data;
 - (NSArray*)getRandomizedSequence:(NSArray*)sequenceOriginal;
 - (NSArray*)getItems;
 

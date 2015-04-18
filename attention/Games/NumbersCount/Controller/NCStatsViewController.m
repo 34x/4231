@@ -8,6 +8,8 @@
 
 #import "NCStatsViewController.h"
 #import "NCGame.h"
+#import "UIPlotView.h"
+
 
 @interface NCStatsViewController ()
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
@@ -57,11 +59,26 @@
 
 - (void) drawStats:(NSString*)format {
     NSDictionary *stats = [NCGame stats:format];
+
     if (0 == [stats count]) {
         return;
     }
-    
+
     [self clearStats];
+    
+    float frameWidth = self.scrollView.bounds.size.width;
+    
+    UIPlotView *plot = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 0., frameWidth, 100.)];
+    plot.plotBackgroundColor = [UIColor whiteColor];
+    plot.lineColor = [UIColor blueColor];
+    NSMutableArray *points = [[NSMutableArray alloc] init];
+    
+    UIPlotView *plotAvg = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 142., frameWidth, 100.)];
+    plotAvg.plotBackgroundColor = [UIColor whiteColor];
+    plotAvg.lineColor = [UIColor greenColor];
+    NSMutableArray *pointsAvg = [[NSMutableArray alloc] init];
+
+
     float rowHeight = 28.;
     NSString *font = @"Helvetica";
     float smallFont = 14.;
@@ -70,40 +87,58 @@
     float max = [[stats objectForKey:@"max"] floatValue];
     self.view.backgroundColor = [UIColor whiteColor];
 
-        NSArray *days = [[[stats objectForKey:@"days"] allKeys] sortedArrayUsingComparator:^(id obj1, id obj2) {
+    NSArray *days = [[[stats objectForKey:@"days"] allKeys] sortedArrayUsingComparator:^(id obj1, id obj2) {
 
-            NSInteger i1 = [[obj1 stringByReplacingOccurrencesOfString:@"." withString:@""] integerValue];
-            NSInteger i2 = [[obj2 stringByReplacingOccurrencesOfString:@"." withString:@""] integerValue];
-            
-            if (i1 > i2) {
-                return (NSComparisonResult)NSOrderedDescending;
-            }
-            
-            if (i1 < i2) {
-                return (NSComparisonResult)NSOrderedAscending;
-            }
-            
-            return (NSComparisonResult)NSOrderedSame;
-        }];
+        NSInteger i1 = [[obj1 stringByReplacingOccurrencesOfString:@"." withString:@""] integerValue];
+        NSInteger i2 = [[obj2 stringByReplacingOccurrencesOfString:@"." withString:@""] integerValue];
+        
+        if (i1 > i2) {
+            return (NSComparisonResult)NSOrderedDescending;
+        }
+        
+        if (i1 < i2) {
+            return (NSComparisonResult)NSOrderedAscending;
+        }
+        
+        return (NSComparisonResult)NSOrderedSame;
+    }];
 
-        NSString *month;
-    
-        for (NSString *day in days) {
-            NSDictionary *dayData = [[stats objectForKey:@"days" ] objectForKey:day];
+    NSString *month;
+    int x = 0;
+    for (NSString *day in days) {
+        NSDictionary *dayData = [[stats objectForKey:@"days" ] objectForKey:day];
 
-            float dayMin = [[dayData objectForKey:@"min"] floatValue];
-            float dayAvg = [[dayData objectForKey:@"avg"] floatValue];
-            float dayMax = [[dayData objectForKey:@"max"] floatValue];
+        float dayMin = [[dayData objectForKey:@"min"] floatValue];
+        float dayAvg = [[dayData objectForKey:@"avg"] floatValue];
+        float dayMax = [[dayData objectForKey:@"max"] floatValue];
 
-            if (0. == dayAvg) {
-                continue;
-            }
-            
-            NSArray *date = [day componentsSeparatedByString:@"."];
+        if (0. == dayAvg) {
+            continue;
+        }
+        NSArray *date = [day componentsSeparatedByString:@"."];
+        
+        
+        NSString *day;
+        if ([date count] > 2) {
+            day = [NSString stringWithFormat:@"%@", date[2]];
+        } else {
+            day = [NSString stringWithFormat:@"%@", date[0]];
+        }
+        
+        [points addObject:@[day, [NSNumber numberWithFloat:dayMax]]];
+        [pointsAvg addObject:@[day, [NSNumber numberWithFloat:dayAvg]]];
+        x = x + 20.;
+        
+        continue;
+        
+
             
             float percentAvg = dayAvg / max;
             float percentMax = dayMax / max;
             float percentMin = dayMin / max;
+            
+            
+            
             
             /*
              * SPEED LABEL DRAW
@@ -117,6 +152,21 @@
 //            lmin.text = [NSString stringWithFormat:@"%.2f", dayMin];
 //            [vmin addSubview:lmin];
 //            row++;
+            
+            UIView *vavg = [[UIView alloc] initWithFrame:CGRectMake(0, row*rowHeight, percentAvg, rowHeight)];
+            
+            vavg.backgroundColor = [NCStatsViewController getColor:114. green:164. blue:222. alpha:1.];
+            
+//            row++;
+
+            UIView *vmax = [[UIView alloc] initWithFrame:CGRectMake(0, row*rowHeight, percentMax, rowHeight)];
+
+            vmax.backgroundColor = [NCStatsViewController getColor:255. green:179. blue:19 alpha:1.];
+
+//            UILabel *lmax = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, rowHeight)];
+//            lmax.text = [NSString stringWithFormat:@"%.2f", dayMax];
+//            [vmax addSubview:lmax];
+            
             
             UILabel *dayLabel = [[UILabel alloc] initWithFrame:CGRectMake(4, row*rowHeight, self.scrollView.frame.size.width, rowHeight)];
             if ([date count] > 2) {
@@ -132,10 +182,7 @@
             
             dayLabel.alpha = .6;
             dayLabel.font = [UIFont fontWithName:font size:smallFont];
-            
-            UIView *vavg = [[UIView alloc] initWithFrame:CGRectMake(0, row*rowHeight, percentAvg, rowHeight)];
-            
-            vavg.backgroundColor = [NCStatsViewController getColor:114. green:164. blue:222. alpha:1.];
+
             
             UILabel *speedLabel = [[UILabel alloc] initWithFrame:CGRectMake(-40., 0., 40., rowHeight)];
             if ([format isEqualToString:@"HH"]) {
@@ -147,24 +194,14 @@
             speedLabel.textAlignment = NSTextAlignmentLeft;
             speedLabel.font = [UIFont fontWithName:font size:smallFont];
             
-//            row++;
-
-            UIView *vmax = [[UIView alloc] initWithFrame:CGRectMake(0, row*rowHeight, percentMax, rowHeight)];
-
-            vmax.backgroundColor = [NCStatsViewController getColor:255. green:179. blue:19 alpha:1.];
-
-//            UILabel *lmax = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, rowHeight)];
-//            lmax.text = [NSString stringWithFormat:@"%.2f", dayMax];
-//            [vmax addSubview:lmax];
-
             
             [vmax addSubview:speedLabel];
             
-            [self.scrollView addSubview:vmax];
-            [self.scrollView addSubview:vavg];
-            [self.scrollView addSubview:vmin];
+//            [self.scrollView addSubview:vmax];
+//            [self.scrollView addSubview:vavg];
+//            [self.scrollView addSubview:vmin];
             
-            [self.scrollView addSubview:dayLabel];
+//            [self.scrollView addSubview:dayLabel];
             row++;
         }
     
@@ -177,8 +214,16 @@
      
      
      */
+
+    plot.points = points;
+    [self.scrollView addSubview:plot];
     
-    float frameWidth = self.scrollView.bounds.size.width;
+    plotAvg.points = pointsAvg;
+    [self.scrollView addSubview:plotAvg];
+    [plotAvg redraw];
+
+    
+    return;
     float paddingWidth = 110.;
     // can be faster!
     float widthForPercentage = frameWidth - paddingWidth - frameWidth * 0.2;

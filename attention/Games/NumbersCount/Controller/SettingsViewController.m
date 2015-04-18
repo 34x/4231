@@ -25,7 +25,7 @@
     // Do any additional setup after loading the view.
     
     
-    self.numbers = @[
+    self.numbers = @[@[@2, @1],
         @[@2, @2], @[@2, @3], @[@2, @4], @[@3, @3], @[@3, @4], @[@3, @5], @[@4, @4], @[@4, @5], @[@5, @5], @[@6, @7]
     ];
     self.labels = [[NSMutableArray alloc] init];

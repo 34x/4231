@@ -45,13 +45,21 @@
 @property (nonatomic, readwrite) NSUInteger sequenceLevel;
 @property (nonatomic, readwrite) float nextLevelLimit;
 @property (nonatomic, readwrite) NSArray *cellItems;
+@property (weak, nonatomic) IBOutlet UIView *restartGameAlert;
+@property (weak, nonatomic) IBOutlet UIButton *sequencePreviewButton;
+
+@property (weak, nonatomic) IBOutlet UIButton *beginGameButton;
 @end
 
 @implementation NCGameViewController
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-//    NSLog(@"disappearing!");
+    self.restartGameAlert.hidden = YES;
+    NSLog(@"disappearing!");
+    NCSettings *settings = [[NCSettings alloc] init];
+    settings.sequence = (int)self.sequenceLevel;
+    [settings save];
     [self endGame:NO];
 }
 
@@ -62,7 +70,7 @@
     self.gameTimeLimit = 30;
     self.difficultyLevel = 0;
     self.sequenceLevel = 0;
-    self.nextLevelLimit = 50.;
+    self.nextLevelLimit = 70.;
     [super viewWillAppear:animated];
 //    [[self navigationController] setNavigationBarHidden:YES animated:NO];
     
@@ -77,6 +85,7 @@
     NCSettings *settings = [[NCSettings alloc] init];
     self.cols = settings.cols;
     self.rows = settings.rows;
+    self.sequenceLevel = settings.sequence;
 
     self.headerRightButton.target = self;
     self.headerRightButton.action = @selector(headerRightButtonClick:);
@@ -93,6 +102,9 @@
         [self.headerCenter addSubview:self.headerCenterLabel];
     }
     [self updateHeaderLabel];
+    
+    [self.beginGameButton addTarget:self action:@selector(beginGame) forControlEvents:UIControlEventTouchUpInside];
+    [self.sequencePreviewButton addTarget:self action:@selector(restartGame) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void) headerRightButtonClick:(id)sender {
@@ -165,14 +177,14 @@
     NSUInteger left = self.game.timeLimit - [[self.game getDuration] floatValue];
     [self.headerCenterLabel setText:[NSString stringWithFormat:@"%lu", left]];
     
-    float diff = [self percentWithPrevious];
-    if (diff > self.nextLevelLimit || (.0 == diff && 0 == self.difficultyLevel)) {
-        [self.headerCenterLabel setTextColor:[UIColor greenColor]];
-        [self.progressBar setTintColor:[UIColor blueColor]];
-    } else {
-        [self.headerCenterLabel setTextColor:[UIColor redColor]];
-        [self.progressBar setTintColor:[UIColor redColor]];
-    }
+//    float diff = [self percentWithPrevious];
+//    if (diff > self.nextLevelLimit || (.0 == diff && 0 == self.difficultyLevel)) {
+//        [self.headerCenterLabel setTextColor:[UIColor greenColor]];
+//        [self.progressBar setTintColor:[UIColor blueColor]];
+//    } else {
+//        [self.headerCenterLabel setTextColor:[UIColor redColor]];
+//        [self.progressBar setTintColor:[UIColor redColor]];
+//    }
 }
 
 - (void) timerTick {
@@ -225,6 +237,7 @@
     NSString *msg = [self.game.sequence componentsJoinedByString:@" "];
     
     msg = [NSString stringWithFormat:@"%@\n→", msg];
+    [self.sequencePreviewButton setTitle:msg forState:UIControlStateNormal];
     
     if (!self.alertGameStart) {
         self.alertGameStart = [[UIAlertView alloc]
@@ -238,10 +251,12 @@
         [self.alertGameStart setMessage:msg];
     }
     
+    self.restartGameAlert.hidden = NO;
 
-    if(![self.alertGameStart isVisible]) {
-        [self.alertGameStart show];
-    }
+//    if(![self.alertGameStart isVisible]) {
+//        [self.alertGameStart show];
+//
+//    }
 }
 
 - (void)drawBoard {
@@ -390,7 +405,7 @@
                 size = [fontsMulti objectAtIndex:(arc4random() % [fontsMulti count])];
             } else {
                 size = [fonts objectAtIndex:(arc4random() % [fonts count])];
-                
+             
             }
             
             [l setFont:[UIFont fontWithName:@"Helvetica" size: [size floatValue]]];
@@ -413,18 +428,6 @@
     }
 }
 
-- (float) percentWithPrevious {
-    float lastResult = self.lastResult;
-    float speed = [self.game getSpeed];
-    float diff;
-    if (lastResult) {
-        diff = speed / (lastResult / 100.);
-    } else {
-        diff = 0.;
-    }
-
-    return diff;
-}
 
 - (void) endGame:(BOOL) showResult{
     NSLog(@"endGame:%i", showResult);
@@ -432,19 +435,30 @@
     [self.timer invalidate];
     self.timer = nil;
     
+    NSDictionary *result;
+    float gameScore = .0;
     if (self.game) {
-        [self.game finish];
+        result = [self.game finish];
+        gameScore = [[NCGame getScore:result] floatValue];
+        
     }
-    
+
     [self updateHeaderLabel];
     NSString *nextLevel;
     if (showResult) {
         
-        float diff = [self percentWithPrevious];
+        float diff = .0;
+        if (gameScore > .0) {
+            diff = gameScore / (self.lastResult / 100.);
+        }
         
-        if ([self.game getSpeed] > 0. && (diff > self.nextLevelLimit || .0 == diff)) {
+        
+        long slevel = self.sequenceLevel;
+        long dlevel = self.difficultyLevel;
+        
+        if (gameScore > 0. && (diff > self.nextLevelLimit || .0 == diff)) {
             nextLevel = @"Next level!";
-            self.lastResult = [self.game getSpeed];
+            self.lastResult = gameScore;
             if (self.difficultyLevel < 3) {
                 self.difficultyLevel++;
                 NSLog(@"Next difficult %lu", (unsigned long)self.difficultyLevel);
@@ -460,14 +474,20 @@
         NSString *nextLevelLimit = @"";
         if (self.lastResult) {
             float nextLimit = self.lastResult / 100. * self.nextLevelLimit;
-            nextLevelLimit = [NSString stringWithFormat:@"\nNext level min speed: %.2f", nextLimit];
+            nextLevelLimit = [NSString stringWithFormat:@"\nNext level limit: %.2f", nextLimit];
         }
         
         
         NSString *alertTitle = [NSString stringWithFormat:@"%@", nextLevel];
-        NSString *alertMessage = [NSString stringWithFormat:@"Duration: %@\nSpeed: %.1f%@",
+        NSString *alertMessage = [NSString
+                                  stringWithFormat:@"Score: %.2f\nDuration: %@\nSpeed: %.1f\nDifficulty: %lu\nSequence: %lu\nClicked: %lu\nWrong:%lu\n%@",
+                                  gameScore,
                                   [self durationString],
                                   [self.game getSpeed],
+                                  dlevel,
+                                  slevel,
+                                  self.game.clicked,
+                                  self.game.clickedWrong,
                                   nextLevelLimit
                                 ];
         
@@ -499,19 +519,25 @@
     } else if (self.alertSequenceSelect == alertView) {
         if (buttonIndex > 0) {
             self.sequenceLevel = buttonIndex - 1;
+            self.difficultyLevel = 0;
         }
 
         [self restartGame];
     } else if (self.alertGameStart == alertView) {
         
-        [self drawBoard];
-        
-        [self.game start];
-        if (!self.timer) {
-            self.timer = [NSTimer scheduledTimerWithTimeInterval:.1 target:self selector:@selector(timerTick) userInfo:nil repeats:YES];
-        }
     }
     
+}
+
+- (void)beginGame {
+    [self drawBoard];
+    
+    self.restartGameAlert.hidden = YES;
+    
+    [self.game start];
+    if (!self.timer) {
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:.1 target:self selector:@selector(timerTick) userInfo:nil repeats:YES];
+    }
 }
 
 - (void) selectGameType {

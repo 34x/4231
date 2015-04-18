@@ -11,6 +11,7 @@
 @interface NCSettings : NSObject
 @property (nonatomic) int cols;
 @property (nonatomic) int rows;
+@property (nonatomic) int sequence;
 
 -(id)init;
 -(void)save;

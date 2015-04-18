@@ -24,6 +24,7 @@
 @property (nonatomic, readwrite) NSUInteger clickedWrong;
 @property (nonatomic, readwrite) NSMutableArray *randomizedSequence;
 @property (nonatomic, readwrite) NSDate *startTime;
+@property (nonatomic, readwrite) NSDictionary *result;
 @end
 
 @implementation NCGame
@@ -138,12 +139,6 @@
                          @"label" : @"Letters"
                          },
                      @{
-                         @"id" : @"emoji",
-                         @"symbols" : @"emoji",
-                         @"label" : @"Random Emoji",
-                         @"generator" : @"getRandomizedSequence:"
-                         },
-                     @{
                          @"id" : @"randomNumbers",
                          @"symbols" : @"numbers",
                          @"label"   : @"Random numbers",
@@ -153,6 +148,12 @@
                          @"id" : @"randomNumbersLetters",
                          @"symbols" : @"numbersLetters",
                          @"label"   : @"Random numbers & letters",
+                         @"generator" : @"getRandomizedSequence:"
+                         },
+                     @{
+                         @"id" : @"emoji",
+                         @"symbols" : @"emoji",
+                         @"label" : @"Random Emoji",
                          @"generator" : @"getRandomizedSequence:"
                          },
                      @{
@@ -174,7 +175,7 @@
 + (NSDictionary*)getSequenceParams:(NSUInteger)level {
     NSArray *sequencesSettings = [NCGame getSequencesParams];
     
-    if (level > [sequencesSettings count]) {
+    if (level > [sequencesSettings count] - 1) {
         level = 0;
     }
     
@@ -303,16 +304,12 @@
     self.startTime = [NSDate date];
     self.isStarted = YES;
 }
-- (void) finish
+- (NSDictionary*) finish
 {
     if (self.isDone) {
-        return;
+        return self.result;
     }
     self.isDone = YES;
-    
-    if(self.timer) {
-        [self.timer invalidate];
-    }
     
     if (self.isComplete) {
         NSLog(@"GAME IS DONE!");
@@ -337,7 +334,7 @@
         
         NSDictionary *settings = [NCGame getSequenceParams:self.sequenceLevel];
 
-        NSDictionary *entry = @{
+        self.result = @{
                                 @"date" : date,
                                 @"total" : [NSString stringWithFormat:@"%lu", self.total],
                                 @"id" : [settings objectForKey:@"id"],
@@ -347,7 +344,7 @@
                                 @"clickedWrong" : [NSString stringWithFormat:@"%lu", self.clickedWrong],
                              };
         
-        [log addObject:entry];
+        [log addObject:self.result];
         
         [def setObject:log forKey:@"log"];
         [def synchronize];
@@ -355,6 +352,8 @@
     } else {
         NSLog(@"game not done :(");
     }
+
+    return self.result;
 }
 
 - (float)getSpeed {
@@ -364,10 +363,61 @@
 + (NSMutableArray*)log {
     NSUserDefaults *def = [[NSUserDefaults alloc] init];
     NSMutableArray *log = [def objectForKey:@"log"];
-    if (nil == log) {
+
+    if (!log) {
         log = [[NSMutableArray alloc] init];
     }
     return log;
+}
+
++ (NSNumber*)getScore:(NSDictionary*)data {
+    NSNumber *score = [NSNumber numberWithFloat:0.0];
+    
+    NSArray *sparams = [NCGame getSequencesParams];
+    NSString *skey = [data objectForKey:@"id"];
+    
+    NSNumber *sequenceIndex = [NSNumber numberWithInt:0];
+    for (int i = 0; i < [sparams count]; i++) {
+        NSDictionary *param = [sparams objectAtIndex:i];
+        if ([skey isEqualToString:[param objectForKey:@"id"]]) {
+            sequenceIndex = [NSNumber numberWithInt:i];
+            break;
+        }
+    }
+    
+    float total = [[data objectForKey:@"total"] floatValue];
+    float duration = [[data objectForKey:@"duration"] floatValue];
+    float speed = total / duration;
+    score = [NSNumber numberWithFloat:speed * total];
+    
+    float percent = [score floatValue] / 100.;
+    float difficulty = [[data objectForKey:@"difficulty"] floatValue];
+    
+    float difficultyBonus = (percent*difficulty*10.) * difficulty;
+    
+    
+    NSLog(@"SCORE base (speed, total) %@, difbonus %.2f", score, difficultyBonus);
+    
+    score = [NSNumber numberWithFloat:[score floatValue] + difficultyBonus ];
+    NSLog(@"SCORE difficult %@", score);
+    
+    percent = [score floatValue] / 100.;
+    
+    float sequenceBonus = (percent*50.) * [sequenceIndex floatValue];
+    
+    score = [NSNumber numberWithFloat:[score floatValue] + sequenceBonus ];
+    NSLog(@"SCORE sequence %@, sbonus %.2f", score, sequenceBonus);
+
+    percent = [score floatValue] / 100.;
+    
+    score = [NSNumber numberWithFloat:[score floatValue] - (percent*10) * [[data objectForKey:@"clickedWrong"] floatValue] ];
+    NSLog(@"SCORE wrong %@", score);
+    
+    NSLog(@"SCORE: %@", score);
+    
+    
+    
+    return score;
 }
 
 + (NSMutableDictionary*)stats:(NSString*)keyFormat {
@@ -375,6 +425,10 @@
     NSMutableDictionary *days = [[NSMutableDictionary alloc] init];
     NSMutableArray *log = [self log];
 
+    if (0 == [log count]) {
+        return stats;
+    }
+    
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:keyFormat];
     
@@ -388,7 +442,8 @@
         }
         
         NSDictionary *item = obj;
-        float gameScore;
+        float gameScore = [[NCGame getScore:item] floatValue];
+        
         NSDate *date = [item objectForKey:@"date"];
         // calculate item value
         float total = [[item objectForKey:@"total"] floatValue];
@@ -397,16 +452,7 @@
         if (!time || time > 1000000) {
             continue;
         }
-
-        float speed = total / time;
-
-        gameScore = speed * total;
         
-        float percent = gameScore / 100.;
-        
-        gameScore = gameScore - percent * [[item objectForKey:@"clickedWrong"] floatValue];
-        gameScore = gameScore + (percent*10.) * [[item objectForKey:@"difficulty"] floatValue];
-
         NSString *dayKey = [formatter stringFromDate:date];
         
         /*

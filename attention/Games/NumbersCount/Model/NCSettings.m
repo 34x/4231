@@ -45,6 +45,14 @@
         } else {
             self.rows = [rows intValue];
         }
+
+        id sequence = [settings objectForKey:@"sequence"];
+        
+        if (nil == sequence) {
+            self.sequence = 0;
+        } else {
+            self.sequence = [sequence intValue];
+        }
     }
     return self;
 }
@@ -53,6 +61,7 @@
     NSDictionary *settings = @{
                                @"cols" : [NSNumber numberWithInt:self.cols],
                                @"rows" : [NSNumber numberWithInt:self.rows],
+                               @"sequence" : [NSNumber numberWithInt:self.sequence],
                             };
     
     NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
