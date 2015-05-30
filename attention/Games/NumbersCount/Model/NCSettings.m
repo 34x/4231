@@ -53,8 +53,37 @@
         } else {
             self.sequence = [sequence intValue];
         }
+        
+        id sequencesSettings = [settings objectForKey:@"sequencesSettings"];
+        
+        if (nil == sequencesSettings) {
+            self.sequencesSettings = [[NSMutableDictionary alloc] init];
+        } else {
+            self.sequencesSettings = [sequencesSettings mutableCopy];
+        }
+        
     }
     return self;
+}
+
+- (NSMutableDictionary*)getSequenceSettings:(NSString*)sid {
+    id obj = [self.sequencesSettings objectForKey:sid];
+    NSMutableDictionary *settings;
+    
+    if (!obj) {
+        settings = [[NSMutableDictionary alloc] initWithDictionary: @{
+                     @"currentBoard" : @0,
+                     @"maximumBoard" : @0,
+                     @"solved": @0,
+                     @"lastResult" : @0.0
+                     }];
+    } else {
+        settings = [obj mutableCopy];
+    }
+    
+    [self.sequencesSettings setObject:settings forKey:sid];
+    
+    return settings;
 }
 
 -(void)save {
@@ -62,12 +91,19 @@
                                @"cols" : [NSNumber numberWithInt:self.cols],
                                @"rows" : [NSNumber numberWithInt:self.rows],
                                @"sequence" : [NSNumber numberWithInt:self.sequence],
+                               @"sequencesSettings" : self.sequencesSettings
                             };
-    
+//    NSLog(@"%@", self.sequencesSettings);
     NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
     
     [defaults setObject:settings forKey:self.key];
     [defaults synchronize];
+}
+
++(NSArray*)getBoardSizes {
+    return @[@[@2, @1],
+                            @[@2, @2], @[@2, @3], @[@2, @4], @[@3, @3], @[@3, @4], @[@3, @5], @[@4, @4], @[@4, @5], @[@5, @5], @[@6, @7]
+                            ];
 }
 
 @end

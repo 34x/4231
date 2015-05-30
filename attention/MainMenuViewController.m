@@ -12,10 +12,18 @@
 #import <QuartzCore/QuartzCore.h>
 
 @interface MainMenuViewController ()
-@property (strong, nonatomic) IBOutlet UIView *numbersCount;
-@property (weak, nonatomic) IBOutlet UIView *numbersCountStats;
+
+
+@property (weak, nonatomic) IBOutlet UIView *numbersCount;
+@property (weak, nonatomic) IBOutlet UIButton *infoButton;
+@property (weak, nonatomic) IBOutlet UINavigationItem *viewTitle;
+@property (weak, nonatomic) IBOutlet UIButton *numbersCountStats;
+@property (weak, nonatomic) IBOutlet UIButton *numbersCountButton;
+
 @property (weak, nonatomic) IBOutlet UIView *plot;
 @property (readwrite) UIView *imageOverlay;
+@property (strong, nonatomic) NSTimer *timer;
+@property (nonatomic) NSUInteger seqIdx;
 @end
 
 @implementation MainMenuViewController
@@ -27,16 +35,72 @@
     UITapGestureRecognizer *numbersCountTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(numbersCountClick:)];
     [self.numbersCount addGestureRecognizer:numbersCountTap];
     
+    [self.numbersCountButton addTarget:self action:@selector(numbersCountClick:) forControlEvents:UIControlEventTouchUpInside];
+    
     UITapGestureRecognizer *numbersCountStatsTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(numbersCountStatsClick:)];
     [self.numbersCountStats addGestureRecognizer:numbersCountStatsTap];
     
+    [self.numbersCountStats addTarget:self action:@selector(numbersCountStatsClick:) forControlEvents:UIControlEventTouchUpInside];
 //    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"bg2.jpg"]];
     
     [self setupLocalNotifications];
     
-    [self drawPlot];
+//    [self drawPlot];
     
 //    NSLog(@"%lu %lu %lu", UIImageOrientationDown, UIImageOrientationUp, UIImageOrientationRight);
+    
+    if (!self.timer) {
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(timerTick) userInfo:nil repeats:YES];
+    }
+    
+    [self.infoButton addTarget:self action:@selector(infoButtonClick) forControlEvents:UIControlEventTouchUpInside];
+
+}
+
+- (void) infoButtonClick {
+    UIAlertView *alert = [[UIAlertView alloc] init];
+    alert.title = @"Little info";
+    alert.message = @"You can contribute to this game on https://github.com/34x/4231";
+    [alert addButtonWithTitle:@"Ok"];
+    [alert addButtonWithTitle:@"Go to github!"];
+    alert.delegate = self;
+    [alert show];
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    NSLog(@"click");
+    if (buttonIndex == 1) {
+        NSURL *url = [NSURL URLWithString: @"https://github.com/34x/4231"];
+        if ([[UIApplication sharedApplication] canOpenURL:url]) {
+            [[UIApplication sharedApplication] openURL:url];
+        }
+    }
+}
+
+- (void) timerTick {
+    if (!self.seqIdx) {
+        self.seqIdx = 0;
+    }
+    
+    NSArray *params = [NCGame getSequencesParams];
+    
+    if (self.seqIdx < [params count]) {
+//    NSDictionary *param = [params objectAtIndex:self.seqIdx];
+        NCGame *tmpGame = [[NCGame alloc] initWithTotal:4];
+        NSArray *seq = [tmpGame getSequence:self.seqIdx difficultyLevel:0];
+    
+        NSString *title = [seq componentsJoinedByString:@" "];
+        [self.numbersCountButton setTitle:title forState:UIControlStateNormal];
+    } else {
+        [self.numbersCountButton setTitle:@"Play" forState:UIControlStateNormal];
+    }
+    
+    if (self.seqIdx < [params count]) {
+        self.seqIdx++;
+    } else {
+        self.seqIdx = 0;
+    }
+
 }
 
 - (void) inspectView:(UIView*)rv {

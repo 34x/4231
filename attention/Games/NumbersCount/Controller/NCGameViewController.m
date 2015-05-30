@@ -47,8 +47,9 @@
 @property (nonatomic, readwrite) NSArray *cellItems;
 @property (weak, nonatomic) IBOutlet UIView *restartGameAlert;
 @property (weak, nonatomic) IBOutlet UIButton *sequencePreviewButton;
-
 @property (weak, nonatomic) IBOutlet UIButton *beginGameButton;
+
+@property (nonatomic, readwrite) NCSettings *settings;
 @end
 
 @implementation NCGameViewController
@@ -70,7 +71,10 @@
     self.gameTimeLimit = 30;
     self.difficultyLevel = 0;
     self.sequenceLevel = 0;
-    self.nextLevelLimit = 70.;
+    self.nextLevelLimit = 60.; // %
+    
+    self.settings = [[NCSettings alloc] init];
+    
     [super viewWillAppear:animated];
 //    [[self navigationController] setNavigationBarHidden:YES animated:NO];
     
@@ -223,10 +227,33 @@
     self.progressBar.progress = 0.0;
     // Do any additional setup after loading the view, typically from a nib.
 
-    self.game = [[NCGame alloc] initWithTotal:self.cols*self.rows];
+    self.sequenceLevel = [NCGame checkSequenceLevel:self.sequenceLevel];
+    
+    NSDictionary *sequenceParams = [NCGame getSequenceParams:self.sequenceLevel];
+    NSMutableDictionary *ssettings = [self.settings getSequenceSettings:[sequenceParams objectForKey:@"id"]];
+    
+//    ssettings[@"solved"] = [NSNumber numberWithInt:[ssettings[@"solved"] intValue] + 1];
+
+    [self.settings save];
+    
+    NSArray *boards = [NCSettings getBoardSizes];
+    NSArray *cBoard = [boards objectAtIndex:[ssettings[@"currentBoard"] intValue]];
+    
+    self.cols = [cBoard[0] intValue];
+    self.rows = [cBoard[1] intValue];
+    
+//    self.cols = 2;
+//    self.rows = 2;
+    
+    self.game = [[NCGame alloc] initWithTotal: self.cols * self.rows ];
     self.game.timeLimit = self.gameTimeLimit;
     self.game.difficultyLevel = self.difficultyLevel;
     self.game.sequenceLevel = self.sequenceLevel;
+    
+    if (0 == self.difficultyLevel) {
+        ssettings[@"lastResult"] = @0.0;
+        [self.settings save];
+    }
     
     [self updateHeaderLabel];
     
@@ -234,9 +261,24 @@
 
     self.cellItems = [self.game getItems];
 
-    NSString *msg = [self.game.sequence componentsJoinedByString:@" "];
+    NSString *sep;
+    if ([self.game.sequence count] < 5) {
+        sep = @"  ";
+    } else if ([self.game.sequence count] < 8) {
+        sep = @" ";
+    } else {
+        sep = @"";
+    }
     
-    msg = [NSString stringWithFormat:@"%@\n→", msg];
+//    show symbols horisontaly
+//    if (0 == arc4random() % 2) {
+//        sep = @"\n";
+//    }
+    
+    NSString *msg = [self.game.sequence componentsJoinedByString:sep];
+    
+//    msg = [NSString stringWithFormat:@"%@\n\n→", msg];
+    
     [self.sequencePreviewButton setTitle:msg forState:UIControlStateNormal];
     
     if (!self.alertGameStart) {
@@ -253,10 +295,6 @@
     
     self.restartGameAlert.hidden = NO;
 
-//    if(![self.alertGameStart isVisible]) {
-//        [self.alertGameStart show];
-//
-//    }
 }
 
 - (void)drawBoard {
@@ -270,25 +308,7 @@
     float margin = 0.0;
     float y = 0.0;
     float x = 0.0;
-    float size = width + width / 10.;
-
-//    [UIColor colorWithRed:1. green:.49 blue:.16 alpha:1],
-//    [UIColor colorWithRed:1. green:.69 blue:.16 alpha:1],
-//    [UIColor colorWithRed:.984 green:.157 blue:.271 alpha:1],
-//    [UIColor colorWithRed:.141 green:.882 blue:.73 alpha:1],
-//    
-//    [UIColor colorWithRed:.965 green:.624 blue:.40 alpha:1],
-//    [UIColor colorWithRed:.965 green:.757 blue:.40 alpha:1],
-//    [UIColor colorWithRed:.918 green:.38 blue:.455 alpha:1],
-//    [UIColor colorWithRed:.255 green:.616 blue:.545 alpha:1],
-
-//    [UIColor colorWithRed:.714 green:.302 blue:.0 alpha:1],
-//    [UIColor colorWithRed:.0 green:.506 blue:.235 alpha:1],
-//    [UIColor colorWithRed:.714 green:.161 blue:.0 alpha:.8],
-//    [UIColor colorWithRed:.0 green:.443 blue:.396 alpha:1],
-//    
-//    [UIColor colorWithRed:.992 green:.576 blue:.271 alpha:1],
-
+    float size = width * 1.6; // + width / 10. + width;
     
     NSArray *colors = @[
                        [UIColor redColor],
@@ -446,41 +466,84 @@
     [self updateHeaderLabel];
     NSString *nextLevel;
     if (showResult) {
+        NSMutableDictionary *ssettings = [self.settings getSequenceSettings:[NCGame getSequenceId:self.sequenceLevel]];
+        
+        float lastResult = [ssettings[@"lastResult"] floatValue];
         
         float diff = .0;
         if (gameScore > .0) {
-            diff = gameScore / (self.lastResult / 100.);
+            diff = gameScore / (lastResult / 100.);
         }
         
+        int solved = [[ssettings objectForKey:@"solved" ] intValue];
+        NSString *nextBoard = [NSString stringWithFormat:@"%lu / %d", (solved * 4) + self.difficultyLevel+1, self.cols*self.rows * 4];
         
         long slevel = self.sequenceLevel;
         long dlevel = self.difficultyLevel;
         
-        if (gameScore > 0. && (diff > self.nextLevelLimit || .0 == diff)) {
+        if (gameScore > 0. && (diff > self.nextLevelLimit || .0 == diff) && 0 == self.game.clickedWrong) {
+            
             nextLevel = @"Next level!";
-            self.lastResult = gameScore;
+            lastResult = gameScore;
+            
             if (self.difficultyLevel < 3) {
                 self.difficultyLevel++;
-                NSLog(@"Next difficult %lu", (unsigned long)self.difficultyLevel);
+
             } else {
+                if ([ssettings[@"currentBoard"] isEqualToNumber:ssettings[@"maximumBoard"]]) {
+                    solved = solved + 1;
+                    ssettings[@"solved"] = [NSNumber numberWithInt:solved];
+
+                    // because we can use lowest board than we have
+                    if (solved * 4 >= self.cols * self.rows * 4) {
+                        ssettings[@"currentBoard"] = [NSNumber numberWithInt:[ssettings[@"currentBoard"] intValue] + 1];
+                        ssettings[@"maximumBoard"] = ssettings[@"currentBoard"];
+                        ssettings[@"solved"] = [NSNumber numberWithInt:0];
+                        
+                        nextBoard = [NSString stringWithFormat:@"Next board!"];
+                    }
+
+                } else {
+                    // temporarly?
+                    ssettings[@"currentBoard"] = ssettings[@"maximumBoard"];
+                }
+                
+                
+                
+                [self.settings save];
+                
                 self.difficultyLevel = 0;
                 self.sequenceLevel++;
-                NSLog(@"Next sequence %lu", self.sequenceLevel);
+                
             }
+            
+            
         } else {
-            nextLevel = @"Try hard for next level!";
+            nextLevel = @"You can do it better!";
         }
-
+        
+        NSLog(@"%@", ssettings);
+        
         NSString *nextLevelLimit = @"";
-        if (self.lastResult) {
-            float nextLimit = self.lastResult / 100. * self.nextLevelLimit;
+        if (lastResult) {
+            float nextLimit = lastResult / 100. * self.nextLevelLimit;
             nextLevelLimit = [NSString stringWithFormat:@"\nNext level limit: %.2f", nextLimit];
         }
         
+        ssettings[@"lastResult"] = [NSNumber numberWithFloat:lastResult];
         
         NSString *alertTitle = [NSString stringWithFormat:@"%@", nextLevel];
+
         NSString *alertMessage = [NSString
-                                  stringWithFormat:@"Score: %.2f\nDuration: %@\nSpeed: %.1f\nDifficulty: %lu\nSequence: %lu\nClicked: %lu\nWrong:%lu\n%@",
+                                  stringWithFormat:@"Score: %.2f\
+                                  \nDuration: %@\
+                                  \nSpeed: %.1f\
+                                  \nDifficulty: %lu\
+                                  \nSequence: %lu\
+                                  \nClicked: %lu\
+                                  \nWrong:%lu\
+                                  \n%@\
+                                  \nnextBoard %@",
                                   gameScore,
                                   [self durationString],
                                   [self.game getSpeed],
@@ -488,8 +551,12 @@
                                   slevel,
                                   self.game.clicked,
                                   self.game.clickedWrong,
-                                  nextLevelLimit
+                                  nextLevelLimit,
+                                  nextBoard
                                 ];
+
+        alertMessage = [NSString stringWithFormat:@"You score: %.2f\
+                        \n%@", gameScore, nextBoard];
         
         if (!self.alertResult) {
         
@@ -547,7 +614,7 @@
         
         self.alertSequenceSelect = [[UIAlertView alloc]
                                     initWithTitle:@"Which one?"
-                                    message: @""
+                                    message: nil
                                     delegate:self
                                     cancelButtonTitle:@"?"
                                     otherButtonTitles:nil];
@@ -557,8 +624,11 @@
         NSMutableArray *labels = [[NSMutableArray alloc] init];
         [params enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop){
             NSDictionary *param = obj;
-//            [labels addObject: [param objectForKey:@"label"]];
-            [self.alertSequenceSelect addButtonWithTitle:[param objectForKey:@"label"]];
+            NCGame *tmpGame = [[NCGame alloc] initWithTotal:6];
+            NSArray *seq = [tmpGame getSequence:idx difficultyLevel:0];
+ 
+            [self.alertSequenceSelect addButtonWithTitle:[seq componentsJoinedByString:@" "]];
+//            [self.alertSequenceSelect addButtonWithTitle:[param objectForKey:@"label"]];
         }];
 
         self.alertSequenceSelect.tag = 1;

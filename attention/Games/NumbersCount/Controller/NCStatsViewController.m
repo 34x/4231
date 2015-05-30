@@ -68,12 +68,12 @@
     
     float frameWidth = self.scrollView.bounds.size.width;
     
-    UIPlotView *plot = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 0., frameWidth, 100.)];
+    UIPlotView *plot = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 0., frameWidth, 150.)];
     plot.plotBackgroundColor = [UIColor whiteColor];
     plot.lineColor = [UIColor blueColor];
     NSMutableArray *points = [[NSMutableArray alloc] init];
     
-    UIPlotView *plotAvg = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 142., frameWidth, 100.)];
+    UIPlotView *plotAvg = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 182., frameWidth, 150.)];
     plotAvg.plotBackgroundColor = [UIColor whiteColor];
     plotAvg.lineColor = [UIColor greenColor];
     NSMutableArray *pointsAvg = [[NSMutableArray alloc] init];
@@ -136,8 +136,6 @@
             float percentAvg = dayAvg / max;
             float percentMax = dayMax / max;
             float percentMin = dayMin / max;
-            
-            
             
             
             /*

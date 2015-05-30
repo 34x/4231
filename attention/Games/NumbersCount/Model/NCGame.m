@@ -119,7 +119,8 @@
                                              @"J", @"K", @"L", @"M", @"N", @"O", @"P", @"Q", @"R", @"S", @"T", @"U", @"V", @"W",
                                              @"X", @"Y", @"Z"],
                               @"emoji" : @[@"🌳", @"🎄", @"🎼", @"🎭", @"🏁", @"🍄", @"🍀", @"🌍", @"🌚", @"🍍", @"🍒", @"🍴", @"🎃", @"🚲", @"🚧", @"🚀", @"📖", @"👣", @"👻", @"👽", @"🌴", @"🐲", @"🐬", @"☔️", @"🎸", @"⚽️", @"😱", @"🌻", @"⛅️", @"❄️", @"🍉", @"🎁", @"🎯", @"🚜", @"🏠", @"📱", @"⌚️", @"🎥", @"💾", @"💿", @"📡", @"💰", @"🔑"],
-                              @"katakana" : @[@"ア",@"イ",@"ウ",@"エ",@"オ",@"カ",@"キ",@"ク",@"ケ",@"コ",@"サ",@"シ",@"ス",@"セ",@"ソ"]
+                              @"katakana" : @[@"ア",@"イ",@"ウ",@"エ",@"オ",@"カ",@"キ",@"ク",@"ケ",@"コ",@"サ",@"シ",@"ス",@"セ",@"ソ"],
+                              @"flags" : @[@"🇦🇺", @"🇦🇹", @"🇧🇪", @"🇧🇷", @"🇨🇦", @"🇨🇱", @"🇨🇳", @"🇨🇴", @"🇩🇰", @"🇫🇮", @"🇫🇷", @"🇩🇪", @"🇭🇰", @"🇮🇳", @"🇮🇩", @"🇮🇪", @"🇮🇱", @"🇮🇹", @"🇯🇵", @"🇰🇷", @"🇲🇴", @"🇲🇾", @"🇲🇽", @"🇳🇱", @"🇳🇿", @"🇳🇴", @"🇵🇭", @"🇵🇱", @"🇵🇹", @"🇵🇷", @"🇷🇺", @"🇸🇦", @"🇸🇬", @"🇿🇦", @"🇪🇸", @"🇸🇪", @"🇨🇭", @"🇹🇷", @"🇬🇧", @"🇺🇸", @"🇦🇪", @"🇻🇳"]
                               };
 
     return symbols[key];
@@ -131,7 +132,7 @@
                      @{
                          @"id" : @"numbers",
                          @"symbols" : @"numbersFrom1",
-                         @"label" : @"Numbers"
+                         @"label" : @"Numbers",
                          },
                      @{
                          @"id" : @"letters",
@@ -153,23 +154,38 @@
                      @{
                          @"id" : @"emoji",
                          @"symbols" : @"emoji",
-                         @"label" : @"Random Emoji",
+                         @"label" : @"Random emoji",
+                         @"generator" : @"getRandomizedSequence:"
+                         },
+                     @{
+                         @"id" : @"randomFlags",
+                         @"symbols" : @"flags",
+                         @"label"   : @"Random flags",
                          @"generator" : @"getRandomizedSequence:"
                          },
                      @{
                          @"id" : @"katakana",
                          @"symbols" : @"katakana",
-                         @"label" : @"Katakana (don't be scared)"
+                         @"label" : @"Katakana"
                          },
                      @{
                          @"id" : @"randomKatakana",
                          @"symbols" : @"katakana",
-                         @"label"   : @"Random Katakana %)",
+                         @"label"   : @"Random katakana",
                          @"generator" : @"getRandomizedSequence:"
                          },
                      ];
     
     return sequencesSettings;
+}
+
++ (NSUInteger)checkSequenceLevel:(NSUInteger)level {
+    NSArray *sequencesSettings = [NCGame getSequencesParams];
+    if (level > [sequencesSettings count] - 1) {
+        level = 0;
+    }
+    
+    return level;
 }
 
 + (NSDictionary*)getSequenceParams:(NSUInteger)level {
@@ -182,6 +198,12 @@
     NSDictionary *settings = [sequencesSettings objectAtIndex:level];
     
     return settings;
+}
+
++ (NSString*)getSequenceId:(NSUInteger)level {
+    NSDictionary *settings = [NCGame getSequenceParams:level];
+    
+    return [settings objectForKey:@"id"];
 }
 
 - (NSMutableArray*)getSequence:(NSUInteger)sequenceLevel difficultyLevel:(NSUInteger)difficultyLevel {
@@ -396,24 +418,24 @@
     float difficultyBonus = (percent*difficulty*10.) * difficulty;
     
     
-    NSLog(@"SCORE base (speed, total) %@, difbonus %.2f", score, difficultyBonus);
+//    NSLog(@"SCORE base (speed, total) %@, difbonus %.2f", score, difficultyBonus);
     
     score = [NSNumber numberWithFloat:[score floatValue] + difficultyBonus ];
-    NSLog(@"SCORE difficult %@", score);
+//    NSLog(@"SCORE difficult %@", score);
     
     percent = [score floatValue] / 100.;
     
     float sequenceBonus = (percent*50.) * [sequenceIndex floatValue];
     
     score = [NSNumber numberWithFloat:[score floatValue] + sequenceBonus ];
-    NSLog(@"SCORE sequence %@, sbonus %.2f", score, sequenceBonus);
+//    NSLog(@"SCORE sequence %@, sbonus %.2f", score, sequenceBonus);
 
     percent = [score floatValue] / 100.;
     
     score = [NSNumber numberWithFloat:[score floatValue] - (percent*10) * [[data objectForKey:@"clickedWrong"] floatValue] ];
-    NSLog(@"SCORE wrong %@", score);
+//    NSLog(@"SCORE wrong %@", score);
     
-    NSLog(@"SCORE: %@", score);
+//    NSLog(@"SCORE: %@", score);
     
     
     

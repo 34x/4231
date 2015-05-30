@@ -8,6 +8,7 @@
 
 #import "SettingsViewController.h"
 #import "NCSettings.h"
+#import "NCGame.h"
 
 @interface SettingsViewController ()
 @property (weak, nonatomic) IBOutlet UIPickerView *colsPicker;
@@ -25,9 +26,8 @@
     // Do any additional setup after loading the view.
     
     
-    self.numbers = @[@[@2, @1],
-        @[@2, @2], @[@2, @3], @[@2, @4], @[@3, @3], @[@3, @4], @[@3, @5], @[@4, @4], @[@4, @5], @[@5, @5], @[@6, @7]
-    ];
+    self.numbers = [NCSettings getBoardSizes];
+    
     self.labels = [[NSMutableArray alloc] init];
     for (NSUInteger i = 0; i < [self.numbers count]; i++) {
         NSArray *cr = [self.numbers objectAtIndex:i];
@@ -35,7 +35,6 @@
 
     }
     
-    NSLog(@"%@", self.labels);
     self.colsPicker.delegate = self;
     
     self.colsPicker.tag = 0;
@@ -98,6 +97,15 @@ numberOfRowsInComponent:(NSInteger)component
     
     self.settings.rows = rows;
     self.settings.cols = cols;
+    
+    NSMutableDictionary *ssettings = self.settings.sequencesSettings;
+
+    [ssettings enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        NSMutableDictionary *seq = [self.settings getSequenceSettings:key];
+ 
+        seq[@"currentBoard"] = [NSNumber numberWithLong:row];
+        
+    }];
     
     [self.settings save];
 }

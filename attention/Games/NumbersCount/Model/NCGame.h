@@ -34,12 +34,16 @@
 - (float)getSpeed;
 - (NSNumber*)getDuration;
 - (BOOL)getIsDone;
+- (NSMutableArray*)getSequence:(NSUInteger)sequenceLevel difficultyLevel:(NSUInteger)difficultyLevel;
 + (NSMutableArray*)log;
 + (NSMutableDictionary*)stats:(NSString*)keyFormat;
 + (NSMutableDictionary*)statsForDay;
 + (NSMutableArray*)createLimitSequence:(NSUInteger)total symbols:(NSArray*)symbols;
 + (NSMutableArray*)randomize:(NSMutableArray*)itemsOriginal;
 + (NSArray*)getSequencesParams;
++ (NSDictionary*)getSequenceParams:(NSUInteger)level;
++ (NSUInteger)checkSequenceLevel:(NSUInteger)level;
++ (NSString*)getSequenceId:(NSUInteger)level;
 + (NSArray*)getSymbols:(NSString*)key;
 + (NSNumber*)getScore:(NSDictionary*)data;
 - (NSArray*)getRandomizedSequence:(NSArray*)sequenceOriginal;

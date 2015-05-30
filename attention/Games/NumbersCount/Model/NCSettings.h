@@ -12,7 +12,10 @@
 @property (nonatomic) int cols;
 @property (nonatomic) int rows;
 @property (nonatomic) int sequence;
+@property (nonatomic) NSMutableDictionary *sequencesSettings;
 
 -(id)init;
 -(void)save;
+-(NSMutableDictionary*)getSequenceSettings:(NSString*)sid;
++(NSArray*)getBoardSizes;
 @end

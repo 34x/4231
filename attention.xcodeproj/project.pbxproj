@@ -37,8 +37,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		501633FA1ADE90FA0073B60E /* UIPlotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIPlotView.h; sourceTree = "<group>"; };
-		501633FB1ADE90FA0073B60E /* UIPlotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIPlotView.m; sourceTree = "<group>"; };
+		501633FA1ADE90FA0073B60E /* UIPlotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UIPlotView.h; path = ../UIPlotView.h; sourceTree = "<group>"; };
+		501633FB1ADE90FA0073B60E /* UIPlotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UIPlotView.m; path = ../UIPlotView.m; sourceTree = "<group>"; };
 		503AAD3F1A027F5B00602F0D /* NCCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NCCell.h; sourceTree = "<group>"; };
 		503AAD401A027F5B00602F0D /* NCCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NCCell.m; sourceTree = "<group>"; };
 		503AAD411A027F5B00602F0D /* NCGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NCGame.h; sourceTree = "<group>"; };
@@ -142,8 +142,6 @@
 		50B0CF2A19CDFB0200CCB9AB = {
 			isa = PBXGroup;
 			children = (
-				501633FA1ADE90FA0073B60E /* UIPlotView.h */,
-				501633FB1ADE90FA0073B60E /* UIPlotView.m */,
 				50B0CF3519CDFB0200CCB9AB /* attention */,
 				50B0CF5219CDFB0200CCB9AB /* attentionTests */,
 				50B0CF3419CDFB0200CCB9AB /* Products */,
@@ -180,6 +178,8 @@
 		50B0CF3619CDFB0200CCB9AB /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				501633FA1ADE90FA0073B60E /* UIPlotView.h */,
+				501633FB1ADE90FA0073B60E /* UIPlotView.m */,
 				50B0CF3A19CDFB0200CCB9AB /* AppDelegate.h */,
 				50B0CF3B19CDFB0200CCB9AB /* AppDelegate.m */,
 				50B0CF3719CDFB0200CCB9AB /* Info.plist */,

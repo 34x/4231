@@ -100,7 +100,7 @@
     maximum = [orderedPoints[[orderedPoints count] -1 ][1] floatValue];
     
     float multiple = (height - 20.) / maximum;
-    float stepX = (width -60.) / ((float)[points count] - 1);
+    float stepX = (width - 48.) / ((float)[points count] - 1);
     
     prevY = height - prevY;
     __block float x = 40.;
@@ -113,7 +113,7 @@
     __block float xLabelY = height - 10.;
     
     
-    int maxCols = 12;
+    int maxCols = 10;
     long divider = floor(([points count] / maxCols)) + 1;
     
     
@@ -170,22 +170,22 @@
         
         UIFont *labelFont = [UIFont fontWithName:@"Helvetica" size:9.];
         
-        if ([yValue floatValue] == maximum || [yValue floatValue] == minimum || iteration == [points count] / 2) {
+//        if ([yValue floatValue] == maximum || [yValue floatValue] == minimum || iteration == floor(maxCols / 2)) {
             UILabel *yLabel = [[UILabel alloc] initWithFrame:CGRectMake(yLabelX, labelY, yLabelWidth, 20.)];
             [yLabel setFont:labelFont];
             [yLabel setText:[NSString stringWithFormat:@"%.2f", [yValue floatValue]]];
             [yLabel setTextAlignment:NSTextAlignmentRight];
             [self addSubview:yLabel];
-        }
+//        }
         
         
         if (floor(iteration / divider) == (float)iteration / (float)divider) {
         
-        UILabel *xLabel = [[UILabel alloc] initWithFrame:CGRectMake(xLabelX, xLabelY, 50., 20.)];
-        xLabel.text = [NSString stringWithFormat:@"%@", xValue];
-        [xLabel setFont:labelFont];
-        xLabel.textAlignment = NSTextAlignmentCenter;
-        [self addSubview:xLabel];
+            UILabel *xLabel = [[UILabel alloc] initWithFrame:CGRectMake(xLabelX, xLabelY, 50., 20.)];
+            xLabel.text = [NSString stringWithFormat:@"%@", xValue];
+            [xLabel setFont:labelFont];
+            xLabel.textAlignment = NSTextAlignmentCenter;
+            [self addSubview:xLabel];
         }
         
         [UIView animateWithDuration:1.2
