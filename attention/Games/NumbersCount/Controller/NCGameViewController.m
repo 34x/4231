@@ -68,7 +68,7 @@
     NSLog(@"will appear");
     self.gameReverse = NO;
     self.gameWithLetters = NO;
-    self.gameTimeLimit = 30;
+    self.gameTimeLimit = 25;
     self.difficultyLevel = 0;
     self.sequenceLevel = 0;
     self.nextLevelLimit = 60.; // %
@@ -242,11 +242,11 @@
     self.cols = [cBoard[0] intValue];
     self.rows = [cBoard[1] intValue];
     
-//    self.cols = 2;
-//    self.rows = 2;
+//    self.cols = 8;
+//    self.rows = 12;
     
     self.game = [[NCGame alloc] initWithTotal: self.cols * self.rows ];
-    self.game.timeLimit = self.gameTimeLimit;
+    self.game.timeLimit = (self.gameTimeLimit * self.cols * self.rows);
     self.game.difficultyLevel = self.difficultyLevel;
     self.game.sequenceLevel = self.sequenceLevel;
     

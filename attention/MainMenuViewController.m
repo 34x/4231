@@ -43,7 +43,7 @@
     [self.numbersCountStats addTarget:self action:@selector(numbersCountStatsClick:) forControlEvents:UIControlEventTouchUpInside];
 //    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"bg2.jpg"]];
     
-    [self setupLocalNotifications];
+//    [self setupLocalNotifications];
     
 //    [self drawPlot];
     
@@ -116,6 +116,7 @@
 }
 
 - (void)setupLocalNotifications {
+
     [[UIApplication sharedApplication] cancelAllLocalNotifications];
 
     UIApplication *application = [UIApplication sharedApplication];

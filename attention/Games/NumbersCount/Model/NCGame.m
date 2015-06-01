@@ -105,9 +105,16 @@
     for (NSUInteger i = 1; i < 100; i++) {
         [numbersFrom1 addObject:[NSString stringWithFormat:@"%lu", (unsigned long)i]];
     }
+    
+    NSMutableArray *numbersFrom0 = [[NSMutableArray alloc] init];
+    for (NSUInteger i = 0; i < 100; i++) {
+        [numbersFrom0 addObject:[NSString stringWithFormat:@"%lu", (unsigned long)i]];
+    }
+    
     NSDictionary *symbols = @{
                               @"numbersFrom1" : numbersFrom1,
-                              @"numbers" : @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"],
+                              @"numbers" : numbersFrom0,
+                              @"numbers09": @[@0, @1, @2, @3, @4, @5, @6, @7, @8, @9],
                               @"numbersLetters" : @[
                                                     @"A", @"B", @"C", @"D", @"E", @"F", @"G", @"H", @"I", @"J", @"K", @"L", @"M", @"N",
                                                     @"O", @"P", @"Q", @"R", @"S", @"T", @"U", @"V", @"W", @"X", @"Y", @"Z",
@@ -133,15 +140,17 @@
                          @"id" : @"numbers",
                          @"symbols" : @"numbersFrom1",
                          @"label" : @"Numbers",
+                         @"generator" : @"getSlicedSequence:"
                          },
                      @{
                          @"id" : @"letters",
                          @"symbols" : @"letters",
-                         @"label" : @"Letters"
+                         @"label" : @"Letters",
+                         @"generator" : @"getSlicedSequence:"
                          },
                      @{
                          @"id" : @"randomNumbers",
-                         @"symbols" : @"numbers",
+                         @"symbols" : @"numbers09",
                          @"label"   : @"Random numbers",
                          @"generator" : @"getRandomizedSequence:"
                          },
@@ -166,7 +175,8 @@
                      @{
                          @"id" : @"katakana",
                          @"symbols" : @"katakana",
-                         @"label" : @"Katakana"
+                         @"label" : @"Katakana",
+                         @"generator" : @"getSlicedSequence:"
                          },
                      @{
                          @"id" : @"randomKatakana",
@@ -303,6 +313,21 @@
             items[i] = items[newIndex];
             items[newIndex] = cell;
         }
+    }
+    
+    return items;
+}
+
+- (NSArray*)getSlicedSequence:(NSArray*)sequenceOriginal {
+    NSMutableArray *items = sequenceOriginal.mutableCopy;
+    if (self.total > [items count]) {
+        return items;
+    }
+    
+    int offset = arc4random() % ([items count] - self.total);
+    
+    for (int i = 0; i < offset; i++) {
+        [items removeObjectAtIndex:0];
     }
     
     return items;

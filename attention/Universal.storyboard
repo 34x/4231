@@ -6,7 +6,7 @@
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
-        <!--Title-->
+        <!--4231-->
         <scene sceneID="Hwa-fc-flB">
             <objects>
                 <viewController id="tyH-Ls-OKc" customClass="MainMenuViewController" sceneMemberID="viewController">
@@ -51,7 +51,7 @@
                         </constraints>
                     </view>
                     <toolbarItems/>
-                    <navigationItem key="navigationItem" title="Title" id="nMW-pB-fdK"/>
+                    <navigationItem key="navigationItem" title="4231" id="nMW-pB-fdK"/>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="infoButton" destination="TbR-M3-epl" id="ikd-X0-PuU"/>
