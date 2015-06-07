@@ -527,6 +527,7 @@
         NSNumber *dayAvg = [dayLog objectForKey:@"avg"];
         NSNumber *dayMax = [dayLog objectForKey:@"max"];
         NSNumber *dayMin = [dayLog objectForKey:@"min"];
+        NSNumber *daySum = [dayLog objectForKey:@"sum"];
         
         if (nil == dayAvg) {
             dayAvg = [NSNumber numberWithFloat:gameScore];
@@ -542,9 +543,16 @@
             dayMin = [NSNumber numberWithFloat:gameScore];
         }
         
+        if (nil == daySum) {
+            daySum = [NSNumber numberWithFloat:gameScore];
+        } else {
+            daySum = [NSNumber numberWithFloat:([daySum floatValue] + gameScore)];
+        }
+        
         [dayLog setObject:dayAvg forKey:@"avg"];
         [dayLog setObject:dayMax forKey:@"max"];
         [dayLog setObject:dayMin forKey:@"min"];
+        [dayLog setObject:daySum forKey:@"sum"];
 
         if (nil == totalAvg) {
             totalAvg = [NSNumber numberWithFloat:gameScore];

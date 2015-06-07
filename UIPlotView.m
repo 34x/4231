@@ -100,16 +100,16 @@
     maximum = [orderedPoints[[orderedPoints count] -1 ][1] floatValue];
     
     float multiple = (height - 20.) / maximum;
-    float stepX = (width - 48.) / ((float)[points count] - 1);
+    float stepX = (width - 68.) / ((float)[points count] - 1);
     
     prevY = height - prevY;
-    __block float x = 40.;
+    __block float x = 58.;
     
     float rowHeight = (height - 10.) / ([points count]);
 
     __block float yLabelX = 0.;
-    __block float yLabelWidth = 28.;
-    __block float xLabelX = x - 25.;
+    __block float yLabelWidth = 54.;
+    __block float xLabelX = x - 28.;
     __block float xLabelY = height - 10.;
     
     
@@ -137,7 +137,7 @@
         
         //
         CGContextBeginPath(context);
-        CGContextSetLineWidth(context, 0.8);
+        CGContextSetLineWidth(context, 1.2);
         CGContextSetStrokeColorWithColor(context, self.lineColor.CGColor);
         
         
@@ -151,13 +151,19 @@
             CGContextMoveToPoint(context, prevX, prevY);
         }
         CGContextAddLineToPoint(context, x, y);
+        CGContextStrokePath(context);
         
+        CGContextBeginPath(context);
+
+        CGContextAddArc(context, x, y, 3, 0, 360, 0);
+        CGContextSetFillColorWithColor(context, self.lineColor.CGColor);
+        CGContextFillPath(context);
         CGContextStrokePath(context);
 
         CGContextBeginPath(context);
         
         CGContextSetStrokeColorWithColor(context, [UIColor lightGrayColor].CGColor);
-        CGContextSetLineWidth(context, .1);
+        CGContextSetLineWidth(context, .4);
         
         CGContextMoveToPoint(context, yLabelWidth + 4., y);
         CGContextAddLineToPoint(context, width, y);
@@ -175,6 +181,7 @@
             [yLabel setFont:labelFont];
             [yLabel setText:[NSString stringWithFormat:@"%.2f", [yValue floatValue]]];
             [yLabel setTextAlignment:NSTextAlignmentRight];
+//        yLabel.backgroundColor = [UIColor grayColor];
             [self addSubview:yLabel];
 //        }
         

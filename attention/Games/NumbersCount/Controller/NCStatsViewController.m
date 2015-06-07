@@ -67,13 +67,22 @@
     [self clearStats];
     
     float frameWidth = self.scrollView.bounds.size.width;
+    UILabel *label1 = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, frameWidth, 24)];
+    label1.textAlignment = NSTextAlignmentCenter;
+    label1.text = @"Summary";
+    [self.scrollView addSubview:label1];
     
-    UIPlotView *plot = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 0., frameWidth, 150.)];
+    UIPlotView *plot = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 24., frameWidth, 150.)];
     plot.plotBackgroundColor = [UIColor whiteColor];
     plot.lineColor = [UIColor blueColor];
     NSMutableArray *points = [[NSMutableArray alloc] init];
     
-    UIPlotView *plotAvg = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 182., frameWidth, 150.)];
+    UILabel *label2 = [[UILabel alloc] initWithFrame:CGRectMake(0, 182, frameWidth, 32)];
+    label2.text = @"Avarage";
+    label2.textAlignment = NSTextAlignmentCenter;
+    [self.scrollView addSubview:label2];
+    
+    UIPlotView *plotAvg = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 214., frameWidth, 150.)];
     plotAvg.plotBackgroundColor = [UIColor whiteColor];
     plotAvg.lineColor = [UIColor greenColor];
     NSMutableArray *pointsAvg = [[NSMutableArray alloc] init];
@@ -111,6 +120,7 @@
         float dayMin = [[dayData objectForKey:@"min"] floatValue];
         float dayAvg = [[dayData objectForKey:@"avg"] floatValue];
         float dayMax = [[dayData objectForKey:@"max"] floatValue];
+        float daySum = [[dayData objectForKey:@"sum"] floatValue];
 
         if (0. == dayAvg) {
             continue;
@@ -125,7 +135,7 @@
             day = [NSString stringWithFormat:@"%@", date[0]];
         }
         
-        [points addObject:@[day, [NSNumber numberWithFloat:dayMax]]];
+        [points addObject:@[day, [NSNumber numberWithFloat:daySum]]];
         [pointsAvg addObject:@[day, [NSNumber numberWithFloat:dayAvg]]];
         x = x + 20.;
         
@@ -215,7 +225,7 @@
 
     plot.points = points;
     [self.scrollView addSubview:plot];
-    
+    [plot redraw];
     plotAvg.points = pointsAvg;
     [self.scrollView addSubview:plotAvg];
     [plotAvg redraw];
