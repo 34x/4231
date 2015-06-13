@@ -482,14 +482,11 @@
         }
         
         int solved = [[ssettings objectForKey:@"solved" ] intValue];
-        NSString *nextBoard = [NSString stringWithFormat:@"%lu / %d", (solved * 4) + self.difficultyLevel+1, self.cols*self.rows * 4];
         
-        long slevel = self.sequenceLevel;
-        long dlevel = self.difficultyLevel;
-        
-        int errorsLimit = 1;
+        int errorsLimit = 4;
+        int nextBoardLimitFactor = 6;
         int sequenceLength = [ssettings[@"sequenceLength"] intValue];
-        int nextBoardLimitFactor = 8;
+
         
         if (self.game.clickedWrong > 0) {
             lastResult = 0;
@@ -505,15 +502,15 @@
                     NSUInteger boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
                     NSUInteger currentIndex = [ssettings[@"currentBoard"] integerValue];
                     
-                    // if we have not initial board for this sequence. We decrase board size
+                    // if we have not in initial board for this sequence. We decrase board size
                     if (currentIndex > boardIndex) {
                         boardIndex--;
                         ssettings[@"currentBoard"] = [NSNumber numberWithInteger:boardIndex];
 
                     } else { // if we at start of board for this sequence length we decrase sequence length
                         sequenceLength--;
-                        boardIndex--;
-//                        boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
+//                        boardIndex--;
+                        boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
 
                         ssettings[@"currentBoard"] = [NSNumber numberWithInteger:boardIndex];
                         ssettings[@"sequenceLength"] = [NSNumber numberWithInt:sequenceLength];
@@ -545,7 +542,7 @@
             } else {
                 ssettings[@"errors"] = [NSNumber numberWithInt:0];
                 // next sequence length
-                if ( !(self.game.sequenceLength * nextBoardLimitFactor > self.game.total)) {
+                if (self.game.total > self.game.sequenceLength * nextBoardLimitFactor) {
 
                     ssettings[@"solved"] = [NSNumber numberWithInt:0];
                     ssettings[@"sequenceLength"] = [NSNumber numberWithInt:++sequenceLength];
@@ -553,7 +550,6 @@
                     NSUInteger boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
                     ssettings[@"currentBoard"] = [NSNumber numberWithInteger:boardIndex];
                     
-                    nextBoard = [NSString stringWithFormat:@"Next board!"];
                 } else { // increase the board size
                     ssettings[@"currentBoard"] = [NSNumber numberWithInt:[ssettings[@"currentBoard"] intValue] + 1];
                 }

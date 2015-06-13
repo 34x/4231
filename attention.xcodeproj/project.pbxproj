@@ -55,6 +55,9 @@
 		504F858F19FC131700DAC9FF /* MainMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainMenuViewController.h; sourceTree = "<group>"; };
 		504F859019FC131700DAC9FF /* MainMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainMenuViewController.m; sourceTree = "<group>"; };
 		50724A3719F277AC00590BC0 /* Universal.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Universal.storyboard; sourceTree = "<group>"; };
+		507BD4881B2CA4BE003FFF10 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		507BD4891B2CA4E5003FFF10 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		507BD48A1B2CA595003FFF10 /* en-GB */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-GB"; path = "en-GB.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		507EBF8C1AD14B5C00AC8E5C /* AppIcon29.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon29.png; path = Images/AppIcon29.png; sourceTree = "<group>"; };
 		50B0CF3319CDFB0200CCB9AB /* attention.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = attention.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50B0CF3719CDFB0200CCB9AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -269,7 +272,6 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
 				English,
 			);
@@ -364,6 +366,9 @@
 			isa = PBXVariantGroup;
 			children = (
 				50B0CF4919CDFB0200CCB9AB /* Base */,
+				507BD4881B2CA4BE003FFF10 /* en-US */,
+				507BD4891B2CA4E5003FFF10 /* en */,
+				507BD48A1B2CA595003FFF10 /* en-GB */,
 			);
 			name = LaunchScreen.xib;
 			sourceTree = "<group>";
