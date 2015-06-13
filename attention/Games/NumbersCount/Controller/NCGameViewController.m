@@ -26,6 +26,7 @@
 @property (strong, nonatomic) IBOutlet UIAlertView *alertGameStart;
 @property (strong, nonatomic) IBOutlet UIAlertView *alertSequenceSelect;
 @property (strong, nonatomic) IBOutlet UIAlertView *alertResult;
+@property (strong, nonatomic) NSString *sequenceId;
 //@property (weak, nonatomic) IBOutlet UILabel *headerTitle;
 
 //@property (nonatomic) UIView *board;
@@ -220,8 +221,6 @@
     [self endGame:NO];
     
     
-    
-    
     // init new game
     
     self.progressBar.progress = 0.0;
@@ -232,7 +231,7 @@
     NSDictionary *sequenceParams = [NCGame getSequenceParams:self.sequenceLevel];
     NSMutableDictionary *ssettings = [self.settings getSequenceSettings:[sequenceParams objectForKey:@"id"]];
     
-//    ssettings[@"solved"] = [NSNumber numberWithInt:[ssettings[@"solved"] intValue] + 1];
+    self.sequenceId = sequenceParams[@"id"];
 
     [self.settings save];
     
@@ -241,14 +240,12 @@
     
     self.cols = [cBoard[0] intValue];
     self.rows = [cBoard[1] intValue];
-    
-//    self.cols = 8;
-//    self.rows = 12;
-    
+
     self.game = [[NCGame alloc] initWithTotal: self.cols * self.rows ];
     self.game.timeLimit = (self.gameTimeLimit * self.cols * self.rows);
     self.game.difficultyLevel = self.difficultyLevel;
     self.game.sequenceLevel = self.sequenceLevel;
+    self.game.sequenceLength = [ssettings[@"sequenceLength"] integerValue];
     
     if (0 == self.difficultyLevel) {
         ssettings[@"lastResult"] = @0.0;
@@ -308,7 +305,9 @@
     float margin = 0.0;
     float y = 0.0;
     float x = 0.0;
-    float size = width * 1.6; // + width / 10. + width;
+
+    float size = MIN(width, height); // + width / 10. + width;
+    size = size * 1.4;
     
     NSArray *colors = @[
                        [UIColor redColor],
@@ -327,7 +326,7 @@
     
     
     NSArray *opacity = @[
-                         [NSNumber numberWithFloat:.2],
+//                         [NSNumber numberWithFloat:.2],
                          [NSNumber numberWithFloat:.4],
                          [NSNumber numberWithFloat:.6],
                          [NSNumber numberWithFloat:.8],
@@ -339,9 +338,9 @@
                        [NSNumber numberWithFloat:size/2],
                        [NSNumber numberWithFloat:size/3],
                        [NSNumber numberWithFloat:size/4],
-                       [NSNumber numberWithFloat:size/5],
-                       [NSNumber numberWithFloat:size/6],
-                       //                       [NSNumber numberWithFloat:size/8],
+//                       [NSNumber numberWithFloat:size/5],
+//                       [NSNumber numberWithFloat:size/6],
+//                       [NSNumber numberWithFloat:size/8],
                        ];
     
     NSArray *fontsMulti = @[//[NSNumber numberWithFloat:size/1.8],
@@ -349,7 +348,7 @@
                             [NSNumber numberWithFloat:size/3],
                             [NSNumber numberWithFloat:size/4],
                             [NSNumber numberWithFloat:size/5],
-                            [NSNumber numberWithFloat:size/6],
+//                            [NSNumber numberWithFloat:size/6],
                             ];
  
     NSArray *fontsTriple = @[//[NSNumber numberWithFloat:size/1.8],
@@ -454,7 +453,7 @@
     
     [self.timer invalidate];
     self.timer = nil;
-    
+
     NSDictionary *result;
     float gameScore = .0;
     if (self.game) {
@@ -462,16 +461,23 @@
         gameScore = [[NCGame getScore:result] floatValue];
         
     }
-
+    
+    NSArray *winMsgs = @[@"Good work!", @"Wow! Hold your horses!"];
+    NSArray *looseMsgs = @[
+                           @"You can do it better!",
+                           @"Put yourself together!", @"Calm down it is not the end of the world. It just the middle."];
+    
     [self updateHeaderLabel];
-    NSString *nextLevel;
+    
+    NSString *msgTitle = looseMsgs[arc4random() % [looseMsgs count]];
+    
     if (showResult) {
         NSMutableDictionary *ssettings = [self.settings getSequenceSettings:[NCGame getSequenceId:self.sequenceLevel]];
         
         float lastResult = [ssettings[@"lastResult"] floatValue];
         
         float diff = .0;
-        if (gameScore > .0) {
+        if (gameScore > .0 && lastResult > .0) {
             diff = gameScore / (lastResult / 100.);
         }
         
@@ -481,48 +487,85 @@
         long slevel = self.sequenceLevel;
         long dlevel = self.difficultyLevel;
         
-        if (gameScore > 0. && (diff > self.nextLevelLimit || .0 == diff) && 0 == self.game.clickedWrong) {
+        int errorsLimit = 1;
+        int sequenceLength = [ssettings[@"sequenceLength"] intValue];
+        int nextBoardLimitFactor = 8;
+        
+        if (self.game.clickedWrong > 0) {
+            lastResult = 0;
+            int errors = [ssettings[@"errors"] intValue] + 1;
+            ssettings[@"errors"] = [NSNumber numberWithInt:errors];
             
-            nextLevel = @"Next level!";
-            lastResult = gameScore;
-            
-            if (self.difficultyLevel < 3) {
-                self.difficultyLevel++;
+            if (errors > errorsLimit) {
+                ssettings[@"errors"] = [NSNumber numberWithInt:0];
+                ssettings[@"solved"] = [NSNumber numberWithInt:0];
+                
+                if (sequenceLength > 2) {
+                    
+                    NSUInteger boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
+                    NSUInteger currentIndex = [ssettings[@"currentBoard"] integerValue];
+                    
+                    // if we have not initial board for this sequence. We decrase board size
+                    if (currentIndex > boardIndex) {
+                        boardIndex--;
+                        ssettings[@"currentBoard"] = [NSNumber numberWithInteger:boardIndex];
 
-            } else {
-                if ([ssettings[@"currentBoard"] isEqualToNumber:ssettings[@"maximumBoard"]]) {
-                    solved = solved + 1;
-                    ssettings[@"solved"] = [NSNumber numberWithInt:solved];
+                    } else { // if we at start of board for this sequence length we decrase sequence length
+                        sequenceLength--;
+                        boardIndex--;
+//                        boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
 
-                    // because we can use lowest board than we have
-                    if (solved * 4 >= self.cols * self.rows * 4) {
-                        ssettings[@"currentBoard"] = [NSNumber numberWithInt:[ssettings[@"currentBoard"] intValue] + 1];
-                        ssettings[@"maximumBoard"] = ssettings[@"currentBoard"];
-                        ssettings[@"solved"] = [NSNumber numberWithInt:0];
-                        
-                        nextBoard = [NSString stringWithFormat:@"Next board!"];
+                        ssettings[@"currentBoard"] = [NSNumber numberWithInteger:boardIndex];
+                        ssettings[@"sequenceLength"] = [NSNumber numberWithInt:sequenceLength];
                     }
 
+
+                    
                 } else {
-                    // temporarly?
-                    ssettings[@"currentBoard"] = ssettings[@"maximumBoard"];
+                    NSUInteger currentIndex = [ssettings[@"currentBoard"] integerValue];
+
+                    if (currentIndex > 0) {
+                        currentIndex--;
+                        ssettings[@"currentBoard"] = [NSNumber numberWithInteger:currentIndex];
+                    }
+                    
                 }
-                
-                
-                
-                [self.settings save];
-                
-                self.difficultyLevel = 0;
-                self.sequenceLevel++;
                 
             }
             
+        } else if (gameScore > 0. && (diff > self.nextLevelLimit || .0 == diff)) {
+            msgTitle = winMsgs[arc4random()%[winMsgs count]];
             
-        } else {
-            nextLevel = @"You can do it better!";
+            lastResult = gameScore;
+            solved++;
+            ssettings[@"solved"] = [NSNumber numberWithInt:solved];
+            
+            if (self.difficultyLevel < 3) {
+                self.difficultyLevel++;
+            } else {
+                ssettings[@"errors"] = [NSNumber numberWithInt:0];
+                // next sequence length
+                if ( !(self.game.sequenceLength * nextBoardLimitFactor > self.game.total)) {
+
+                    ssettings[@"solved"] = [NSNumber numberWithInt:0];
+                    ssettings[@"sequenceLength"] = [NSNumber numberWithInt:++sequenceLength];
+
+                    NSUInteger boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
+                    ssettings[@"currentBoard"] = [NSNumber numberWithInteger:boardIndex];
+                    
+                    nextBoard = [NSString stringWithFormat:@"Next board!"];
+                } else { // increase the board size
+                    ssettings[@"currentBoard"] = [NSNumber numberWithInt:[ssettings[@"currentBoard"] intValue] + 1];
+                }
+                
+                // change sequence
+                self.sequenceLevel++;
+
+                self.difficultyLevel = 0;
+            }
         }
         
-        NSLog(@"%@", ssettings);
+        [self.settings save];
         
         NSString *nextLevelLimit = @"";
         if (lastResult) {
@@ -532,31 +575,92 @@
         
         ssettings[@"lastResult"] = [NSNumber numberWithFloat:lastResult];
         
-        NSString *alertTitle = [NSString stringWithFormat:@"%@", nextLevel];
+        NSString *alertTitle = msgTitle;
 
-        NSString *alertMessage = [NSString
-                                  stringWithFormat:@"Score: %.2f\
-                                  \nDuration: %@\
-                                  \nSpeed: %.1f\
-                                  \nDifficulty: %lu\
-                                  \nSequence: %lu\
-                                  \nClicked: %lu\
-                                  \nWrong:%lu\
-                                  \n%@\
-                                  \nnextBoard %@",
-                                  gameScore,
-                                  [self durationString],
-                                  [self.game getSpeed],
-                                  dlevel,
-                                  slevel,
-                                  self.game.clicked,
-                                  self.game.clickedWrong,
-                                  nextLevelLimit,
-                                  nextBoard
-                                ];
+//        NSString *alertMessage = [NSString
+//                                  stringWithFormat:@"Score: %.2f\
+//                                  \nDuration: %@\
+//                                  \nSpeed: %.1f\
+//                                  \nDifficulty: %lu\
+//                                  \nSequence: %lu\
+//                                  \nClicked: %lu\
+//                                  \nWrong:%lu\
+//                                  \n%@\
+//                                  \nnextBoard %@",
+//                                  gameScore,
+//                                  [self durationString],
+//                                  [self.game getSpeed],
+//                                  dlevel,
+//                                  slevel,
+//                                  self.game.clicked,
+//                                  self.game.clickedWrong,
+//                                  nextLevelLimit,
+//                                  nextBoard
+//                                ];
 
-        alertMessage = [NSString stringWithFormat:@"You score: %.2f\
-                        \n%@", gameScore, nextBoard];
+        NSString *alertMessage = [NSString stringWithFormat:@"You score: %.2f\n", gameScore];
+        NSLog(@"%@", self.sequenceId);
+        if ([@"randomFlags" isEqualToString:self.sequenceId]) {
+            NSDictionary *flags = @{
+                                    @"🇦🇺" : @"Australia",
+                                    @"🇦🇹" : @"Austria",
+                                    @"🇧🇪" : @"Belgium",
+                                    @"🇧🇷" : @"Brazil",
+                                    @"🇨🇦" : @"Canada",
+                                    @"🇨🇱" : @"Chile",
+                                    @"🇨🇳" : @"China",
+                                    @"🇨🇴" : @"Colombia",
+                                    @"🇩🇰" : @"Denmark",
+                                    @"🇫🇮" : @"Finland",
+                                    @"🇫🇷" : @"France",
+                                    @"🇩🇪" : @"Germany",
+                                    @"🇭🇰" : @"Hong Kong",
+                                    @"🇮🇳" : @"India",
+                                    @"🇮🇩" : @"Indonesia",
+                                    @"🇮🇪" : @"Ireland",
+                                    @"🇮🇱" : @"Israel",
+                                    @"🇮🇹" : @"Italy",
+                                    @"🇯🇵" : @"Japan",
+                                    @"🇰🇷" : @"Korea",
+                                    @"🇲🇴" : @"Macao",
+                                    @"🇲🇾" : @"Malaysia",
+                                    @"🇲🇽" : @"Mexico",
+                                    @"🇳🇱" : @"Netherland",
+                                    @"🇳🇿" : @"New Zealand",
+                                    @"🇳🇴" : @"Norway",
+                                    @"🇵🇭" : @"Philippines",
+                                    @"🇵🇱" : @"Poland",
+                                    @"🇵🇹" : @"Portugal",
+                                    @"🇵🇷" : @"Puerto Rico",
+                                    @"🇷🇺" : @"Russia",
+                                    @"🇸🇦" : @"Saudi Arabia",
+                                    @"🇸🇬" : @"Singapore",
+                                    @"🇿🇦" : @"South Africa",
+                                    @"🇪🇸" : @"Spain",
+                                    @"🇸🇪" : @"Sweden",
+                                    @"🇨🇭" : @"Switzerland",
+                                    @"🇹🇷" : @"Turkey",
+                                    @"🇬🇧" : @"Great Britain",
+                                    @"🇺🇸" : @"USA",
+                                    @"🇦🇪" : @"United Arab Emirates",
+                                    @"🇻🇳" : @"Vietnam"
+            };
+            
+            NSLog(@"%@", self.game.sequence);
+            
+            for (int i = 0; i < [self.game.sequence count]; i++) {
+                NSString *flag = self.game.sequence[i];
+                NSString *country = [flags objectForKey:flag];
+                
+                NSLog(@"flag %@", flag);
+
+                if (country) {
+                    alertMessage = [NSString stringWithFormat:@"%@\n%@ %s",
+                                    alertMessage, self.game.sequence[i], [country UTF8String]];
+                }
+                
+            }
+        }
         
         if (!self.alertResult) {
         

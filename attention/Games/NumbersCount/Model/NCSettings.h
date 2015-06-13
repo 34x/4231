@@ -18,4 +18,5 @@
 -(void)save;
 -(NSMutableDictionary*)getSequenceSettings:(NSString*)sid;
 +(NSArray*)getBoardSizes;
++(NSUInteger)getCloserBoardIndex:(NSInteger)size;
 @end

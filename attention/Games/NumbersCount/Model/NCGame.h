@@ -11,6 +11,8 @@
 @interface NCGame : NSObject
 @property (readonly, nonatomic) NSUInteger cols;
 @property (readonly, nonatomic) NSUInteger rows;
+@property (readonly, nonatomic) NSUInteger total;
+@property (readwrite, nonatomic) NSUInteger sequenceLength;
 @property (readonly, nonatomic) NSNumber *duration;
 @property (readonly, nonatomic) NSMutableArray *items;
 @property (readonly, nonatomic) NSUInteger currentIndex;

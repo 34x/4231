@@ -79,6 +79,7 @@
     __block float prevY = [points[0][1] floatValue];
     __block float maximum = .0;
     __block float minimum = .0;
+    __block float avarage = .0;
     
     NSArray *orderedPoints = [points sortedArrayUsingComparator:^(id obj1, id obj2) {
         
@@ -99,6 +100,7 @@
     minimum = [orderedPoints[0][1] floatValue];
     maximum = [orderedPoints[[orderedPoints count] -1 ][1] floatValue];
     
+    
     float multiple = (height - 20.) / maximum;
     float stepX = (width - 68.) / ((float)[points count] - 1);
     
@@ -110,10 +112,10 @@
     __block float yLabelX = 0.;
     __block float yLabelWidth = 54.;
     __block float xLabelX = x - 28.;
-    __block float xLabelY = height - 10.;
+    __block float xLabelY = height;
     
     
-    int maxCols = 10;
+    int maxCols = 8;
     long divider = floor(([points count] / maxCols)) + 1;
     
     
@@ -134,12 +136,24 @@
 
         
         xLabelX = x - 25.;
+
+        CGContextBeginPath(context);
         
-        //
+        CGContextSetStrokeColorWithColor(context, [UIColor lightGrayColor].CGColor);
+        CGContextSetLineWidth(context, .1);
+        
+        CGContextMoveToPoint(context, yLabelWidth + 4., y);
+        CGContextAddLineToPoint(context, width, y);
+        
+        CGContextMoveToPoint(context, x, 0);
+        CGContextAddLineToPoint(context, x, height-4.);
+        
+        CGContextStrokePath(context);
+        
+        
         CGContextBeginPath(context);
         CGContextSetLineWidth(context, 1.2);
         CGContextSetStrokeColorWithColor(context, self.lineColor.CGColor);
-        
         
         
         labelY = y - 10;
@@ -153,41 +167,33 @@
         CGContextAddLineToPoint(context, x, y);
         CGContextStrokePath(context);
         
+        
+        
         CGContextBeginPath(context);
-
+        
         CGContextAddArc(context, x, y, 3, 0, 360, 0);
         CGContextSetFillColorWithColor(context, self.lineColor.CGColor);
         CGContextFillPath(context);
         CGContextStrokePath(context);
-
-        CGContextBeginPath(context);
         
-        CGContextSetStrokeColorWithColor(context, [UIColor lightGrayColor].CGColor);
-        CGContextSetLineWidth(context, .4);
-        
-        CGContextMoveToPoint(context, yLabelWidth + 4., y);
-        CGContextAddLineToPoint(context, width, y);
-        
-        CGContextMoveToPoint(context, x, 0);
-        CGContextAddLineToPoint(context, x, height-4.);
-        
-        
-        CGContextStrokePath(context);
         
         UIFont *labelFont = [UIFont fontWithName:@"Helvetica" size:9.];
         
-//        if ([yValue floatValue] == maximum || [yValue floatValue] == minimum || iteration == floor(maxCols / 2)) {
+        NSUInteger yIndex = [orderedPoints indexOfObject:xy];
+        
+        NSLog(@"%lu", yIndex);
+        if (floor(yIndex / divider) == (float)yIndex / (float)divider) {
             UILabel *yLabel = [[UILabel alloc] initWithFrame:CGRectMake(yLabelX, labelY, yLabelWidth, 20.)];
             [yLabel setFont:labelFont];
             [yLabel setText:[NSString stringWithFormat:@"%.2f", [yValue floatValue]]];
             [yLabel setTextAlignment:NSTextAlignmentRight];
-//        yLabel.backgroundColor = [UIColor grayColor];
+            
             [self addSubview:yLabel];
-//        }
-        
+        }
+
         
         if (floor(iteration / divider) == (float)iteration / (float)divider) {
-        
+            
             UILabel *xLabel = [[UILabel alloc] initWithFrame:CGRectMake(xLabelX, xLabelY, 50., 20.)];
             xLabel.text = [NSString stringWithFormat:@"%@", xValue];
             [xLabel setFont:labelFont];

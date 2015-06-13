@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E26a" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="2sX-hZ-jje">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E33b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="2sX-hZ-jje">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
@@ -223,22 +223,23 @@
                             <segmentedControl opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="0jh-zo-QUj">
                                 <rect key="frame" x="16" y="72" width="568" height="29"/>
                                 <segments>
-                                    <segment title="Progress"/>
+                                    <segment title="Day"/>
+                                    <segment title="Month"/>
                                     <segment title="Performance"/>
                                 </segments>
                             </segmentedControl>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LB2-FA-xRk">
-                                <rect key="frame" x="180" y="114" width="240" height="250"/>
+                                <rect key="frame" x="180" y="108" width="240" height="256"/>
                             </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="0jh-zo-QUj" firstAttribute="leading" secondItem="4ge-P5-JTL" secondAttribute="leading" constant="20" id="B8r-lp-q9j"/>
+                            <constraint firstItem="0jh-zo-QUj" firstAttribute="leading" secondItem="4ge-P5-JTL" secondAttribute="leading" constant="4" id="B8r-lp-q9j"/>
+                            <constraint firstItem="LB2-FA-xRk" firstAttribute="top" secondItem="0jh-zo-QUj" secondAttribute="bottom" constant="8" id="C1O-eQ-BxG"/>
                             <constraint firstItem="LB2-FA-xRk" firstAttribute="leading" secondItem="4ge-P5-JTL" secondAttribute="leading" id="Pgp-Be-d5G"/>
                             <constraint firstAttribute="centerX" secondItem="0jh-zo-QUj" secondAttribute="centerX" id="eeB-tD-XPg"/>
                             <constraint firstItem="mKF-xR-WZP" firstAttribute="top" secondItem="LB2-FA-xRk" secondAttribute="bottom" id="gh3-Yx-dPS"/>
-                            <constraint firstAttribute="trailing" secondItem="0jh-zo-QUj" secondAttribute="trailing" constant="20" id="pOP-y9-ixP"/>
-                            <constraint firstItem="LB2-FA-xRk" firstAttribute="top" secondItem="0jh-zo-QUj" secondAttribute="bottom" constant="14" id="ruB-bY-d9U"/>
+                            <constraint firstAttribute="trailing" secondItem="0jh-zo-QUj" secondAttribute="trailing" constant="4" id="pOP-y9-ixP"/>
                             <constraint firstAttribute="trailing" secondItem="LB2-FA-xRk" secondAttribute="trailing" constant="4" id="y3z-1N-C2O"/>
                         </constraints>
                     </view>

@@ -35,6 +35,7 @@
     
     if (self) {
         self.total = total;
+        self.sequenceLength = total;
         self.timeLimit = 30;
         self.difficultyLevel = 0;
         self.sequenceLevel = 0;
@@ -59,15 +60,13 @@
 
 - (BOOL)select:(NSUInteger)index value:(NSString*)value
 {
-    NCCell *cell = self.items[self.currentIndex];
-    
     NSString *current = self.sequence[self.currentIndex];
     
     if ([current isEqualToString:value]) {
         self.currentIndex++;
         self.clicked++;
         
-        if (self.currentIndex >= [self.items count]) {
+        if (self.currentIndex >= [self.sequence count]) {
             self.isComplete = YES;
             [self finish];
         }
@@ -136,24 +135,24 @@
 + (NSArray*)getSequencesParams {
 
     NSArray *sequencesSettings = @[
-                     @{
-                         @"id" : @"numbers",
-                         @"symbols" : @"numbersFrom1",
-                         @"label" : @"Numbers",
-                         @"generator" : @"getSlicedSequence:"
-                         },
-                     @{
-                         @"id" : @"letters",
-                         @"symbols" : @"letters",
-                         @"label" : @"Letters",
-                         @"generator" : @"getSlicedSequence:"
-                         },
-                     @{
-                         @"id" : @"randomNumbers",
-                         @"symbols" : @"numbers09",
-                         @"label"   : @"Random numbers",
-                         @"generator" : @"getRandomizedSequence:"
-                         },
+                   @{
+                       @"id" : @"randomNumbers",
+                       @"symbols" : @"numbers09",
+                       @"label"   : @"Random numbers",
+                       @"generator" : @"getRandomizedSequence:"
+                       },
+//                     @{
+//                         @"id" : @"numbers",
+//                         @"symbols" : @"numbersFrom1",
+//                         @"label" : @"Numbers",
+//                         @"generator" : @"getSlicedSequence:"
+//                         },
+//                     @{
+//                         @"id" : @"letters",
+//                         @"symbols" : @"letters",
+//                         @"label" : @"Letters",
+//                         @"generator" : @"getSlicedSequence:"
+//                         },
                      @{
                          @"id" : @"randomNumbersLetters",
                          @"symbols" : @"numbersLetters",
@@ -172,12 +171,12 @@
                          @"label"   : @"Random flags",
                          @"generator" : @"getRandomizedSequence:"
                          },
-                     @{
-                         @"id" : @"katakana",
-                         @"symbols" : @"katakana",
-                         @"label" : @"Katakana",
-                         @"generator" : @"getSlicedSequence:"
-                         },
+//                     @{
+//                         @"id" : @"katakana",
+//                         @"symbols" : @"katakana",
+//                         @"label" : @"Katakana",
+//                         @"generator" : @"getSlicedSequence:"
+//                         },
                      @{
                          @"id" : @"randomKatakana",
                          @"symbols" : @"katakana",
@@ -224,11 +223,11 @@
     NSArray *symbols = [NCGame getSymbols:[settings objectForKey:@"symbols"]];
     
     if (nil == [settings objectForKey:@"generator"]) {
-        sequence = [NCGame createLimitSequence:self.total symbols:symbols];
+        sequence = [NCGame createLimitSequence:self.sequenceLength symbols:symbols];
     } else {
         SEL selector = NSSelectorFromString([settings objectForKey:@"generator"]);
         sequence = [self performSelector:selector withObject:symbols];
-        sequence = [NCGame createLimitSequence:self.total symbols:sequence];
+        sequence = [NCGame createLimitSequence:self.sequenceLength symbols:sequence];
     }
     
     return sequence;
@@ -239,52 +238,64 @@
     
     NSString *val;
     NSUInteger symbolsCount = [symbols count];
-
-    for (NSUInteger i = 0; i < total; i++) {
-
-        if (i < symbolsCount) {
-            val = [NSString stringWithFormat:@"%@", [symbols objectAtIndex:i]];
-        } else if (i < symbolsCount * 2){
-            val = [NSString stringWithFormat:@"%@%@",
-                   [symbols objectAtIndex:0],
-                   [symbols objectAtIndex:i - symbolsCount]
-                   ];
-        } else {
-            break;
-        }
-
+    
+    NSUInteger idx = 0;
+    while ([sequence count] < total) {
+        val = [NSString stringWithFormat:@"%@", [symbols objectAtIndex:idx]];
+    
         [sequence addObject:[NSString stringWithFormat:@"%@", val]];
+        if (++idx >= [symbols count]) {
+            idx = 0;
+        }
     }
 
     return sequence;
 }
 
 - (void)generateItems:(BOOL)reverse {
-    [self.sequence enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop){
+
+    NSDictionary *settings = [NCGame getSequenceParams:self.sequenceLevel];
+    
+    NSArray *symbols = [NCGame getSymbols:[settings objectForKey:@"symbols"]];
+
+    
+    for (int i = 0; i < [self.sequence count]; i++) {
         NCCell *cell = [[NCCell alloc] init];
         
-        cell.value = idx;
-        cell.text = obj;
+        cell.value = i;
+        cell.text = self.sequence[i];
         [self.items addObject:cell];
-    }];
-}
+    }
 
-+ (NSMutableArray*)randomizeArray:(NSMutableArray*)itemsOriginal {
-    NSMutableArray *items = itemsOriginal.mutableCopy;
+    int idx = 0;
     
-    for (int i = 0; i < [items count]; i++) {
-        NCCell *cell = [items objectAtIndex:i];
-        int newIndex = arc4random() % [items count];
-        
-        if (newIndex != i) {
-            items[i] = items[newIndex];
-            items[newIndex] = cell;
+    while ([self.items count] < self.total) {
+        if (idx >= [symbols count]) {
+            idx = 0;
         }
+        
+        NSString *symbol = symbols[idx];
+        
+        if (NSNotFound == [self.sequence indexOfObject:symbol]) {
+            NCCell *cell = [[NCCell alloc] init];
+            
+            cell.value = idx;
+            cell.text = symbols[idx];
+            [self.items addObject:cell];
+        }
+        
+        idx++;
     }
     
-    return items;
+    
+//    [self.sequence enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop){
+//        NCCell *cell = [[NCCell alloc] init];
+//        
+//        cell.value = idx;
+//        cell.text = obj;
+//        [self.items addObject:cell];
+//    }];
 }
-
 
 + (NSMutableArray*)randomize:(NSMutableArray*)itemsOriginal {
     NSMutableArray *items = itemsOriginal.mutableCopy;
@@ -340,8 +351,10 @@
 
     [self generateItems:NO];
     
-    //randomizing
-    self.items = [NCGame randomize:self.items];
+    //randomizing few times
+    for (int i = 0; i < 3; i++) {
+        self.items = [NCGame randomize:self.items];
+    }
     
     return self.items;
 }
@@ -433,9 +446,17 @@
     }
     
     float total = [[data objectForKey:@"total"] floatValue];
+    float sequenceCount = [[data objectForKey:@"sequenceCount"] floatValue];
+    if (sequenceCount < 2.) {
+        sequenceCount = 2.;
+    }
+    
     float duration = [[data objectForKey:@"duration"] floatValue];
-    float speed = total / duration;
-    score = [NSNumber numberWithFloat:speed * total];
+    float speed = sequenceCount / duration;
+//    NSLog(@"%f / %f = %f", sequenceCount, duration, speed);
+    score = [NSNumber numberWithFloat:speed * sequenceCount];
+    
+    score = [NSNumber numberWithFloat:[score floatValue] * total ];
     
     float percent = [score floatValue] / 100.;
     float difficulty = [[data objectForKey:@"difficulty"] floatValue];
@@ -450,7 +471,7 @@
     
     percent = [score floatValue] / 100.;
     
-    float sequenceBonus = (percent*50.) * [sequenceIndex floatValue];
+    float sequenceBonus = (percent*20.) * [sequenceIndex floatValue];
     
     score = [NSNumber numberWithFloat:[score floatValue] + sequenceBonus ];
 //    NSLog(@"SCORE sequence %@, sbonus %.2f", score, sequenceBonus);
@@ -493,7 +514,6 @@
         
         NSDate *date = [item objectForKey:@"date"];
         // calculate item value
-        float total = [[item objectForKey:@"total"] floatValue];
         float time  = [[item objectForKey:@"duration"] floatValue];
         
         if (!time || time > 1000000) {

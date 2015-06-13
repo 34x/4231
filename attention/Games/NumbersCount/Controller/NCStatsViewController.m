@@ -27,8 +27,11 @@
 }
 
 - (IBAction)selectStats:(id)sender {
-    if (0 == self.statsSelector.selectedSegmentIndex) {
+    NSUInteger idx = self.statsSelector.selectedSegmentIndex;
+    if (0 == idx) {
         [self drawStats:@"YYYY.MM.dd"];
+    } else if (1 == idx) {
+        [self drawStats:@"YYYY.MM"];
     } else {
         [self drawStats:@"HH"];
     }
@@ -72,21 +75,20 @@
     label1.text = @"Summary";
     [self.scrollView addSubview:label1];
     
-    UIPlotView *plot = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 24., frameWidth, 150.)];
+    UIPlotView *plot = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 24., frameWidth, 180.)];
     plot.plotBackgroundColor = [UIColor whiteColor];
     plot.lineColor = [UIColor blueColor];
     NSMutableArray *points = [[NSMutableArray alloc] init];
     
-    UILabel *label2 = [[UILabel alloc] initWithFrame:CGRectMake(0, 182, frameWidth, 32)];
-    label2.text = @"Avarage";
+    UILabel *label2 = [[UILabel alloc] initWithFrame:CGRectMake(0, 218, frameWidth, 24)];
+    label2.text = @"Average";
     label2.textAlignment = NSTextAlignmentCenter;
     [self.scrollView addSubview:label2];
     
-    UIPlotView *plotAvg = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 214., frameWidth, 150.)];
+    UIPlotView *plotAvg = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 244., frameWidth, 180.)];
     plotAvg.plotBackgroundColor = [UIColor whiteColor];
     plotAvg.lineColor = [UIColor greenColor];
     NSMutableArray *pointsAvg = [[NSMutableArray alloc] init];
-
 
     float rowHeight = 28.;
     NSString *font = @"Helvetica";
@@ -129,11 +131,9 @@
         
         
         NSString *day;
-        if ([date count] > 2) {
-            day = [NSString stringWithFormat:@"%@", date[2]];
-        } else {
-            day = [NSString stringWithFormat:@"%@", date[0]];
-        }
+
+        day = [NSString stringWithFormat:@"%@", [date lastObject]];
+
         
         [points addObject:@[day, [NSNumber numberWithFloat:daySum]]];
         [pointsAvg addObject:@[day, [NSNumber numberWithFloat:dayAvg]]];
@@ -213,8 +213,11 @@
             row++;
         }
     
+//    UIView *lastView = [[self.scrollView subviews] lastObject];
     
-    [self.scrollView setContentSize:CGSizeMake(self.scrollView.bounds.size.width, rowHeight*row)];
+    
+    
+//    [self.scrollView setContentSize:CGSizeMake(self.scrollView.bounds.size.width, lastView.center.y + lastView.frame.size.height )];
     
 
     /*

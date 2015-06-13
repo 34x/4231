@@ -75,11 +75,20 @@
                      @"currentBoard" : @0,
                      @"maximumBoard" : @0,
                      @"solved": @0,
-                     @"lastResult" : @0.0
+                     @"lastResult" : @0.0,
                      }];
     } else {
         settings = [obj mutableCopy];
     }
+    
+    if (![settings objectForKey:@"sequenceLength"]) {
+        [settings setObject:@2 forKey:@"sequenceLength"];
+    }
+    
+    if (![settings objectForKey:@"errors"]) {
+        [settings setObject:@0 forKey:@"errors"];
+    }
+    
     
     [self.sequencesSettings setObject:settings forKey:sid];
     
@@ -101,9 +110,38 @@
 }
 
 +(NSArray*)getBoardSizes {
-    return @[@[@2, @1],
-                            @[@2, @2], @[@2, @3], @[@2, @4], @[@3, @3], @[@3, @4], @[@3, @5], @[@4, @4], @[@4, @5], @[@5, @5], @[@6, @7]
-                            ];
+    return @[
+             @[@2, @1], @[@2, @2], @[@2, @3],
+             @[@2, @4], @[@3, @3], @[@3, @4],
+             @[@3, @5], @[@4, @4], @[@4, @5],
+             @[@4, @6], @[@5, @5], @[@5, @6],
+             @[@5, @7], @[@6, @6], @[@5, @8],
+             @[@6, @7], @[@6, @8], @[@7, @7]
+    ];
+}
+
++(NSUInteger)getCloserBoardIndex:(NSInteger)size {
+    NSArray *sizes = [NCSettings getBoardSizes];
+    NSUInteger closer = 0;
+    
+    long diff = 99999;
+    
+    for (int i = 0; i < [sizes count]; i++) {
+        int total = [sizes[i][0] intValue] * [sizes[i][1] intValue];
+        long cdiff = labs(total - size);
+        
+        if (total >= size) {
+            if (cdiff < diff) {
+                diff = cdiff;
+                closer = i;
+            } else {
+                break;
+            }
+        }
+    }
+    
+    
+    return closer;
 }
 
 @end
