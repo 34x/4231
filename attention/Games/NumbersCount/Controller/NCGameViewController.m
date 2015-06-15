@@ -237,7 +237,8 @@
     
     NSArray *boards = [NCSettings getBoardSizes];
     NSArray *cBoard = [boards objectAtIndex:[ssettings[@"currentBoard"] intValue]];
-    
+    NSUInteger sequenceLength = [ssettings[@"sequenceLength"] integerValue];
+
     self.cols = [cBoard[0] intValue];
     self.rows = [cBoard[1] intValue];
 
@@ -245,7 +246,7 @@
     self.game.timeLimit = (self.gameTimeLimit * self.cols * self.rows);
     self.game.difficultyLevel = self.difficultyLevel;
     self.game.sequenceLevel = self.sequenceLevel;
-    self.game.sequenceLength = [ssettings[@"sequenceLength"] integerValue];
+    self.game.sequenceLength = sequenceLength;
     
     if (0 == self.difficultyLevel) {
         ssettings[@"lastResult"] = @0.0;
