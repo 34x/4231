@@ -760,7 +760,6 @@
         NSArray *params = [NCGame getSequencesParams];
 
         [params enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop){
-            NSDictionary *param = obj;
             NCGame *tmpGame = [[NCGame alloc] initWithTotal:6];
             NSArray *seq = [tmpGame getSequence:idx difficultyLevel:0];
  
