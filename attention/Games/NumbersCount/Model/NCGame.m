@@ -74,6 +74,11 @@
         return YES;
     } else {
         self.clickedWrong++;
+        
+        if (self.clickedWrong >= self.sequenceLength) {
+            [self finish];
+        }
+        
         return NO;
     }
 }
@@ -483,7 +488,9 @@
     
 //    NSLog(@"SCORE: %@", score);
     
-    
+    if (nil == score || isnan([score floatValue])) {
+        score = [NSNumber numberWithFloat:0.0];
+    }
     
     return score;
 }

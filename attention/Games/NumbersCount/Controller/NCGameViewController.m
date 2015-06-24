@@ -132,7 +132,7 @@
     if (result) {
         [self updateHeaderLabel];
         
-        float progress = (float)self.game.currentIndex / (float)[self.game.items count];
+        float progress = (float)self.game.currentIndex / (float)self.game.sequenceLength;
         [self.progressBar setProgress:progress animated:YES];
         
         if (self.game.isComplete) {
@@ -149,16 +149,36 @@
 //        AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
         // vibrate only if support
         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+
     }
     
     UIView *cellView = [sender superview];
-    UIView *bgv = [[cellView subviews] objectAtIndex:0];
 
     if (result) {
         cellView.alpha = 0;
 //        bgv.alpha = 1;
     } else {
-//        bgv.alpha = 0.1;
+        [UIView animateWithDuration:.1
+         animations:^{
+             cellView.transform = CGAffineTransformRotate(cellView.transform, M_PI / 10.);
+             
+         } completion: ^(BOOL finished) {
+             [UIView animateWithDuration:.2
+                  animations:^{
+                      cellView.transform = CGAffineTransformRotate(cellView.transform, M_PI / -5.);
+                      
+                  } completion: ^(BOOL finished) {
+                      [UIView animateWithDuration:.1
+                                       animations:^{
+                                           cellView.transform = CGAffineTransformRotate(cellView.transform, M_PI / 10.);
+                                           
+                                       } completion: ^(BOOL finished) {
+                                           
+                                       }];
+
+                  }];
+
+         }];
     }
     [UIView animateWithDuration:.8
                      animations:^{
@@ -230,14 +250,29 @@
     
     NSDictionary *sequenceParams = [NCGame getSequenceParams:self.sequenceLevel];
     NSMutableDictionary *ssettings = [self.settings getSequenceSettings:[sequenceParams objectForKey:@"id"]];
+
+    NSUInteger sequenceLength = [ssettings[@"sequenceLength"] integerValue];
+
+ 
+    NSInteger boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
+    NSInteger currentBoardIndex = [ssettings[@"currentBoard"] integerValue];
+    
+    // if in some cases we have wrong board size, fix it here
+    if (currentBoardIndex < boardIndex) {
+        ssettings[@"currentBoard"] = [NSNumber numberWithInteger: boardIndex];
+    }
+    
     
     self.sequenceId = sequenceParams[@"id"];
+    
 
     [self.settings save];
     
     NSArray *boards = [NCSettings getBoardSizes];
-    NSArray *cBoard = [boards objectAtIndex:[ssettings[@"currentBoard"] intValue]];
-    NSUInteger sequenceLength = [ssettings[@"sequenceLength"] integerValue];
+    NSArray *cBoard = [boards objectAtIndex:[ssettings[@"currentBoard"] integerValue]];
+    
+    
+
 
     self.cols = [cBoard[0] intValue];
     self.rows = [cBoard[1] intValue];
@@ -450,7 +485,7 @@
 
 
 - (void) endGame:(BOOL) showResult{
-    NSLog(@"endGame:%i", showResult);
+//    NSLog(@"endGame:%i", showResult);
     
     [self.timer invalidate];
     self.timer = nil;
@@ -484,7 +519,7 @@
         
         int solved = [[ssettings objectForKey:@"solved" ] intValue];
         
-        int errorsLimit = 4;
+        int errorsLimit = 6;
         int nextBoardLimitFactor = 6;
         int sequenceLength = [ssettings[@"sequenceLength"] intValue];
 
@@ -494,7 +529,7 @@
             int errors = [ssettings[@"errors"] intValue] + 1;
             ssettings[@"errors"] = [NSNumber numberWithInt:errors];
             
-            if (errors > errorsLimit) {
+            if (errors >= errorsLimit) {
                 ssettings[@"errors"] = [NSNumber numberWithInt:0];
                 ssettings[@"solved"] = [NSNumber numberWithInt:0];
                 
@@ -595,6 +630,7 @@
 //                                  nextBoard
 //                                ];
 
+        
         NSString *alertMessage = [NSString stringWithFormat:@"You score: %.2f\n", gameScore];
         NSLog(@"%@", self.sequenceId);
         if ([@"randomFlags" isEqualToString:self.sequenceId]) {
@@ -722,7 +758,7 @@
 
         
         NSArray *params = [NCGame getSequencesParams];
-        NSMutableArray *labels = [[NSMutableArray alloc] init];
+
         [params enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop){
             NSDictionary *param = obj;
             NCGame *tmpGame = [[NCGame alloc] initWithTotal:6];

@@ -10,6 +10,7 @@
 #import "NCGame.h"
 #import "UIPlotView.h"
 #import <QuartzCore/QuartzCore.h>
+#import "NCSettings.h"
 
 @interface MainMenuViewController ()
 
