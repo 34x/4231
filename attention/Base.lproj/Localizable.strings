@@ -1,0 +1,24 @@
+/* 
+  Localizable.strings
+  attention
+
+  Created by Max on 24/06/15.
+  Copyright (c) 2015 Max. All rights reserved.
+*/
+
+"Summary" = "Summary";
+"Avarage" = "Avarage";
+
+"about" = "You can contribute to this game on github";
+"info_ok" = "Ok";
+
+"you_score" = "You score: %.2f";
+
+"win1" = "Good work!";
+"win2" = "Wow! Hold your horses!";
+"win3" = "Veni, vidi, vici";
+
+"loose1" = "You can do it better!";
+"loose2" = "Put yourself together!";
+"loose3" = "Calm down it is not the end of the world. It just the middle.";
+"loose4" = "Sometimes it can better.";

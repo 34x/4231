@@ -72,7 +72,7 @@
     float frameWidth = self.scrollView.bounds.size.width;
     UILabel *label1 = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, frameWidth, 24)];
     label1.textAlignment = NSTextAlignmentCenter;
-    label1.text = @"Summary";
+    label1.text = NSLocalizedString(@"Summary", nil);
     [self.scrollView addSubview:label1];
     
     UIPlotView *plot = [[UIPlotView alloc] initWithFrame:CGRectMake(.0, 24., frameWidth, 180.)];
@@ -81,7 +81,7 @@
     NSMutableArray *points = [[NSMutableArray alloc] init];
     
     UILabel *label2 = [[UILabel alloc] initWithFrame:CGRectMake(0, 218, frameWidth, 24)];
-    label2.text = @"Average";
+    label2.text = NSLocalizedString(@"Average", nil);
     label2.textAlignment = NSTextAlignmentCenter;
     [self.scrollView addSubview:label2];
     

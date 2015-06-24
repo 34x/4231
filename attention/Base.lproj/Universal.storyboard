@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E33b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="2sX-hZ-jje">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E36b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="2sX-hZ-jje">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
@@ -19,7 +19,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Iz6-ba-grF">
-                                <rect key="frame" x="268" y="518" width="64" height="30"/>
+                                <rect key="frame" x="201" y="518" width="198" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="198" id="4ix-d0-kog"/>
+                                </constraints>
                                 <state key="normal" title="Statistics">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -208,10 +211,10 @@
             </objects>
             <point key="canvasLocation" x="1949" y="-411"/>
         </scene>
-        <!--Numbers Count Statistic-->
+        <!--Statistics-->
         <scene sceneID="Ylf-rH-l5X">
             <objects>
-                <viewController title="Numbers Count Statistic" id="7yN-ug-mPQ" customClass="NCStatsViewController" sceneMemberID="viewController">
+                <viewController title="Statistics" id="7yN-ug-mPQ" customClass="NCStatsViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="QOo-ag-Dco"/>
                         <viewControllerLayoutGuide type="bottom" id="mKF-xR-WZP"/>
@@ -225,7 +228,7 @@
                                 <segments>
                                     <segment title="Day"/>
                                     <segment title="Month"/>
-                                    <segment title="Performance"/>
+                                    <segment title="Performance" width="180"/>
                                 </segments>
                             </segmentedControl>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LB2-FA-xRk">

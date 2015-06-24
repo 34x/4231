@@ -1,0 +1,39 @@
+
+/* Class = "UISegmentedControl"; 0jh-zo-QUj.segmentTitles[0] = "День"; ObjectID = "0jh-zo-QUj"; */
+"0jh-zo-QUj.segmentTitles[0]" = "День";
+
+/* Class = "UISegmentedControl"; 0jh-zo-QUj.segmentTitles[1] = "Месяц"; ObjectID = "0jh-zo-QUj"; */
+"0jh-zo-QUj.segmentTitles[1]" = "Месяц";
+
+/* Class = "UISegmentedControl"; 0jh-zo-QUj.segmentTitles[2] = "Эффективность"; ObjectID = "0jh-zo-QUj"; */
+"0jh-zo-QUj.segmentTitles[2]" = "Эффективность";
+
+/* Class = "UIButton"; normalTitle = "Поехали!"; ObjectID = "3Kh-tF-Jl0"; */
+"3Kh-tF-Jl0.normalTitle" = "Поехали!";
+
+/* Class = "UIViewController"; title = "Статистика"; ObjectID = "7yN-ug-mPQ"; */
+"7yN-ug-mPQ.title" = "Статистика";
+
+/* Class = "UIButton"; normalTitle = "Статистика"; ObjectID = "Iz6-ba-grF"; */
+"Iz6-ba-grF.normalTitle" = "Статистика";
+
+/* Class = "UIButton"; normalTitle = "?"; ObjectID = "TbR-M3-epl"; */
+"TbR-M3-epl.normalTitle" = "?";
+
+/* Class = "UIButton"; normalTitle = "Играть"; ObjectID = "bUG-fK-JBd"; */
+"bUG-fK-JBd.normalTitle" = "Играть";
+
+/* Class = "UIViewController"; title = "Настройки"; ObjectID = "dAq-cR-U5W"; */
+"dAq-cR-U5W.title" = "Настройки";
+
+/* Class = "UILabel"; text = "Grid size: 12 x 14"; ObjectID = "hfV-1W-TVX"; */
+"hfV-1W-TVX.text" = "Grid size: 12 x 14";
+
+/* Class = "UINavigationItem"; title = "4231"; ObjectID = "nMW-pB-fdK"; */
+"nMW-pB-fdK.title" = "4231";
+
+/* Class = "UIButton"; normalTitle = "-"; ObjectID = "qWR-3U-b3k"; */
+"qWR-3U-b3k.normalTitle" = "-";
+
+/* Class = "UILabel"; text = "→"; ObjectID = "zsX-pr-tMI"; */
+"zsX-pr-tMI.text" = "→";

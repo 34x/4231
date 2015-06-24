@@ -498,14 +498,12 @@
         
     }
     
-    NSArray *winMsgs = @[@"Good work!", @"Wow! Hold your horses!"];
-    NSArray *looseMsgs = @[
-                           @"You can do it better!",
-                           @"Put yourself together!", @"Calm down it is not the end of the world. It just the middle."];
+    NSArray *winMsgs = @[@"win1", @"win2", @"win3"];
+    NSArray *looseMsgs = @[@"loose1", @"loose2", @"loose3", @"loose4"];
     
     [self updateHeaderLabel];
     
-    NSString *msgTitle = looseMsgs[arc4random() % [looseMsgs count]];
+    NSString *msgTitle = NSLocalizedString(looseMsgs[arc4random() % [looseMsgs count]], nil);
     
     if (showResult) {
         NSMutableDictionary *ssettings = [self.settings getSequenceSettings:[NCGame getSequenceId:self.sequenceLevel]];
@@ -567,7 +565,7 @@
             }
             
         } else if (gameScore > 0. && (diff > self.nextLevelLimit || .0 == diff)) {
-            msgTitle = winMsgs[arc4random()%[winMsgs count]];
+            msgTitle = NSLocalizedString(winMsgs[arc4random()%[winMsgs count]], nil);
             
             lastResult = gameScore;
             solved++;
@@ -631,8 +629,10 @@
 //                                ];
 
         
-        NSString *alertMessage = [NSString stringWithFormat:@"You score: %.2f\n", gameScore];
-        NSLog(@"%@", self.sequenceId);
+        NSString *alertMessage = [NSString stringWithFormat:@"%@\n",
+                                  [NSString stringWithFormat:NSLocalizedString(@"you_score",nil), gameScore ]
+                ];
+//        NSLog(@"%@", self.sequenceId);
         if ([@"randomFlags" isEqualToString:self.sequenceId]) {
             NSDictionary *flags = @{
                                     @"🇦🇺" : @"Australia",
@@ -679,13 +679,13 @@
                                     @"🇻🇳" : @"Vietnam"
             };
             
-            NSLog(@"%@", self.game.sequence);
+//            NSLog(@"%@", self.game.sequence);
             
             for (int i = 0; i < [self.game.sequence count]; i++) {
                 NSString *flag = self.game.sequence[i];
                 NSString *country = [flags objectForKey:flag];
                 
-                NSLog(@"flag %@", flag);
+//                NSLog(@"flag %@", flag);
 
                 if (country) {
                     alertMessage = [NSString stringWithFormat:@"%@\n%@ %s",
@@ -750,7 +750,7 @@
     if (!self.alertSequenceSelect) {
         
         self.alertSequenceSelect = [[UIAlertView alloc]
-                                    initWithTitle:@"Which one?"
+                                    initWithTitle:NSLocalizedString(@"Which one?", nil)
                                     message: nil
                                     delegate:self
                                     cancelButtonTitle:@"?"

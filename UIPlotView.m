@@ -181,7 +181,7 @@
         
         NSUInteger yIndex = [orderedPoints indexOfObject:xy];
         
-        NSLog(@"%lu", yIndex);
+//        NSLog(@"%lu", yIndex);
         if (floor(yIndex / divider) == (float)yIndex / (float)divider) {
             UILabel *yLabel = [[UILabel alloc] initWithFrame:CGRectMake(yLabelX, labelY, yLabelWidth, 20.)];
             [yLabel setFont:labelFont];

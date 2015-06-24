@@ -60,10 +60,10 @@
 
 - (void) infoButtonClick {
     UIAlertView *alert = [[UIAlertView alloc] init];
-    alert.title = @"Little info";
-    alert.message = @"You can contribute to this game on https://github.com/34x/4231";
-    [alert addButtonWithTitle:@"Ok"];
-    [alert addButtonWithTitle:@"Go to github!"];
+    alert.title = NSLocalizedString(@"Little info", nil);
+    alert.message = NSLocalizedString(@"about", nil);
+    [alert addButtonWithTitle:NSLocalizedString(@"info_ok", nil)];
+    [alert addButtonWithTitle:NSLocalizedString(@"Go to github!", nil)];
     alert.delegate = self;
     [alert show];
 }
