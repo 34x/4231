@@ -1,0 +1,38 @@
+/* Class = "UISegmentedControl"; 0jh-zo-QUj.segmentTitles[0] = "Day"; ObjectID = "0jh-zo-QUj"; */
+"0jh-zo-QUj.segmentTitles[0]" = "Jour";
+
+/* Class = "UISegmentedControl"; 0jh-zo-QUj.segmentTitles[1] = "Month"; ObjectID = "0jh-zo-QUj"; */
+"0jh-zo-QUj.segmentTitles[1]" = "Mois";
+
+/* Class = "UISegmentedControl"; 0jh-zo-QUj.segmentTitles[2] = "Performance"; ObjectID = "0jh-zo-QUj"; */
+"0jh-zo-QUj.segmentTitles[2]" = "Résultats";
+
+/* Class = "UIButton"; normalTitle = "GO!"; ObjectID = "3Kh-tF-Jl0"; */
+"3Kh-tF-Jl0.normalTitle" = "Allez!";
+
+/* Class = "UIViewController"; title = "Statistics"; ObjectID = "7yN-ug-mPQ"; */
+"7yN-ug-mPQ.title" = "Statistiques";
+
+/* Class = "UIButton"; normalTitle = "Statistics"; ObjectID = "Iz6-ba-grF"; */
+"Iz6-ba-grF.normalTitle" = "Statistiques";
+
+/* Class = "UIButton"; normalTitle = "?"; ObjectID = "TbR-M3-epl"; */
+"TbR-M3-epl.normalTitle" = "?";
+
+/* Class = "UIButton"; normalTitle = "Play"; ObjectID = "bUG-fK-JBd"; */
+"bUG-fK-JBd.normalTitle" = "Jouer";
+
+/* Class = "UIViewController"; title = "Numbers Count Settings"; ObjectID = "dAq-cR-U5W"; */
+"dAq-cR-U5W.title" = "Numbers Count Settings";
+
+/* Class = "UILabel"; text = "Grid size: 12 x 14"; ObjectID = "hfV-1W-TVX"; */
+"hfV-1W-TVX.text" = "Grid size: 12 x 14";
+
+/* Class = "UINavigationItem"; title = "4231"; ObjectID = "nMW-pB-fdK"; */
+"nMW-pB-fdK.title" = "4231";
+
+/* Class = "UIButton"; normalTitle = "-"; ObjectID = "qWR-3U-b3k"; */
+"qWR-3U-b3k.normalTitle" = "-";
+
+/* Class = "UILabel"; text = "→"; ObjectID = "zsX-pr-tMI"; */
+"zsX-pr-tMI.text" = "→";

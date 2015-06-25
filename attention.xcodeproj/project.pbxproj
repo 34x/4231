@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		501633FC1ADE90FA0073B60E /* UIPlotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 501633FB1ADE90FA0073B60E /* UIPlotView.m */; };
-		503AAD4C1A027F5B00602F0D /* NCCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AAD401A027F5B00602F0D /* NCCell.m */; };
 		503AAD4D1A027F5B00602F0D /* NCGame.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AAD421A027F5B00602F0D /* NCGame.m */; };
 		503AAD4E1A027F5B00602F0D /* NCSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AAD441A027F5B00602F0D /* NCSettings.m */; };
 		503AAD4F1A027F5B00602F0D /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AAD471A027F5B00602F0D /* SettingsViewController.m */; };
@@ -25,6 +24,7 @@
 		50B0CF5619CDFB0200CCB9AB /* attentionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 50B0CF5519CDFB0200CCB9AB /* attentionTests.m */; };
 		50CF3C7C1B3ABE0200B1CD4D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 50CF3C7E1B3ABE0200B1CD4D /* Localizable.strings */; };
 		50CF3C801B3ABF6100B1CD4D /* Universal.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 50CF3C821B3ABF6100B1CD4D /* Universal.storyboard */; };
+		50CF3C8C1B3B0F0200B1CD4D /* NCCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 50CF3C8B1B3B0F0200B1CD4D /* NCCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,8 +40,6 @@
 /* Begin PBXFileReference section */
 		501633FA1ADE90FA0073B60E /* UIPlotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UIPlotView.h; path = ../UIPlotView.h; sourceTree = "<group>"; };
 		501633FB1ADE90FA0073B60E /* UIPlotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UIPlotView.m; path = ../UIPlotView.m; sourceTree = "<group>"; };
-		503AAD3F1A027F5B00602F0D /* NCCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NCCell.h; sourceTree = "<group>"; };
-		503AAD401A027F5B00602F0D /* NCCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NCCell.m; sourceTree = "<group>"; };
 		503AAD411A027F5B00602F0D /* NCGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NCGame.h; sourceTree = "<group>"; };
 		503AAD421A027F5B00602F0D /* NCGame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NCGame.m; sourceTree = "<group>"; };
 		503AAD431A027F5B00602F0D /* NCSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NCSettings.h; sourceTree = "<group>"; };
@@ -75,6 +73,11 @@
 		50CF3C811B3ABF6100B1CD4D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Universal.storyboard; sourceTree = "<group>"; };
 		50CF3C851B3ABF7700B1CD4D /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		50CF3C891B3AC2DB00B1CD4D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Universal.strings; sourceTree = "<group>"; };
+		50CF3C8A1B3B0F0200B1CD4D /* NCCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NCCell.h; sourceTree = "<group>"; };
+		50CF3C8B1B3B0F0200B1CD4D /* NCCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NCCell.m; sourceTree = "<group>"; };
+		50CF3C8D1B3C1BC100B1CD4D /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Universal.strings; sourceTree = "<group>"; };
+		50CF3C8E1B3C1BC200B1CD4D /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		50CF3C8F1B3C1BC200B1CD4D /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,8 +110,8 @@
 		503AAD3E1A027F5B00602F0D /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				503AAD3F1A027F5B00602F0D /* NCCell.h */,
-				503AAD401A027F5B00602F0D /* NCCell.m */,
+				50CF3C8A1B3B0F0200B1CD4D /* NCCell.h */,
+				50CF3C8B1B3B0F0200B1CD4D /* NCCell.m */,
 				503AAD411A027F5B00602F0D /* NCGame.h */,
 				503AAD421A027F5B00602F0D /* NCGame.m */,
 				503AAD431A027F5B00602F0D /* NCSettings.h */,
@@ -282,6 +285,7 @@
 				English,
 				en,
 				ru,
+				fr,
 			);
 			mainGroup = 50B0CF2A19CDFB0200CCB9AB;
 			productRefGroup = 50B0CF3419CDFB0200CCB9AB /* Products */;
@@ -343,8 +347,8 @@
 				504F859119FC131700DAC9FF /* MainMenuViewController.m in Sources */,
 				503AAD511A027F5B00602F0D /* NCGameViewController.m in Sources */,
 				501633FC1ADE90FA0073B60E /* UIPlotView.m in Sources */,
-				503AAD4C1A027F5B00602F0D /* NCCell.m in Sources */,
 				503AAD501A027F5B00602F0D /* NCStatsViewController.m in Sources */,
+				50CF3C8C1B3B0F0200B1CD4D /* NCCell.m in Sources */,
 				503AAD4D1A027F5B00602F0D /* NCGame.m in Sources */,
 				50B0CF3919CDFB0200CCB9AB /* main.m in Sources */,
 				503AAD4F1A027F5B00602F0D /* SettingsViewController.m in Sources */,
@@ -379,6 +383,7 @@
 				507BD4891B2CA4E5003FFF10 /* en */,
 				507BD48A1B2CA595003FFF10 /* en-GB */,
 				50CF3C7B1B3ABDA500B1CD4D /* ru */,
+				50CF3C8E1B3C1BC200B1CD4D /* fr */,
 			);
 			name = LaunchScreen.xib;
 			sourceTree = "<group>";
@@ -388,6 +393,7 @@
 			children = (
 				50CF3C7D1B3ABE0200B1CD4D /* ru */,
 				50CF3C851B3ABF7700B1CD4D /* Base */,
+				50CF3C8F1B3C1BC200B1CD4D /* fr */,
 			);
 			name = Localizable.strings;
 			path = attention;
@@ -398,6 +404,7 @@
 			children = (
 				50CF3C811B3ABF6100B1CD4D /* Base */,
 				50CF3C891B3AC2DB00B1CD4D /* ru */,
+				50CF3C8D1B3C1BC100B1CD4D /* fr */,
 			);
 			name = Universal.storyboard;
 			sourceTree = "<group>";
@@ -440,7 +447,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -475,7 +482,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;

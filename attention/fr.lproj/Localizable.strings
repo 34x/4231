@@ -1,0 +1,32 @@
+/*
+ Localizable.strings
+ attention
+ 
+ Créé par Max en 24/06/15.
+ Copyright (c) 2015 Max. Tous droits réservés.
+ */
+
+"Summary" = "Résumé";
+"Average" = "Moyenne";
+
+"about" = "Vous pouvez contribuer à ce jeu sur github";
+"Little info" = "Information";
+"info_ok" = "Ok";
+
+"Go to github!" = "Allez à github!";
+
+"you_score" = "Votre score: %.2f";
+
+"Play" = "Jouer";
+
+"win1" = "Très bien!";
+"win2" = "Wow! Il n'y a pas le feu!";
+"win3" = "Veni, vidi, vici";
+
+"loose1" = "Vous pouvez faire mieux!";
+"loose2" = "Ressaisis-toi!";
+"loose3" = "Calmez-vous, il est pas la fin du monde. Juste milieu.";
+"loose4" = "Pourrait être mieux.";
+
+"Which one?" = "Commencer où?";
+"Rate us!" = "Évaluez nous! ⭐️⭐️⭐️⭐️⭐️";

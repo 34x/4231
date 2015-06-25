@@ -55,7 +55,30 @@
     }
     
     [self.infoButton addTarget:self action:@selector(infoButtonClick) forControlEvents:UIControlEventTouchUpInside];
+}
 
+- (void) viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    [NSTimer scheduledTimerWithTimeInterval:9 target:self selector:@selector(infoButtonMove) userInfo:nil repeats:YES];
+}
+
+- (void) infoButtonMove {
+    [UIView animateWithDuration:0.4 animations:^{
+        self.infoButton.transform = CGAffineTransformRotate(self.infoButton.transform, M_PI / 5.0);
+        self.infoButton.transform = CGAffineTransformScale(self.infoButton.transform, 2.0, 2.0);
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.7 animations:^{
+            self.infoButton.transform = CGAffineTransformRotate(self.infoButton.transform, M_PI / -2.5);
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:0.4 animations:^{
+                self.infoButton.transform = CGAffineTransformRotate(self.infoButton.transform, M_PI / 5.0);
+                self.infoButton.transform = CGAffineTransformScale(self.infoButton.transform, 0.5, 0.5);
+            } completion:^(BOOL finished) {
+                
+            }];
+        }];
+    }];
 }
 
 - (void) infoButtonClick {
@@ -64,6 +87,7 @@
     alert.message = NSLocalizedString(@"about", nil);
     [alert addButtonWithTitle:NSLocalizedString(@"info_ok", nil)];
     [alert addButtonWithTitle:NSLocalizedString(@"Go to github!", nil)];
+    [alert addButtonWithTitle:NSLocalizedString(@"Rate us!", nil)];
     alert.delegate = self;
     [alert show];
 }
@@ -75,6 +99,15 @@
         if ([[UIApplication sharedApplication] canOpenURL:url]) {
             [[UIApplication sharedApplication] openURL:url];
         }
+    } else if (buttonIndex == 2) {
+        NSString *appId = @"982592630"; //Change this one to your ID
+        
+        NSString *iOS7AppStoreURLFormat = @"itms-apps://itunes.apple.com/app/id%@";
+        NSString *iOSAppStoreURLFormat = @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=4231&id=%@";
+        
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:([[UIDevice currentDevice].systemVersion floatValue] >= 7.0f)? iOS7AppStoreURLFormat: iOSAppStoreURLFormat, appId]]; // Would contain the right link
+        NSLog(@"%@", url);
+        [[UIApplication sharedApplication] openURL:url];
     }
 }
 
@@ -93,7 +126,7 @@
         NSString *title = [seq componentsJoinedByString:@" "];
         [self.numbersCountButton setTitle:title forState:UIControlStateNormal];
     } else {
-        [self.numbersCountButton setTitle:@"Play" forState:UIControlStateNormal];
+        [self.numbersCountButton setTitle:NSLocalizedString(@"Play", nil) forState:UIControlStateNormal];
     }
     
     if (self.seqIdx < [params count]) {

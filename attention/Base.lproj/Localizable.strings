@@ -7,9 +7,10 @@
 */
 
 "Summary" = "Summary";
-"Avarage" = "Avarage";
+"Average" = "Average";
 
 "about" = "You can contribute to this game on github";
+"Little info" = "Info";
 "info_ok" = "Ok";
 
 "you_score" = "You score: %.2f";
@@ -18,7 +19,9 @@
 "win2" = "Wow! Hold your horses!";
 "win3" = "Veni, vidi, vici";
 
-"loose1" = "You can do it better!";
+"loose1" = "You can do better!";
 "loose2" = "Put yourself together!";
-"loose3" = "Calm down it is not the end of the world. It just the middle.";
-"loose4" = "Sometimes it can better.";
+"loose3" = "Calm down, it's not the end of the world. Only the middle";
+"loose4" = "Could be better";
+
+"Rate us!" = "Rate us! ⭐️⭐️⭐️⭐️⭐️";

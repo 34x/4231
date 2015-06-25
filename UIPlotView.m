@@ -50,7 +50,6 @@
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     if (context) {
-    
         CGContextSetFillColorWithColor(context, self.plotBackgroundColor.CGColor);
         
         CGContextFillRect(context, frame);
@@ -107,13 +106,12 @@
     prevY = height - prevY;
     __block float x = 58.;
     
-    float rowHeight = (height - 10.) / ([points count]);
+//    float rowHeight = (height - 10.) / ([points count]);
 
     __block float yLabelX = 0.;
     __block float yLabelWidth = 54.;
     __block float xLabelX = x - 28.;
     __block float xLabelY = height;
-    
     
     int maxCols = 8;
     long divider = floor(([points count] / maxCols)) + 1;
@@ -127,13 +125,21 @@
         NSNumber *yValue = [xy objectAtIndex:1];
 
         float labelY;
-
-        float y = [yValue floatValue] * multiple;
+        float y;
+        /*
+        y = [yValue floatValue] * multiple;
+        // old way with same height
         // slow but true!
         y = ([orderedPoints indexOfObject:xy] + 1) * rowHeight;
-        
-        y = height - y;
 
+        y = height - y;
+        */
+        
+        float percent = ([yValue floatValue] + 1.0 - minimum) / ((maximum + 1.0 - minimum) / 100.0);
+        
+        y = (height - 30.) * (percent / 100.0);
+        
+        y = height - y - 10.;
         
         xLabelX = x - 25.;
 
@@ -152,7 +158,7 @@
         
         
         CGContextBeginPath(context);
-        CGContextSetLineWidth(context, 1.2);
+        CGContextSetLineWidth(context, 1.4);
         CGContextSetStrokeColorWithColor(context, self.lineColor.CGColor);
         
         
@@ -179,10 +185,11 @@
         
         UIFont *labelFont = [UIFont fontWithName:@"Helvetica" size:9.];
         
-        NSUInteger yIndex = [orderedPoints indexOfObject:xy];
+//        NSUInteger yIndex = [orderedPoints indexOfObject:xy];
         
 //        NSLog(@"%lu", yIndex);
-        if (floor(yIndex / divider) == (float)yIndex / (float)divider) {
+//        if (floor(yIndex / divider) == (float)yIndex / (float)divider) {
+        if ([yValue floatValue] == maximum || [yValue floatValue] == minimum) {
             UILabel *yLabel = [[UILabel alloc] initWithFrame:CGRectMake(yLabelX, labelY, yLabelWidth, 20.)];
             [yLabel setFont:labelFont];
             [yLabel setText:[NSString stringWithFormat:@"%.2f", [yValue floatValue]]];

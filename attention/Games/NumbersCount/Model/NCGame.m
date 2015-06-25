@@ -405,7 +405,7 @@
                                 @"id" : [settings objectForKey:@"id"],
                                 @"difficulty" : [NSString stringWithFormat:@"%lu", self.difficultyLevel],
                                 @"duration" : self.duration,
-                                @"clicked" : [NSString stringWithFormat:@"%lu", self.clicked],
+                                @"clicked" : [NSString stringWithFormat:@"%lu", self.clicked + 100],
                                 @"clickedWrong" : [NSString stringWithFormat:@"%lu", self.clickedWrong],
                              };
         

@@ -257,11 +257,11 @@
     NSInteger boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
     NSInteger currentBoardIndex = [ssettings[@"currentBoard"] integerValue];
     
+    
     // if in some cases we have wrong board size, fix it here
     if (currentBoardIndex < boardIndex) {
         ssettings[@"currentBoard"] = [NSNumber numberWithInteger: boardIndex];
     }
-    
     
     self.sequenceId = sequenceParams[@"id"];
     
@@ -271,9 +271,6 @@
     NSArray *boards = [NCSettings getBoardSizes];
     NSArray *cBoard = [boards objectAtIndex:[ssettings[@"currentBoard"] integerValue]];
     
-    
-
-
     self.cols = [cBoard[0] intValue];
     self.rows = [cBoard[1] intValue];
 
