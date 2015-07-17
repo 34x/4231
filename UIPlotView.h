@@ -13,6 +13,6 @@
 @property(nonatomic, readwrite) UIColor *plotBackgroundColor;
 @property(nonatomic, readwrite) NSArray *points;
 
-- (instancetype)initWithPoints:(NSArray*)points;
+//- (instancetype)initWithPoints:(NSArray*)points;
 - (void)redraw;
 @end

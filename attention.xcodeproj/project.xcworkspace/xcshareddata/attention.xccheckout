@@ -10,6 +10,8 @@
 	<string>attention</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
+		<key>7F40157D2AC93B01DE3D01044094C929B8ACBA3D</key>
+		<string>github.com:34x/howmany.git</string>
 		<key>D709344F329483EC994BF92E0D0997C8011B070D</key>
 		<string>github.com:34x/4231.git</string>
 	</dict>
@@ -17,6 +19,8 @@
 	<string>attention.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
+		<key>7F40157D2AC93B01DE3D01044094C929B8ACBA3D</key>
+		<string>../../../HowManyC</string>
 		<key>D709344F329483EC994BF92E0D0997C8011B070D</key>
 		<string>../..</string>
 	</dict>
@@ -35,6 +39,14 @@
 			<string>D709344F329483EC994BF92E0D0997C8011B070D</string>
 			<key>IDESourceControlWCCName</key>
 			<string>attention</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>7F40157D2AC93B01DE3D01044094C929B8ACBA3D</string>
+			<key>IDESourceControlWCCName</key>
+			<string>HowManyC</string>
 		</dict>
 	</array>
 </dict>

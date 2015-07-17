@@ -38,8 +38,7 @@
 - (BOOL)getIsDone;
 - (NSMutableArray*)getSequence:(NSUInteger)sequenceLevel difficultyLevel:(NSUInteger)difficultyLevel;
 + (NSMutableArray*)log;
-+ (NSMutableDictionary*)stats:(NSString*)keyFormat;
-+ (NSMutableDictionary*)statsForDay;
++ (NSMutableDictionary*)stats:(NSString*)keyFormat fromDate:(NSDate*)fromDate;
 + (NSMutableArray*)createLimitSequence:(NSUInteger)total symbols:(NSArray*)symbols;
 + (NSMutableArray*)randomize:(NSMutableArray*)itemsOriginal;
 + (NSArray*)getSequencesParams;

@@ -242,7 +242,6 @@
     NSMutableArray *sequence = [[NSMutableArray alloc] init];
     
     NSString *val;
-    NSUInteger symbolsCount = [symbols count];
     
     NSUInteger idx = 0;
     while ([sequence count] < total) {
@@ -401,12 +400,13 @@
 
         self.result = @{
                                 @"date" : date,
-                                @"total" : [NSString stringWithFormat:@"%lu", self.total],
+                                @"sequenceCount" : [NSNumber numberWithInteger:self.sequenceLength],
+                                @"total" : [NSNumber numberWithInteger:self.total],
                                 @"id" : [settings objectForKey:@"id"],
-                                @"difficulty" : [NSString stringWithFormat:@"%lu", self.difficultyLevel],
+                                @"difficulty" : [NSNumber numberWithInteger:self.difficultyLevel],
                                 @"duration" : self.duration,
-                                @"clicked" : [NSString stringWithFormat:@"%lu", self.clicked + 100],
-                                @"clickedWrong" : [NSString stringWithFormat:@"%lu", self.clickedWrong],
+                                @"clicked" : [NSNumber numberWithInteger:self.clicked],
+                                @"clickedWrong" : [NSNumber numberWithInteger:self.clickedWrong],
                              };
         
         [log addObject:self.result];
@@ -455,14 +455,17 @@
     if (sequenceCount < 2.) {
         sequenceCount = 2.;
     }
-    
+
     float duration = [[data objectForKey:@"duration"] floatValue];
     float speed = sequenceCount / duration;
-//    NSLog(@"%f / %f = %f", sequenceCount, duration, speed);
-    score = [NSNumber numberWithFloat:speed * sequenceCount];
     
-    score = [NSNumber numberWithFloat:[score floatValue] * total ];
+    float speedBonus = speed + sequenceCount + total;
+    float sizeBonus = (sequenceCount * sequenceCount * sequenceCount) + (total * total);
     
+    NSLog(@"%f %f", speedBonus, sizeBonus);
+    score = [NSNumber numberWithFloat:speedBonus + sizeBonus];
+    
+//    NSLog(@"%@", score);
     float percent = [score floatValue] / 100.;
     float difficulty = [[data objectForKey:@"difficulty"] floatValue];
     
@@ -490,12 +493,15 @@
     
     if (nil == score || isnan([score floatValue])) {
         score = [NSNumber numberWithFloat:0.0];
+    } else {
+        score = [NSNumber numberWithFloat:[score floatValue] / 4.0 / 10.0];
     }
     
     return score;
 }
 
-+ (NSMutableDictionary*)stats:(NSString*)keyFormat {
++ (NSMutableDictionary*)stats:(NSString*)keyFormat fromDate:(NSDate*)fromDate {
+
     NSMutableDictionary *stats = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *days = [[NSMutableDictionary alloc] init];
     NSMutableArray *log = [self log];
@@ -507,9 +513,9 @@
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:keyFormat];
     
-    NSNumber *totalMax;
-    NSNumber *totalAvg;
-    NSNumber *totalMin;
+    NSNumber *totalMax = @0;
+    NSNumber *totalAvg = @0;
+    NSNumber *totalMin = @0;
 
     for (id obj in log) {
         if (![obj isKindOfClass:[NSDictionary class]]) {
@@ -520,6 +526,11 @@
         float gameScore = [[NCGame getScore:item] floatValue];
         
         NSDate *date = [item objectForKey:@"date"];
+        NSLog(@"%@ ? %@", [formatter stringFromDate:date], [formatter stringFromDate:fromDate]);
+        if (nil != fromDate && [date compare:fromDate] == NSOrderedAscending) {
+            continue;
+        }
+        
         // calculate item value
         float time  = [[item objectForKey:@"duration"] floatValue];
         
@@ -604,52 +615,4 @@
     return stats;
 }
 
-+ (NSMutableDictionary*)statsForDay {
-    NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
-    
-    return result;
-    // TODO: не делить на totalsб среднее считать из всех записей за час, только данное количество есть в каждом часу
-    // напрмиер, если в каждом часу считали 15 и 42, а в одном или в нескольких, но не во всех, 24, то среднее берется только
-    // из 15 и 42,  24 исключается
-    NSMutableDictionary *stats = [[NSMutableDictionary alloc] init];
-    NSMutableArray *log = [self log];
-    
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"HH"];
-    
-    for (id obj in log) {
-        if ([obj isKindOfClass:[NSArray class]]) {
-            NSArray *item = obj;
-            int total = [item[1] intValue];
-            int time  = [item[2] intValue];
-            float speed = (float)total / (float)time;
-            
-            speed = speed * total;
-
-            NSDate *date = item[0];
-            
-            //            NSLog(@"%d", total);
-            
-            NSMutableDictionary *dayLog = [stats objectForKey:[NSString stringWithFormat:@"%d", total]];
-            NSString *dayKey;
-            if (nil == dayLog) {
-                dayLog = [[NSMutableDictionary alloc] init];
-                dayKey = [NSString stringWithFormat:@"%d", 42];
-                stats[dayKey] = dayLog;
-            }
-            
-            dayKey = [formatter stringFromDate:date];
-            NSNumber *val = [dayLog objectForKey:dayKey];
-            if (nil == val) {
-                //                NSLog(@"%f", speed);
-                [dayLog setObject:[NSNumber numberWithFloat:speed] forKey:dayKey];
-            } else {
-                [dayLog setObject:[NSNumber numberWithFloat:(([val floatValue] + speed) / 2.)] forKey:dayKey];
-            }
-            
-        }
-    }
-
-    return stats;
-}
 @end

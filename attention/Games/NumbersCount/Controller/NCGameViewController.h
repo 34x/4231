@@ -11,7 +11,6 @@
 @interface NCGameViewController : UIViewController
 @property (strong, nonatomic) NCGame *game;
 - (void) restartGame;
-- (float) percentWithPrevious;
 - (void) endGame:(BOOL) showResult;
 @end
 

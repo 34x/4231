@@ -270,6 +270,9 @@
     
     NSArray *boards = [NCSettings getBoardSizes];
     NSArray *cBoard = [boards objectAtIndex:[ssettings[@"currentBoard"] integerValue]];
+//    sequenceLength = 2;
+//    cBoard = [boards objectAtIndex:8]; // 11 73, 12 91
+//    self.difficultyLevel = 2;
     
     self.cols = [cBoard[0] intValue];
     self.rows = [cBoard[1] intValue];
@@ -367,7 +370,8 @@
                          ];
     
     
-    NSArray *fonts = @[[NSNumber numberWithFloat:size],
+    NSArray *fonts = @[
+//                       [NSNumber numberWithFloat:size],
                        [NSNumber numberWithFloat:size/2],
                        [NSNumber numberWithFloat:size/3],
                        [NSNumber numberWithFloat:size/4],

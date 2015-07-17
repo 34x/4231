@@ -29,17 +29,17 @@
 - (IBAction)selectStats:(id)sender {
     NSUInteger idx = self.statsSelector.selectedSegmentIndex;
     if (0 == idx) {
-        [self drawStats:@"YYYY.MM.dd"];
+        [self drawStats:@"week"];
     } else if (1 == idx) {
-        [self drawStats:@"YYYY.MM"];
+        [self drawStats:@"month"];
     } else {
-        [self drawStats:@"HH"];
+        [self drawStats:@"day"];
     }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self drawStats:@"YYYY.MM.dd"];
+    [self drawStats:@"week"];
     [self.statsSelector addTarget:self action:@selector(selectStats:) forControlEvents:UIControlEventValueChanged];
     
     
@@ -60,14 +60,35 @@
     }
 }
 
-- (void) drawStats:(NSString*)format {
-    NSDictionary *stats = [NCGame stats:format];
-
+- (void) drawStats:(NSString*)type {
+    
+    NSString *format;
+    NSDate *fromDate = nil;
+    
+    if ([type isEqualToString:@"week"]) {
+        format = @"YYYY.MM.dd";
+        
+        NSCalendar *cal = [NSCalendar currentCalendar];
+        NSDateComponents *components = [cal components:( NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit ) fromDate:[[NSDate alloc] init]];
+        
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        
+        [components setDay:([components day] - ([components weekday] - 1))];
+        fromDate  = [cal dateFromComponents:components];
+        
+    } else if ([type isEqualToString:@"month"]) {
+        format = @"YYYY.MM";
+    } else {
+        format = @"HH";
+    }
+    
+    NSDictionary *stats = [NCGame stats:format fromDate:fromDate];
+    [self clearStats];
     if (0 == [stats count]) {
         return;
     }
 
-    [self clearStats];
+
     
     float frameWidth = self.scrollView.bounds.size.width;
     UILabel *label1 = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, frameWidth, 24)];
@@ -214,10 +235,7 @@
         }
     
 //    UIView *lastView = [[self.scrollView subviews] lastObject];
-    
-    
-    
-//    [self.scrollView setContentSize:CGSizeMake(self.scrollView.bounds.size.width, lastView.center.y + lastView.frame.size.height )];
+
     
 
     /*
@@ -233,6 +251,7 @@
     [self.scrollView addSubview:plotAvg];
     [plotAvg redraw];
 
+    [self.scrollView setContentSize:CGSizeMake(self.scrollView.bounds.size.width, plotAvg.center.y + plotAvg.frame.size.height )];
     
     return;
     float paddingWidth = 110.;

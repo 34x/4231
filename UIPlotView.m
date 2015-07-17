@@ -78,7 +78,7 @@
     __block float prevY = [points[0][1] floatValue];
     __block float maximum = .0;
     __block float minimum = .0;
-    __block float avarage = .0;
+//    __block float avarage = .0;
     
     NSArray *orderedPoints = [points sortedArrayUsingComparator:^(id obj1, id obj2) {
         
@@ -100,7 +100,7 @@
     maximum = [orderedPoints[[orderedPoints count] -1 ][1] floatValue];
     
     
-    float multiple = (height - 20.) / maximum;
+//    float multiple = (height - 20.) / maximum;
     float stepX = (width - 68.) / ((float)[points count] - 1);
     
     prevY = height - prevY;
