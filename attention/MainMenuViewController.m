@@ -11,9 +11,12 @@
 #import "UIPlotView.h"
 #import <QuartzCore/QuartzCore.h>
 #import "NCSettings.h"
+#import "PiwikTracker.h"
+#import "GCHelper.h"
 
 @interface MainMenuViewController ()
 
+@property (weak, nonatomic) IBOutlet UIButton *leaderboardButton;
 
 @property (weak, nonatomic) IBOutlet UIView *numbersCount;
 @property (weak, nonatomic) IBOutlet UIButton *infoButton;
@@ -59,8 +62,16 @@
 
 - (void) viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    [[PiwikTracker sharedInstance] sendView:@"main_menu"];
     
-    [NSTimer scheduledTimerWithTimeInterval:9 target:self selector:@selector(infoButtonMove) userInfo:nil repeats:YES];
+    
+    //[NSTimer scheduledTimerWithTimeInterval:9 target:self selector:@selector(infoButtonMove) userInfo:nil repeats:YES];
+    
+    if ([GCHelper sharedInstance].gameCenterAvailable) {
+        self.leaderboardButton.hidden = false;
+    } else {
+        self.leaderboardButton.hidden = true;
+    }
 }
 
 - (void) infoButtonMove {
@@ -90,12 +101,16 @@
     [alert addButtonWithTitle:NSLocalizedString(@"Rate us!", nil)];
     alert.delegate = self;
     [alert show];
+    
+    [[PiwikTracker sharedInstance] sendView:@"info"];
 }
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     NSLog(@"click");
     if (buttonIndex == 1) {
         NSURL *url = [NSURL URLWithString: @"https://github.com/34x/4231"];
+        [[PiwikTracker sharedInstance] sendOutlink:[url absoluteString]];
+
         if ([[UIApplication sharedApplication] canOpenURL:url]) {
             [[UIApplication sharedApplication] openURL:url];
         }
@@ -106,7 +121,9 @@
         NSString *iOSAppStoreURLFormat = @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=4231&id=%@";
         
         NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:([[UIDevice currentDevice].systemVersion floatValue] >= 7.0f)? iOS7AppStoreURLFormat: iOSAppStoreURLFormat, appId]]; // Would contain the right link
-        NSLog(@"%@", url);
+
+        [[PiwikTracker sharedInstance] sendOutlink:[NSString stringWithFormat:@"https://itunes.apple.com/app/id%@", appId]];
+
         [[UIApplication sharedApplication] openURL:url];
     }
 }

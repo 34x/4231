@@ -9,6 +9,7 @@
 #import "NCStatsViewController.h"
 #import "NCGame.h"
 #import "UIPlotView.h"
+#import "PiwikTracker.h"
 
 
 @interface NCStatsViewController ()
@@ -39,6 +40,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    
     [self drawStats:@"week"];
     [self.statsSelector addTarget:self action:@selector(selectStats:) forControlEvents:UIControlEventValueChanged];
     
@@ -61,7 +63,7 @@
 }
 
 - (void) drawStats:(NSString*)type {
-    
+    [[PiwikTracker sharedInstance] sendViews:@"Stats", type, nil];
     NSString *format;
     NSDate *fromDate = nil;
     

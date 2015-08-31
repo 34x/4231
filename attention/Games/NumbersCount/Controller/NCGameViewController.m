@@ -9,9 +9,11 @@
 #import "NCGameViewController.h"
 #import "NCGame.h"
 #import "NCCell.h"
+#import "GCHelper.h"
 #import "NCStatsViewController.h"
 #import "NCSettings.h"
 #import <AudioToolbox/AudioServices.h>
+#import "PiwikTracker.h"
 
 @interface NCGameViewController ()
 @property (weak, nonatomic) IBOutlet UIView *headerCenter;
@@ -83,6 +85,7 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
+    [[PiwikTracker sharedInstance] sendView:@"game"];
     NSLog(@"did appear");
     [super viewDidAppear:animated];
     [self.navigationController.interactivePopGestureRecognizer setEnabled:NO];
@@ -231,7 +234,6 @@
 }
 
 - (void) restartGame {
-
     NSLog(@"restart game");
     
 //    [self performSelector:<#(SEL)#> withObject:<#(id)#>]
@@ -276,7 +278,9 @@
     
     self.cols = [cBoard[0] intValue];
     self.rows = [cBoard[1] intValue];
-
+    
+    [[PiwikTracker sharedInstance] sendViews: @"game", @"start", self.sequenceId, nil];
+    
     self.game = [[NCGame alloc] initWithTotal: self.cols * self.rows ];
     self.game.timeLimit = (self.gameTimeLimit * self.cols * self.rows);
     self.game.difficultyLevel = self.difficultyLevel;
@@ -331,38 +335,64 @@
 }
 
 - (void)drawBoard {
-    while ([[self.board subviews] count] > 0) {
-        [[[self.board subviews] objectAtIndex:0] removeFromSuperview];
+    
+    __block NSInteger cellsCount = [[self.board subviews] count];
+    
+    if ( 0 == cellsCount) {
+        [self drawNewCells];
+        return;
+    }
+    
+    for (int i = 0; i < cellsCount; i++) {
+        NSLog(@" %li", cellsCount);
+        UIView *cell = (UIView*)[[self.board subviews] objectAtIndex:i];
+        [UIView animateWithDuration:0.1 animations:^{
+            cell.alpha = 0.1;
+            cell.transform = CGAffineTransformScale(cell.transform, 0.1, 0.1);
+        } completion:^(BOOL finished){
+            [cell removeFromSuperview];
+            cellsCount--;
+
+            if (0 == cellsCount) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self drawNewCells];
+                });
+            }
+        }];
     }
     
     
+    
+}
+
+- (void) drawNewCells {
     float width = self.board.bounds.size.width / self.cols;
     float height = self.board.bounds.size.height / self.rows;
     float margin = 0.0;
     float y = 0.0;
     float x = 0.0;
-
+    
     float size = MIN(width, height); // + width / 10. + width;
     size = size * 1.4;
     
     NSArray *colors = @[
-                       [UIColor redColor],
-                       [UIColor orangeColor],
-                       [UIColor yellowColor],
-                       [UIColor greenColor],
-                       [UIColor blueColor],
-                       [UIColor purpleColor],
-                       [UIColor brownColor],
-                       [UIColor cyanColor],
-                       [UIColor magentaColor]
-                    ];
+                        [UIColor redColor],
+                        [UIColor orangeColor],
+                        [UIColor yellowColor],
+                        [UIColor greenColor],
+                        [UIColor blueColor],
+                        [UIColor purpleColor],
+                        [UIColor brownColor],
+                        [UIColor cyanColor],
+                        [UIColor magentaColor]
+                        ];
     
-
+    
     NSArray *darkColors = @[[UIColor blueColor], [UIColor purpleColor]];
     
     
     NSArray *opacity = @[
-//                         [NSNumber numberWithFloat:.2],
+                         //                         [NSNumber numberWithFloat:.2],
                          [NSNumber numberWithFloat:.4],
                          [NSNumber numberWithFloat:.6],
                          [NSNumber numberWithFloat:.8],
@@ -371,13 +401,13 @@
     
     
     NSArray *fonts = @[
-//                       [NSNumber numberWithFloat:size],
+                       //                       [NSNumber numberWithFloat:size],
                        [NSNumber numberWithFloat:size/2],
                        [NSNumber numberWithFloat:size/3],
                        [NSNumber numberWithFloat:size/4],
-//                       [NSNumber numberWithFloat:size/5],
-//                       [NSNumber numberWithFloat:size/6],
-//                       [NSNumber numberWithFloat:size/8],
+                       //                       [NSNumber numberWithFloat:size/5],
+                       //                       [NSNumber numberWithFloat:size/6],
+                       //                       [NSNumber numberWithFloat:size/8],
                        ];
     
     NSArray *fontsMulti = @[//[NSNumber numberWithFloat:size/1.8],
@@ -385,15 +415,15 @@
                             [NSNumber numberWithFloat:size/3],
                             [NSNumber numberWithFloat:size/4],
                             [NSNumber numberWithFloat:size/5],
-//                            [NSNumber numberWithFloat:size/6],
+                            //                            [NSNumber numberWithFloat:size/6],
                             ];
- 
+    
     NSArray *fontsTriple = @[//[NSNumber numberWithFloat:size/1.8],
-//                            [NSNumber numberWithFloat:size/3],
-//                            [NSNumber numberWithFloat:size/4],
-                            [NSNumber numberWithFloat:size/5],
-                            [NSNumber numberWithFloat:size/6],
-                            ];
+                             //                            [NSNumber numberWithFloat:size/3],
+                             //                            [NSNumber numberWithFloat:size/4],
+                             [NSNumber numberWithFloat:size/5],
+                             [NSNumber numberWithFloat:size/6],
+                             ];
     
     
     for (int i = 0; i < [self.cellItems count]; i++) {
@@ -407,11 +437,11 @@
         UIView *cellView = [[UIView alloc] initWithFrame:CGRectMake(x, y, width, height)];
         
         UIButton *v = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, width, height)];
-
+        
         UIView *vbg = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
-
+        
         [vbg setBackgroundColor:[UIColor whiteColor]];
-
+        
         [cellView addSubview:vbg];
         [cellView addSubview:v];
         
@@ -432,7 +462,7 @@
             
             for (int r = 0; r < 100; r++) {
                 randomColor = colors[(arc4random() % [colors count])];
-
+                
                 if (i > 0 && randomColor == ((NCCell*)self.cellItems[i - 1]).color) {
                     continue;
                 }
@@ -461,7 +491,7 @@
                 size = [fontsMulti objectAtIndex:(arc4random() % [fontsMulti count])];
             } else {
                 size = [fonts objectAtIndex:(arc4random() % [fonts count])];
-             
+                
             }
             
             [l setFont:[UIFont fontWithName:@"Helvetica" size: [size floatValue]]];
@@ -480,7 +510,18 @@
         
         v.tag = i;
         
+
+        __block float alpha = cellView.alpha;
+        __block CGAffineTransform transform = cellView.transform;
+        
         [self.board addSubview:cellView];
+        cellView.alpha = 0.0;
+        cellView.transform = CGAffineTransformScale(transform, 0.1, 0.1);
+        
+        [UIView animateWithDuration:0.1 animations:^{
+            cellView.transform = CGAffineTransformScale(transform, 1.0, 1.0);
+            cellView.alpha = alpha;
+        }];
     }
 }
 
@@ -516,12 +557,15 @@
             diff = gameScore / (lastResult / 100.);
         }
         
+        [[GCHelper sharedInstance] reportScore:gameScore*100];
+        
         int solved = [[ssettings objectForKey:@"solved" ] intValue];
         
         int errorsLimit = 6;
         int nextBoardLimitFactor = 6;
         int sequenceLength = [ssettings[@"sequenceLength"] intValue];
 
+        [[PiwikTracker sharedInstance] sendViews: @"game", @"finish", self.sequenceId, nil];
         
         if (self.game.clickedWrong > 0) {
             lastResult = 0;
@@ -541,6 +585,12 @@
                     if (currentIndex > boardIndex) {
                         boardIndex--;
                         ssettings[@"currentBoard"] = [NSNumber numberWithInteger:boardIndex];
+                        
+                        [[PiwikTracker sharedInstance] sendEventWithCategory:@"game"
+                              action:@"decrease_board"
+                                name:self.sequenceId
+                               value:@1
+                         ];
 
                     } else { // if we at start of board for this sequence length we decrase sequence length
                         sequenceLength--;
@@ -549,6 +599,12 @@
 
                         ssettings[@"currentBoard"] = [NSNumber numberWithInteger:boardIndex];
                         ssettings[@"sequenceLength"] = [NSNumber numberWithInt:sequenceLength];
+                        
+                        [[PiwikTracker sharedInstance] sendEventWithCategory:@"game"
+                              action:@"decrease_sequence"
+                                name:self.sequenceId
+                               value:@1
+                         ];
                     }
 
 
@@ -559,6 +615,13 @@
                     if (currentIndex > 0) {
                         currentIndex--;
                         ssettings[@"currentBoard"] = [NSNumber numberWithInteger:currentIndex];
+                        
+                        [[PiwikTracker sharedInstance] sendEventWithCategory:@"game"
+                              action:@"decrease_board"
+                                name:self.sequenceId
+                               value:@1
+                         ];
+                        
                     }
                     
                 }
@@ -585,8 +648,20 @@
                     NSUInteger boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
                     ssettings[@"currentBoard"] = [NSNumber numberWithInteger:boardIndex];
                     
+                    [[PiwikTracker sharedInstance] sendEventWithCategory:@"game"
+                        action:@"increase_sequence"
+                        name:self.sequenceId
+                        value:@1
+                     ];
+                    
                 } else { // increase the board size
                     ssettings[@"currentBoard"] = [NSNumber numberWithInt:[ssettings[@"currentBoard"] intValue] + 1];
+                    
+                    [[PiwikTracker sharedInstance] sendEventWithCategory:@"game"
+                          action:@"increase_board"
+                            name:self.sequenceId
+                           value:@1
+                     ];
                 }
                 
                 // change sequence
@@ -727,6 +802,12 @@
             self.difficultyLevel = 0;
         }
 
+        self.sequenceLevel = [NCGame checkSequenceLevel:self.sequenceLevel];
+        NSDictionary *sequenceParams = [NCGame getSequenceParams:self.sequenceLevel];
+        self.sequenceId = sequenceParams[@"id"];
+
+        [[PiwikTracker sharedInstance] sendViews: @"game", @"select_type_with", self.sequenceId, nil];
+        
         [self restartGame];
     } else if (self.alertGameStart == alertView) {
         
@@ -747,6 +828,8 @@
 
 - (void) selectGameType {
     [self endGame:NO];
+
+    [[PiwikTracker sharedInstance] sendViews: @"game", @"select_type_from", self.sequenceId, nil];
     
     if (!self.alertSequenceSelect) {
         

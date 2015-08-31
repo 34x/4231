@@ -462,7 +462,7 @@
     float speedBonus = speed + sequenceCount + total;
     float sizeBonus = (sequenceCount * sequenceCount * sequenceCount) + (total * total);
     
-    NSLog(@"%f %f", speedBonus, sizeBonus);
+//    NSLog(@"%f %f", speedBonus, sizeBonus);
     score = [NSNumber numberWithFloat:speedBonus + sizeBonus];
     
 //    NSLog(@"%@", score);
@@ -526,7 +526,7 @@
         float gameScore = [[NCGame getScore:item] floatValue];
         
         NSDate *date = [item objectForKey:@"date"];
-        NSLog(@"%@ ? %@", [formatter stringFromDate:date], [formatter stringFromDate:fromDate]);
+//        NSLog(@"%@ ? %@", [formatter stringFromDate:date], [formatter stringFromDate:fromDate]);
         if (nil != fromDate && [date compare:fromDate] == NSOrderedAscending) {
             continue;
         }
