@@ -84,7 +84,7 @@
     GKScore *score = (GKScore*)[self.scores objectAtIndex:indexPath.row];
     
     
-    ((UILabel*)[cell viewWithTag:1]).text = [NSString stringWithFormat:@"#%li", score.rank];
+    ((UILabel*)[cell viewWithTag:1]).text = [NSString stringWithFormat:@"#%lu", score.rank];
     ((UILabel*)[cell viewWithTag:2]).text = score.player.alias;
     ((UILabel*)[cell viewWithTag:3]).text = [NSString stringWithFormat:@"%.2f", (float)score.value / 100];;
     

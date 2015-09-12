@@ -255,7 +255,6 @@
 
     NSUInteger sequenceLength = [ssettings[@"sequenceLength"] integerValue];
 
- 
     NSInteger boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
     NSInteger currentBoardIndex = [ssettings[@"currentBoard"] integerValue];
     
@@ -298,25 +297,45 @@
 
     self.cellItems = [self.game getItems];
 
-    NSString *sep;
-    if ([self.game.sequence count] < 5) {
-        sep = @"  ";
-    } else if ([self.game.sequence count] < 8) {
-        sep = @" ";
-    } else {
-        sep = @"";
-    }
+//    NSString *sep;
+//    if ([self.game.sequence count] < 8) {
+//        sep = @"     ";
+//    } else if ([self.game.sequence count] < 12) {
+//        sep = @"   ";
+//    } else {
+//        sep = @" ";
+//    }
     
 //    show symbols horisontaly
 //    if (0 == arc4random() % 2) {
 //        sep = @"\n";
 //    }
     
-    NSString *msg = [self.game.sequence componentsJoinedByString:sep];
     
-//    msg = [NSString stringWithFormat:@"%@\n\n→", msg];
+//    NSMutableArray *seq = [[NSMutableArray alloc] init];
+//    
+//    for (int i = 0; i < sequenceLength; i++) {
+//        [seq addObject:[self.game.sequence objectAtIndex:i]];
+//
+////        if (5 == i % 5 && i > 0) {
+////            [seq addObject:@"\n+"];
+////        } else {
+//            [seq addObject:@"   "];
+////        }
+//    }
+    
+    NSString *msg = [self.game.sequence componentsJoinedByString:@"   "];
+    
+    
+    self.sequencePreviewButton.titleLabel.textAlignment = NSTextAlignmentCenter;
     
     [self.sequencePreviewButton setTitle:msg forState:UIControlStateNormal];
+
+    if (sequenceLength < 28) {
+        self.sequencePreviewButton.titleLabel.font = [UIFont systemFontOfSize:42];
+    } else {
+        self.sequencePreviewButton.titleLabel.font = [UIFont systemFontOfSize:32];
+    }
     
     if (!self.alertGameStart) {
         self.alertGameStart = [[UIAlertView alloc]
