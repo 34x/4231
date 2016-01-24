@@ -51,11 +51,21 @@
 @property (weak, nonatomic) IBOutlet UIView *restartGameAlert;
 @property (weak, nonatomic) IBOutlet UIButton *sequencePreviewButton;
 @property (weak, nonatomic) IBOutlet UIButton *beginGameButton;
+@property (weak, nonatomic) IBOutlet UIView *popupAskAtEnd;
 
 @property (nonatomic, readwrite) NCSettings *settings;
 @end
 
 @implementation NCGameViewController
+
+- (void) viewDidLoad {
+    self.popupAskAtEnd.layer.cornerRadius = 8.0;
+    self.popupAskAtEnd.layer.masksToBounds = true;
+    self.popupAskAtEnd.backgroundColor = [UIColor whiteColor];
+    self.popupAskAtEnd.layer.borderColor = [UIColor grayColor].CGColor;
+    self.popupAskAtEnd.layer.borderWidth = 1.0;
+    self.popupAskAtEnd.hidden = true;
+}
 
 - (void)viewWillDisappear:(BOOL)animated
 {
@@ -568,7 +578,7 @@
     
     if (showResult) {
         NSMutableDictionary *ssettings = [self.settings getSequenceSettings:[NCGame getSequenceId:self.sequenceLevel]];
-        
+
         float lastResult = [ssettings[@"lastResult"] floatValue];
         
         float diff = .0;

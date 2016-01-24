@@ -13,8 +13,10 @@
 #import "NCSettings.h"
 #import "PiwikTracker.h"
 #import "GCHelper.h"
+#import "ATSettings.h"
+#import <iAd/iAd.h>
 
-@interface MainMenuViewController ()
+@interface MainMenuViewController () <ADBannerViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton *leaderboardButton;
 
@@ -59,6 +61,15 @@
     
     [self.infoButton addTarget:self action:@selector(infoButtonClick) forControlEvents:UIControlEventTouchUpInside];
 }
+
+- (void) viewWillAppear:(BOOL)animated {
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
+}
+
+- (void) viewWillDisappear:(BOOL)animated {
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
+}
+
 
 - (void) viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -106,19 +117,19 @@
 }
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    NSLog(@"click");
+
     if (buttonIndex == 1) {
-        NSURL *url = [NSURL URLWithString: @"https://github.com/34x/4231"];
+        NSURL *url = [NSURL URLWithString: [[ATSettings sharedInstance] get:@"github"]];
         [[PiwikTracker sharedInstance] sendOutlink:[url absoluteString]];
 
         if ([[UIApplication sharedApplication] canOpenURL:url]) {
             [[UIApplication sharedApplication] openURL:url];
         }
     } else if (buttonIndex == 2) {
-        NSString *appId = @"982592630"; //Change this one to your ID
+        NSString *appId = [[ATSettings sharedInstance] get:@"app_id"]; //Change this one to your ID
         
-        NSString *iOS7AppStoreURLFormat = @"itms-apps://itunes.apple.com/app/id%@";
-        NSString *iOSAppStoreURLFormat = @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=4231&id=%@";
+        NSString *iOS7AppStoreURLFormat = [[ATSettings sharedInstance] get:@"rate_url"];
+        NSString *iOSAppStoreURLFormat = [[ATSettings sharedInstance] get:@"rate_url_old"];
         
         NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:([[UIDevice currentDevice].systemVersion floatValue] >= 7.0f)? iOS7AppStoreURLFormat: iOSAppStoreURLFormat, appId]]; // Would contain the right link
 

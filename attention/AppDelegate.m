@@ -11,6 +11,7 @@
 #import "NCGameViewController.h"
 #import "GCHelper.h"
 #import "PiwikTracker.h"
+#import "ATSettings.h"
 
 @interface AppDelegate ()
 - (void)showAlarm:(NSString *)text;
@@ -31,19 +32,13 @@
 //    }
 //    
 //    [self.window makeKeyAndVisible];
-#ifdef DEBUG
-    [PiwikTracker sharedInstanceWithSiteID:@"2" baseURL:[NSURL URLWithString:@"http://stat.34x.me/"]];
-    [PiwikTracker sharedInstance].dispatchInterval = 2;
-    NSLog(@"debug");
-#else
-    [PiwikTracker sharedInstanceWithSiteID:@"3" baseURL:[NSURL URLWithString:@"http://stat.34x.me/"]];
-    NSLog(@"prod");
-#endif
+
+    
+
+    [PiwikTracker sharedInstanceWithSiteID:[[ATSettings sharedInstance] get:@"piwik_id"]
+                                   baseURL:[NSURL URLWithString:[[ATSettings sharedInstance] get:@"piwik_url"]]];
     
     [PiwikTracker sharedInstance].appVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-//    [PiwikTracker sharedInstance]
-
-//    [PiwikTracker sharedInstance].debug = YES;
     
     
     [[GCHelper sharedInstance] authenticateLocalUser];
