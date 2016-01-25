@@ -63,58 +63,17 @@
 
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [self performSegueWithIdentifier:@"show_question" sender:nil];
-
-
-//        NSMutableArray *hidingItems = [NSMutableArray new];
-//        
-//        NSLog(@"total: %li", [boardView.subviews count]);
-//        
-//
-//        for (int i = 0; i < boardView.subviews.count; i++) {
-//
-//            UIView *v = boardView.subviews[i];
-//            
-//            if (NSNotFound != [hidingItems indexOfObject:v]) {
-//                continue;
-//            }
-//            [hidingItems addObject:v];
-//            
-//            [UIView animateWithDuration: 1.2
-//                                  delay: i * 0.8
-//                                options:UIViewAnimationOptionCurveLinear
-//                             animations:^{
-//                                 v.alpha = 0.0;
-//                             }
-//                             completion:^(BOOL finished){
-//
-//                                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-//                                     [v removeFromSuperview];
-//                                     if (0 == boardView.subviews.count) {
-//                                        [self performSegueWithIdentifier:@"show_question" sender:nil];
-//                                     }
-//                                 }];
-//                             }];
-        
-//            [UIView animateWithDuration:2.2 animations:^{
-//                v.alpha = 0.0;
-//                
-//            } completion:^(BOOL finished){
-//                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-//                    [v removeFromSuperview];
-//                    if (0 == boardView.subviews.count) {
-////                        [self performSegueWithIdentifier:@"show_question" sender:nil];
-//                    }
-//
-//                }];
-//                
-//            }];
-//        }
     }];
     
 
 }
 
+- (void) viewWillAppear:(BOOL)animated {
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
+}
+
 - (void) viewDidAppear:(BOOL)animated {
+    
     game.delegate = self;
     
     [game start];
@@ -194,6 +153,7 @@
     
     if ([dest isKindOfClass:[ATQuestionViewController class]]) {
         ((ATQuestionViewController*)dest).game = game;
+        ((ATQuestionViewController*)dest).mainController = self;
     }
 }
 

@@ -7,6 +7,7 @@
 //
 
 #import "ATQuestionViewController.h"
+#import "ATSuspectsResultViewController.h"
 #import "ATShape.h"
 #import "Utils.h"
 
@@ -29,6 +30,12 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 }
+
+
+- (void) viewWillAppear:(BOOL)animated {
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
+}
+
 
 - (void) viewDidAppear:(BOOL)animated {
     _scroll.alpha = 0.0;
@@ -211,7 +218,7 @@
     NSInteger right = 0;
     NSInteger wrong = 0;
     
-    for (int i = 0; i < [selectedSuspects count]; i++) {
+    for (int i = 0; i < selectedSuspects.count; i++) {
         NSInteger idx = [selectedSuspects[i] integerValue];
         NSString *symbol = symbols[idx];
         
@@ -222,10 +229,10 @@
         }
     }
     
-    BOOL win = false;
+    BOOL win = NO;
 
-    if (right == [suspectSymbols count] && 0 == wrong) {
-        win = true;
+    if (right == suspectSymbols.count && 0 == wrong) {
+        win = YES;
     }
     
     NSString *title = @"You win!";
@@ -249,8 +256,9 @@
         [UIView animateWithDuration:0.2 animations:^{
             _scroll.alpha = 0.0;
         }];
-        [self.navigationController popViewControllerAnimated:YES];
+//        [self.navigationController popViewControllerAnimated:YES];
 //        [self dismissViewControllerAnimated:true completion:^{}];
+        [self performSegueWithIdentifier:@"show_result" sender:self];
     
     }];
     
@@ -265,14 +273,22 @@
     // Dispose of any resources that can be recreated.
 }
 
-/*
+
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
+    
+    id dest = [segue destinationViewController];
+    
+    if ([dest isKindOfClass:[ATSuspectsResultViewController class]]) {
+
+        ((ATSuspectsResultViewController*)dest).mainController = _mainController;
+    }
+
 }
-*/
+
 
 @end

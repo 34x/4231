@@ -146,8 +146,6 @@
         // for sure!
         shapesHidden = [[Utils getRandomizedSequence:shapesHidden] mutableCopy];
         shapes = [[NSArray alloc] initWithArray:shapesHidden];
-        
-        NSLog(@"Total shapes actual %li from %li, right: %li", [shapesHidden count], maxShapesCount, rightShapesMarked);
     }];
     
     if (timer) {

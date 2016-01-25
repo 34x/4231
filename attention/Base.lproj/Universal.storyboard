@@ -310,11 +310,46 @@
                     </view>
                     <connections>
                         <outlet property="scroll" destination="lbv-ks-SHk" id="bXk-6U-dJ4"/>
+                        <segue destination="1j8-hR-UyO" kind="show" identifier="show_result" id="99I-8M-Aai"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Q2a-sc-s0g" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2527" y="1140"/>
+            <point key="canvasLocation" x="2526" y="1140"/>
+        </scene>
+        <!--Suspects Result View Controller-->
+        <scene sceneID="th2-YA-XtI">
+            <objects>
+                <viewController id="1j8-hR-UyO" customClass="ATSuspectsResultViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="WIX-Qf-asi"/>
+                        <viewControllerLayoutGuide type="bottom" id="VbE-mZ-Bfv"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="eia-AC-43l">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="t4V-xn-WgY">
+                                <rect key="frame" x="277" y="285" width="46" height="30"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="onButtonClick:" destination="1j8-hR-UyO" eventType="touchUpInside" id="2OA-XV-Kc1"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="t4V-xn-WgY" firstAttribute="centerX" secondItem="eia-AC-43l" secondAttribute="centerX" id="Yjb-ZU-Bly"/>
+                            <constraint firstItem="t4V-xn-WgY" firstAttribute="centerY" secondItem="eia-AC-43l" secondAttribute="centerY" id="gvz-Yv-Riv"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="button" destination="t4V-xn-WgY" id="zzV-kr-7MH"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="QId-DU-TSO" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3177" y="1140"/>
         </scene>
         <!--numbers_count_game-->
         <scene sceneID="0CX-aN-FCU">

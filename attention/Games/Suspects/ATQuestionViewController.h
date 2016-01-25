@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "ATGame.h"
+#import "ATSuspectsMainViewController.h"
 
 @interface ATQuestionViewController : UIViewController
 @property (nonatomic) ATGame *game;
+@property (nonatomic) ATSuspectsMainViewController *mainController;
 @end
