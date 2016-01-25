@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AttentionViewController : UIViewController
+@interface ATSuspectsMainViewController : UIViewController
 
 @end

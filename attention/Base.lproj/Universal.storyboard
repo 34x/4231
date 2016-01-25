@@ -147,10 +147,7 @@
                                 </state>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bUG-fK-JBd">
-                                <rect key="frame" x="20" y="160" width="560" height="280"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="280" id="go4-rR-FKl"/>
-                                </constraints>
+                                <rect key="frame" x="20" y="250" width="560" height="100"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="36"/>
                                 <state key="normal" title="Play">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -194,10 +191,10 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VLo-Y8-rBy">
-                                <rect key="frame" x="172" y="188" width="256" height="30"/>
+                                <rect key="frame" x="172" y="166" width="256" height="52"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="256" id="89z-hX-f6a"/>
-                                    <constraint firstAttribute="height" constant="30" id="k2w-dU-2Ih"/>
+                                    <constraint firstAttribute="height" constant="52" id="k2w-dU-2Ih"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="32"/>
                                 <state key="normal" title="Faces (beta)">
@@ -218,6 +215,7 @@
                         <constraints>
                             <constraint firstAttribute="centerX" secondItem="bUG-fK-JBd" secondAttribute="centerX" id="1eO-eb-8kj"/>
                             <constraint firstAttribute="centerY" secondItem="bUG-fK-JBd" secondAttribute="centerY" id="5j4-Px-M1i"/>
+                            <constraint firstItem="bUG-fK-JBd" firstAttribute="top" secondItem="VLo-Y8-rBy" secondAttribute="bottom" constant="32" id="JBk-GZ-NTL"/>
                             <constraint firstItem="bUG-fK-JBd" firstAttribute="trailing" secondItem="5Go-WW-9r0" secondAttribute="trailingMargin" id="JUs-M2-OC1"/>
                             <constraint firstAttribute="centerX" secondItem="VLo-Y8-rBy" secondAttribute="centerX" id="K2L-nw-vzc"/>
                             <constraint firstItem="Zd7-Vj-zZd" firstAttribute="centerX" secondItem="5Go-WW-9r0" secondAttribute="centerX" id="M2O-JC-Yx2"/>
@@ -251,10 +249,10 @@
             </objects>
             <point key="canvasLocation" x="1229" y="321"/>
         </scene>
-        <!--Attention View Controller-->
+        <!--Suspects Main View Controller-->
         <scene sceneID="nrc-mY-Cpa">
             <objects>
-                <viewController id="VEK-Ud-oIJ" customClass="AttentionViewController" sceneMemberID="viewController">
+                <viewController id="VEK-Ud-oIJ" customClass="ATSuspectsMainViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="L0o-JN-ix0"/>
                         <viewControllerLayoutGuide type="bottom" id="bDT-Rc-OyX"/>
@@ -275,7 +273,7 @@
         <!--Question View Controller-->
         <scene sceneID="PjV-QF-ZNf">
             <objects>
-                <viewController id="sW0-ZG-aYp" customClass="ATQuestionViewController" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="sW0-ZG-aYp" customClass="ATQuestionViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="wCQ-zm-o3L"/>
                         <viewControllerLayoutGuide type="bottom" id="sId-OR-hW6"/>
@@ -284,15 +282,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <scrollView multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceHorizontal="YES" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lbv-ks-SHk">
-                                <rect key="frame" x="64" y="72" width="472" height="383"/>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.59999999999999998" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lbv-ks-SHk">
+                                <rect key="frame" x="20" y="64" width="560" height="416"/>
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dkf-03-HPv">
-                                <rect key="frame" x="0.0" y="463" width="600" height="85"/>
+                                <rect key="frame" x="0.0" y="480" width="600" height="76"/>
+                                <color key="backgroundColor" red="0.20000000300000001" green="0.20000000300000001" blue="0.20000000300000001" alpha="0.078281249999999997" colorSpace="calibratedRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="85" id="hN8-hb-V6f"/>
+                                    <constraint firstAttribute="height" constant="76" id="hN8-hb-V6f"/>
                                 </constraints>
-                                <state key="normal" title="Check"/>
+                                <state key="normal" title="Done"/>
                                 <connections>
                                     <action selector="checkAnswer:" destination="sW0-ZG-aYp" eventType="touchUpInside" id="uQX-Ye-weC"/>
                                 </connections>
@@ -300,13 +299,13 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="Dkf-03-HPv" firstAttribute="top" secondItem="lbv-ks-SHk" secondAttribute="bottom" constant="8" id="BNi-of-w5B"/>
+                            <constraint firstItem="Dkf-03-HPv" firstAttribute="top" secondItem="lbv-ks-SHk" secondAttribute="bottom" id="BNi-of-w5B"/>
                             <constraint firstItem="Dkf-03-HPv" firstAttribute="leading" secondItem="3z6-ta-fVm" secondAttribute="leading" id="Dc4-XH-3qm"/>
-                            <constraint firstAttribute="trailing" secondItem="lbv-ks-SHk" secondAttribute="trailing" constant="64" id="K9I-1D-0fz"/>
+                            <constraint firstAttribute="trailing" secondItem="lbv-ks-SHk" secondAttribute="trailing" constant="20" id="K9I-1D-0fz"/>
                             <constraint firstAttribute="trailing" secondItem="Dkf-03-HPv" secondAttribute="trailing" id="PvM-Pf-VD2"/>
-                            <constraint firstItem="lbv-ks-SHk" firstAttribute="leading" secondItem="3z6-ta-fVm" secondAttribute="leading" constant="64" id="W9o-ND-ZV0"/>
-                            <constraint firstItem="sId-OR-hW6" firstAttribute="top" secondItem="Dkf-03-HPv" secondAttribute="bottom" constant="8" id="m70-lh-j7o"/>
-                            <constraint firstItem="lbv-ks-SHk" firstAttribute="top" secondItem="wCQ-zm-o3L" secondAttribute="bottom" constant="8" id="ouc-rg-0XR"/>
+                            <constraint firstItem="lbv-ks-SHk" firstAttribute="top" secondItem="wCQ-zm-o3L" secondAttribute="bottom" id="SCk-ak-AOR"/>
+                            <constraint firstItem="lbv-ks-SHk" firstAttribute="leading" secondItem="3z6-ta-fVm" secondAttribute="leading" constant="20" id="W9o-ND-ZV0"/>
+                            <constraint firstItem="sId-OR-hW6" firstAttribute="top" secondItem="Dkf-03-HPv" secondAttribute="bottom" id="m70-lh-j7o"/>
                         </constraints>
                     </view>
                     <connections>

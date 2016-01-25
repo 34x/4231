@@ -38,9 +38,13 @@
 - (ATShape*)addShapeToRandom:(ATShape*)shape;
 - (void) start;
 - (void) finish;
-- (void)shapeDidRemove:(ATShape*)shape;
+- (void) shapeDidRemove:(ATShape*)shape;
+- (void) shapeDidAdd:(ATShape*)shape;
 - (NSArray*)getShapes;
 - (NSArray*)getSymbols;
+- (void) increaseDifficulty;
+- (void) decreaseDifficulty;
+
 @end
 
 

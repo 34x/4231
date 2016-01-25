@@ -41,7 +41,7 @@
 		5056616D1C562F1300F75330 /* ATGame.m in Sources */ = {isa = PBXBuildFile; fileRef = 505661641C562F1300F75330 /* ATGame.m */; };
 		5056616E1C562F1300F75330 /* ATQuestionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 505661661C562F1300F75330 /* ATQuestionViewController.m */; };
 		505661701C562F1300F75330 /* ATShape.m in Sources */ = {isa = PBXBuildFile; fileRef = 5056616A1C562F1300F75330 /* ATShape.m */; };
-		505661711C562F1300F75330 /* AttentionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5056616C1C562F1300F75330 /* AttentionViewController.m */; };
+		505661711C562F1300F75330 /* ATSuspectsMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5056616C1C562F1300F75330 /* ATSuspectsMainViewController.m */; };
 		5058ABCC1BAF053200EBD28B /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 5058ABCB1BAF053200EBD28B /* Utils.m */; };
 		508F6EB81C35B958006CD8A8 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 508F6EB71C35B958006CD8A8 /* iAd.framework */; };
 		50A0A0B31B5D2FAD0096B38B /* LeaderboardTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 50A0A0B21B5D2FAD0096B38B /* LeaderboardTableViewController.m */; };
@@ -136,8 +136,8 @@
 		505661661C562F1300F75330 /* ATQuestionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATQuestionViewController.m; sourceTree = "<group>"; };
 		505661691C562F1300F75330 /* ATShape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATShape.h; sourceTree = "<group>"; };
 		5056616A1C562F1300F75330 /* ATShape.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATShape.m; sourceTree = "<group>"; };
-		5056616B1C562F1300F75330 /* AttentionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttentionViewController.h; sourceTree = "<group>"; };
-		5056616C1C562F1300F75330 /* AttentionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttentionViewController.m; sourceTree = "<group>"; };
+		5056616B1C562F1300F75330 /* ATSuspectsMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATSuspectsMainViewController.h; sourceTree = "<group>"; };
+		5056616C1C562F1300F75330 /* ATSuspectsMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATSuspectsMainViewController.m; sourceTree = "<group>"; };
 		5058ABCA1BAF053200EBD28B /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		5058ABCB1BAF053200EBD28B /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		507BD4881B2CA4BE003FFF10 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
@@ -308,12 +308,12 @@
 			children = (
 				505661631C562F1300F75330 /* ATGame.h */,
 				505661641C562F1300F75330 /* ATGame.m */,
+				5056616B1C562F1300F75330 /* ATSuspectsMainViewController.h */,
+				5056616C1C562F1300F75330 /* ATSuspectsMainViewController.m */,
 				505661651C562F1300F75330 /* ATQuestionViewController.h */,
 				505661661C562F1300F75330 /* ATQuestionViewController.m */,
 				505661691C562F1300F75330 /* ATShape.h */,
 				5056616A1C562F1300F75330 /* ATShape.m */,
-				5056616B1C562F1300F75330 /* AttentionViewController.h */,
-				5056616C1C562F1300F75330 /* AttentionViewController.m */,
 			);
 			name = Suspects;
 			path = Games/Suspects;
@@ -549,7 +549,7 @@
 				5056616E1C562F1300F75330 /* ATQuestionViewController.m in Sources */,
 				50B0CF3919CDFB0200CCB9AB /* main.m in Sources */,
 				5056615B1C562DF900F75330 /* PiwikTrackedViewController.m in Sources */,
-				505661711C562F1300F75330 /* AttentionViewController.m in Sources */,
+				505661711C562F1300F75330 /* ATSuspectsMainViewController.m in Sources */,
 				5056611E1C562CEF00F75330 /* GCHelper.m in Sources */,
 				5056615A1C562DF900F75330 /* PiwikNSURLSessionDispatcher.m in Sources */,
 				503AAD4E1A027F5B00602F0D /* NCSettings.m in Sources */,

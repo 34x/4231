@@ -20,6 +20,14 @@
 @end
 
 @implementation ATGame
+{
+    NSUserDefaults *defaults;
+    NSArray *currentSymbols;
+    BOOL gameIsRunning;
+    NSMutableArray *suspectsShowed;
+    CFAbsoluteTime gameTimerStarted;
+}
+
 @synthesize queue;
 @synthesize rows;
 @synthesize cols;
@@ -50,9 +58,22 @@
         cellSize = 4;
         shapesCount = 32;
         
-        suspectCount = 1;
-        totalCount = 2;
         gameTimeLimit = 5.0;
+        
+        
+        defaults = [[NSUserDefaults alloc] init];
+        
+        if ([defaults objectForKey:@"suspects"]) {
+            totalCount = [[defaults objectForKey:@"suspects"] integerValue];
+        } else {
+            totalCount = 2;
+        }
+        
+        suspectCount = totalCount / 3;
+        
+        if (suspectCount < 1) {
+            suspectCount = 1;
+        }
     }
     
     return self;
@@ -70,12 +91,21 @@
 }
 
 - (NSArray*)getSymbols {
-    return [NCGame getSymbols:@"emoji"];
+    if (!currentSymbols) {
+        NSArray *symbolsNames = @[@"emoji", @"faces", @"flags"];
+        currentSymbols = [NCGame getSymbols:symbolsNames[arc4random() % symbolsNames.count]];
+    }
+    
+    return currentSymbols;
 }
 
 - (void) start {
     
     [self.queue addOperationWithBlock:^{
+        gameIsRunning = YES;
+        currentSymbols = nil;
+        suspectsShowed = [NSMutableArray new];
+        
         NSArray *symbols = [self getSymbols];
         
         NSArray *randomized = [Utils getRandomizedSequence:symbols];
@@ -96,6 +126,8 @@
         shapesOnBoard = [[NSMutableArray alloc] init];
         boardCells = [[NSMutableDictionary alloc] init];
         NSInteger rightShapesMarked = 0;
+        
+        cellSize = cols / maxShapesCount;
         
         for (int i = 0; i < maxShapesCount; i++) {
             
@@ -122,23 +154,25 @@
         [timer invalidate];
     }
     
-    timer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(tick) userInfo:nil repeats:true];
+    timer = [NSTimer scheduledTimerWithTimeInterval:0.4 target:self selector:@selector(tick) userInfo:nil repeats:YES];
     
     if (gameTimer) {
         [gameTimer invalidate];
     }
     
     gameTimeLimit = totalCount * 2.0;
-    
-    gameTimer = [NSTimer scheduledTimerWithTimeInterval:gameTimeLimit target:self selector:@selector(finish) userInfo:nil repeats:false];
+    gameTimerStarted = CFAbsoluteTimeGetCurrent();
+    gameTimer = [NSTimer scheduledTimerWithTimeInterval:gameTimeLimit target:self selector:@selector(finish) userInfo:nil repeats:NO];
 }
 
 - (void) finish {
-    [self.queue addOperationWithBlock:^{
-        [timer invalidate];
+    [queue addOperationWithBlock:^{
         [gameTimer invalidate];
-        
-        [delegate atGameFinish:self];
+//        if (suspectCount != suspectsShowed.count) {
+//            gameTimer = [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(finish) userInfo:nil repeats:NO];
+//        } else {
+            gameIsRunning = NO;
+//        }
     }];
 }
 
@@ -169,20 +203,41 @@
             ATShape *shape = [shapesOnBoard objectAtIndex:i];
             if (0 == shapesHidden.count) {
                 [self removeShape:shape];
+                break;
             } else {
-                if (0 == arc4random() % 5) {
+                NSInteger chance;
+                if (gameIsRunning) {
+                    chance = 8;
+                } else {
+                    chance = 2;
+                }
+                
+                if (0 == arc4random() % chance) {
                     [self removeShape:shape];
                 }
             }
         }
         
-        for(NSInteger i = 0; i < [shapesHidden count]; i++) {
-            ATShape *shape = [shapesHidden objectAtIndex:i];
-            if (0 == shapesOnBoard.count) {
-                [self addShapeToRandom:shape];
-            } else {
-                if (0 == arc4random() % 2) {
+        if (gameIsRunning) {
+            for(NSInteger i = 0; i < [shapesHidden count]; i++) {
+                ATShape *shape = [shapesHidden objectAtIndex:i];
+                if (0 == shapesOnBoard.count) {
                     [self addShapeToRandom:shape];
+                    break;
+                } else {
+                    NSInteger chance = 2;
+                    // this point to be sure that all suspects will be showed at least once before game will be over
+                    if (shape.isRight && NSNotFound == [suspectsShowed indexOfObject:shape]) {
+                        CFAbsoluteTime timeSpent = CFAbsoluteTimeGetCurrent() - gameTimerStarted;
+                        CFAbsoluteTime timeLeft = gameTimeLimit - timeSpent;
+                        if (timeLeft < gameTimeLimit / 2.0) {
+                            chance = 1;
+                        }
+                    }
+
+                    if (0 == arc4random() % chance) {
+                        [self addShapeToRandom:shape];
+                    }
                 }
             }
         }
@@ -224,9 +279,6 @@
             }
         }
         
-        
-        [shapesOnBoard addObject:shape];
-        
      
         [delegate addShape:shape];
 
@@ -241,19 +293,57 @@
 }
 
 - (void)shapeDidRemove:(ATShape*)shape {
-    
-    for (NSInteger ix = shape.position.x; ix < shape.position.x + shape.size; ix++) {
-        for (NSInteger iy = shape.position.y; iy < shape.position.y + shape.size; iy++) {
-            NSString *key =[NSString stringWithFormat:@"%lix%li", ix, iy];
-            [boardCells removeObjectForKey:key];
+    [queue addOperationWithBlock:^{
+        for (NSInteger ix = shape.position.x; ix < shape.position.x + shape.size; ix++) {
+            for (NSInteger iy = shape.position.y; iy < shape.position.y + shape.size; iy++) {
+                NSString *key =[NSString stringWithFormat:@"%lix%li", ix, iy];
+                [boardCells removeObjectForKey:key];
+            }
         }
-    }
+        
+        [shapesHidden addObject:shape];
+        
+
+        if (!gameIsRunning && 0 == shapesOnBoard.count && totalCount == shapesHidden.count) {
+            [timer invalidate];
+            [delegate atGameFinish:self];
+        }
+    }];
     
-    [shapesHidden addObject:shape];
+    
+}
+
+- (void) shapeDidAdd:(ATShape *)shape {
+    [queue addOperationWithBlock:^{
+        [shapesOnBoard addObject:shape];
+        // to be sure that all suspects was showed
+        if (shape.isRight && NSNotFound == [suspectsShowed indexOfObject:shape]) {
+            [suspectsShowed addObject:shape];
+        }
+    }];
 }
 
 - (NSArray*)getShapes {
     return shapes;
+}
+
+
+- (void) increaseDifficulty {
+    totalCount++;
+    suspectCount = totalCount / 3;
+    
+    [defaults setObject:[NSNumber numberWithInteger:totalCount] forKey:@"suspects"];
+}
+
+
+- (void) decreaseDifficulty {
+    if (totalCount > 2) {
+        totalCount--;
+        suspectCount = totalCount / 3;
+    }
+    
+    [defaults setObject:[NSNumber numberWithInteger:totalCount] forKey:@"suspects"];
+
 }
 
 @end

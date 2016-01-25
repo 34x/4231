@@ -22,7 +22,7 @@ static ATSettings *sharedInstance;
         NSString *settingsFilename = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"plist"];
         settings = [NSDictionary dictionaryWithContentsOfFile:settingsFilename];
     }
-    NSLog(@"instantiate %@", sharedInstance);
+
     return self;
 }
 
