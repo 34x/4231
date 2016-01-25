@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		5010515C1B94AD3300D08C16 /* WordsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5010515B1B94AD3300D08C16 /* WordsViewController.m */; };
 		501633FC1ADE90FA0073B60E /* UIPlotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 501633FB1ADE90FA0073B60E /* UIPlotView.m */; };
-		501BB6891B5906C20002728A /* GCHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 501BB6881B5906C20002728A /* GCHelper.m */; };
 		503AAD4D1A027F5B00602F0D /* NCGame.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AAD421A027F5B00602F0D /* NCGame.m */; };
 		503AAD4E1A027F5B00602F0D /* NCSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AAD441A027F5B00602F0D /* NCSettings.m */; };
 		503AAD501A027F5B00602F0D /* NCStatsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AAD491A027F5B00602F0D /* NCStatsViewController.m */; };
@@ -19,6 +18,7 @@
 		505661161C556B3400F75330 /* Settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 505661151C556B3400F75330 /* Settings.plist */; };
 		505661191C55706A00F75330 /* ATSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 505661181C55706A00F75330 /* ATSettings.m */; };
 		5056611B1C55761400F75330 /* Settings.example.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5056611A1C55761400F75330 /* Settings.example.plist */; };
+		5056611E1C562CEF00F75330 /* GCHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 5056611D1C562CEF00F75330 /* GCHelper.m */; };
 		5058ABC61BAD921000EBD28B /* ATGame.m in Sources */ = {isa = PBXBuildFile; fileRef = 5058ABC51BAD921000EBD28B /* ATGame.m */; };
 		5058ABC91BAEAEC000EBD28B /* ATQuestionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5058ABC81BAEAEC000EBD28B /* ATQuestionViewController.m */; };
 		5058ABCC1BAF053200EBD28B /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 5058ABCB1BAF053200EBD28B /* Utils.m */; };
@@ -73,8 +73,6 @@
 		5010515B1B94AD3300D08C16 /* WordsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WordsViewController.m; sourceTree = "<group>"; };
 		501633FA1ADE90FA0073B60E /* UIPlotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UIPlotView.h; path = ../UIPlotView.h; sourceTree = "<group>"; };
 		501633FB1ADE90FA0073B60E /* UIPlotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UIPlotView.m; path = ../UIPlotView.m; sourceTree = "<group>"; };
-		501BB6871B5906C20002728A /* GCHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GCHelper.h; path = ../../HowManyC/HowManyC/GCHelper.h; sourceTree = "<group>"; };
-		501BB6881B5906C20002728A /* GCHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GCHelper.m; path = ../../HowManyC/HowManyC/GCHelper.m; sourceTree = "<group>"; };
 		503AAD411A027F5B00602F0D /* NCGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NCGame.h; sourceTree = "<group>"; };
 		503AAD421A027F5B00602F0D /* NCGame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NCGame.m; sourceTree = "<group>"; };
 		503AAD431A027F5B00602F0D /* NCSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NCSettings.h; sourceTree = "<group>"; };
@@ -90,6 +88,8 @@
 		505661171C55706A00F75330 /* ATSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATSettings.h; sourceTree = "<group>"; };
 		505661181C55706A00F75330 /* ATSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATSettings.m; sourceTree = "<group>"; };
 		5056611A1C55761400F75330 /* Settings.example.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Settings.example.plist; sourceTree = "<group>"; };
+		5056611C1C562CEF00F75330 /* GCHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCHelper.h; sourceTree = "<group>"; };
+		5056611D1C562CEF00F75330 /* GCHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCHelper.m; sourceTree = "<group>"; };
 		5058ABC41BAD921000EBD28B /* ATGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATGame.h; sourceTree = "<group>"; };
 		5058ABC51BAD921000EBD28B /* ATGame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATGame.m; sourceTree = "<group>"; };
 		5058ABC71BAEAEC000EBD28B /* ATQuestionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATQuestionViewController.h; sourceTree = "<group>"; };
@@ -241,6 +241,8 @@
 		504F858E19FAD66700DAC9FF /* Games */ = {
 			isa = PBXGroup;
 			children = (
+				5056611C1C562CEF00F75330 /* GCHelper.h */,
+				5056611D1C562CEF00F75330 /* GCHelper.m */,
 				503AAD2B1A027D1E00602F0D /* NumbersCount */,
 				5010515A1B94AD3300D08C16 /* WordsViewController.h */,
 				5010515B1B94AD3300D08C16 /* WordsViewController.m */,
@@ -338,8 +340,6 @@
 			children = (
 				50A0A0941B5D0AC80096B38B /* AFNetworking */,
 				50A0A06F1B5CEE840096B38B /* PiwikTracker */,
-				501BB6871B5906C20002728A /* GCHelper.h */,
-				501BB6881B5906C20002728A /* GCHelper.m */,
 				504F858E19FAD66700DAC9FF /* Games */,
 				50CF3C821B3ABF6100B1CD4D /* Universal.storyboard */,
 				50CF3C7E1B3ABE0200B1CD4D /* Localizable.strings */,
@@ -528,7 +528,6 @@
 				50A0A08D1B5CEE840096B38B /* PiwikTransaction.m in Sources */,
 				5058ABCC1BAF053200EBD28B /* Utils.m in Sources */,
 				50A0A0871B5CEE840096B38B /* PiwikDebugDispatcher.m in Sources */,
-				501BB6891B5906C20002728A /* GCHelper.m in Sources */,
 				50A0A08F1B5CEE840096B38B /* PiwikTransactionItem.m in Sources */,
 				503AAD511A027F5B00602F0D /* NCGameViewController.m in Sources */,
 				50A0A0AF1B5D0AC80096B38B /* AFURLResponseSerialization.m in Sources */,
@@ -546,6 +545,7 @@
 				50A0A0AB1B5D0AC80096B38B /* AFNetworkReachabilityManager.m in Sources */,
 				503AAD4D1A027F5B00602F0D /* NCGame.m in Sources */,
 				50B0CF3919CDFB0200CCB9AB /* main.m in Sources */,
+				5056611E1C562CEF00F75330 /* GCHelper.m in Sources */,
 				5058ABC91BAEAEC000EBD28B /* ATQuestionViewController.m in Sources */,
 				50A0A08C1B5CEE840096B38B /* piwiktracker.xcdatamodeld in Sources */,
 				50A0A08E1B5CEE840096B38B /* PiwikTransactionBuilder.m in Sources */,
