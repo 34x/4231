@@ -13,7 +13,6 @@
 		503AAD4E1A027F5B00602F0D /* NCSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AAD441A027F5B00602F0D /* NCSettings.m */; };
 		503AAD501A027F5B00602F0D /* NCStatsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AAD491A027F5B00602F0D /* NCStatsViewController.m */; };
 		503AAD511A027F5B00602F0D /* NCGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AAD4B1A027F5B00602F0D /* NCGameViewController.m */; };
-		503AAD561A04E7B300602F0D /* AppIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 503AAD551A04E7B300602F0D /* AppIcon.png */; };
 		504F859119FC131700DAC9FF /* MainMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 504F859019FC131700DAC9FF /* MainMenuViewController.m */; };
 		505661161C556B3400F75330 /* Settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 505661151C556B3400F75330 /* Settings.plist */; };
 		505661191C55706A00F75330 /* ATSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 505661181C55706A00F75330 /* ATSettings.m */; };
@@ -39,12 +38,11 @@
 		5056615F1C562DF900F75330 /* PiwikTransactionBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 505661491C562DF900F75330 /* PiwikTransactionBuilder.m */; };
 		505661601C562DF900F75330 /* PiwikTransactionItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 5056614B1C562DF900F75330 /* PiwikTransactionItem.m */; };
 		505661611C562DF900F75330 /* PTEventEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 5056614D1C562DF900F75330 /* PTEventEntity.m */; };
-		5058ABC61BAD921000EBD28B /* ATGame.m in Sources */ = {isa = PBXBuildFile; fileRef = 5058ABC51BAD921000EBD28B /* ATGame.m */; };
-		5058ABC91BAEAEC000EBD28B /* ATQuestionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5058ABC81BAEAEC000EBD28B /* ATQuestionViewController.m */; };
+		5056616D1C562F1300F75330 /* ATGame.m in Sources */ = {isa = PBXBuildFile; fileRef = 505661641C562F1300F75330 /* ATGame.m */; };
+		5056616E1C562F1300F75330 /* ATQuestionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 505661661C562F1300F75330 /* ATQuestionViewController.m */; };
+		505661701C562F1300F75330 /* ATShape.m in Sources */ = {isa = PBXBuildFile; fileRef = 5056616A1C562F1300F75330 /* ATShape.m */; };
+		505661711C562F1300F75330 /* AttentionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5056616C1C562F1300F75330 /* AttentionViewController.m */; };
 		5058ABCC1BAF053200EBD28B /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 5058ABCB1BAF053200EBD28B /* Utils.m */; };
-		507E7C3D1BAC89DA005A012F /* AttentionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 507E7C3C1BAC89DA005A012F /* AttentionViewController.m */; };
-		507E7C401BACA5EF005A012F /* ATShape.m in Sources */ = {isa = PBXBuildFile; fileRef = 507E7C3F1BACA5EF005A012F /* ATShape.m */; };
-		507EBF8D1AD14B5C00AC8E5C /* AppIcon29.png in Resources */ = {isa = PBXBuildFile; fileRef = 507EBF8C1AD14B5C00AC8E5C /* AppIcon29.png */; };
 		508F6EB81C35B958006CD8A8 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 508F6EB71C35B958006CD8A8 /* iAd.framework */; };
 		50A0A0B31B5D2FAD0096B38B /* LeaderboardTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 50A0A0B21B5D2FAD0096B38B /* LeaderboardTableViewController.m */; };
 		50B0CF3919CDFB0200CCB9AB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 50B0CF3819CDFB0200CCB9AB /* main.m */; };
@@ -81,7 +79,6 @@
 		503AAD491A027F5B00602F0D /* NCStatsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NCStatsViewController.m; sourceTree = "<group>"; };
 		503AAD4A1A027F5B00602F0D /* NCGameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NCGameViewController.h; sourceTree = "<group>"; };
 		503AAD4B1A027F5B00602F0D /* NCGameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NCGameViewController.m; sourceTree = "<group>"; };
-		503AAD551A04E7B300602F0D /* AppIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon.png; path = Images/AppIcon.png; sourceTree = "<group>"; };
 		504F858F19FC131700DAC9FF /* MainMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainMenuViewController.h; sourceTree = "<group>"; };
 		504F859019FC131700DAC9FF /* MainMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainMenuViewController.m; sourceTree = "<group>"; };
 		505661151C556B3400F75330 /* Settings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Settings.plist; sourceTree = "<group>"; };
@@ -133,20 +130,19 @@
 		5056614B1C562DF900F75330 /* PiwikTransactionItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PiwikTransactionItem.m; sourceTree = "<group>"; };
 		5056614C1C562DF900F75330 /* PTEventEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTEventEntity.h; sourceTree = "<group>"; };
 		5056614D1C562DF900F75330 /* PTEventEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTEventEntity.m; sourceTree = "<group>"; };
-		5058ABC41BAD921000EBD28B /* ATGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATGame.h; sourceTree = "<group>"; };
-		5058ABC51BAD921000EBD28B /* ATGame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATGame.m; sourceTree = "<group>"; };
-		5058ABC71BAEAEC000EBD28B /* ATQuestionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATQuestionViewController.h; sourceTree = "<group>"; };
-		5058ABC81BAEAEC000EBD28B /* ATQuestionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATQuestionViewController.m; sourceTree = "<group>"; };
+		505661631C562F1300F75330 /* ATGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATGame.h; sourceTree = "<group>"; };
+		505661641C562F1300F75330 /* ATGame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATGame.m; sourceTree = "<group>"; };
+		505661651C562F1300F75330 /* ATQuestionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATQuestionViewController.h; sourceTree = "<group>"; };
+		505661661C562F1300F75330 /* ATQuestionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATQuestionViewController.m; sourceTree = "<group>"; };
+		505661691C562F1300F75330 /* ATShape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATShape.h; sourceTree = "<group>"; };
+		5056616A1C562F1300F75330 /* ATShape.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATShape.m; sourceTree = "<group>"; };
+		5056616B1C562F1300F75330 /* AttentionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttentionViewController.h; sourceTree = "<group>"; };
+		5056616C1C562F1300F75330 /* AttentionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttentionViewController.m; sourceTree = "<group>"; };
 		5058ABCA1BAF053200EBD28B /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		5058ABCB1BAF053200EBD28B /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		507BD4881B2CA4BE003FFF10 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		507BD4891B2CA4E5003FFF10 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		507BD48A1B2CA595003FFF10 /* en-GB */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-GB"; path = "en-GB.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
-		507E7C3B1BAC89DA005A012F /* AttentionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttentionViewController.h; sourceTree = "<group>"; };
-		507E7C3C1BAC89DA005A012F /* AttentionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttentionViewController.m; sourceTree = "<group>"; };
-		507E7C3E1BACA5EF005A012F /* ATShape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATShape.h; sourceTree = "<group>"; };
-		507E7C3F1BACA5EF005A012F /* ATShape.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATShape.m; sourceTree = "<group>"; };
-		507EBF8C1AD14B5C00AC8E5C /* AppIcon29.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon29.png; path = Images/AppIcon29.png; sourceTree = "<group>"; };
 		508F6EB71C35B958006CD8A8 /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		50A0A0B11B5D2FAD0096B38B /* LeaderboardTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LeaderboardTableViewController.h; sourceTree = "<group>"; };
 		50A0A0B21B5D2FAD0096B38B /* LeaderboardTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LeaderboardTableViewController.m; sourceTree = "<group>"; };
@@ -229,33 +225,15 @@
 			path = Games/NumbersCount/Controller;
 			sourceTree = "<group>";
 		};
-		503AAD541A04E74300602F0D /* Images */ = {
-			isa = PBXGroup;
-			children = (
-				507EBF8C1AD14B5C00AC8E5C /* AppIcon29.png */,
-				503AAD551A04E7B300602F0D /* AppIcon.png */,
-			);
-			name = Images;
-			sourceTree = "<group>";
-		};
 		504F858E19FAD66700DAC9FF /* Games */ = {
 			isa = PBXGroup;
 			children = (
-				5056611C1C562CEF00F75330 /* GCHelper.h */,
-				5056611D1C562CEF00F75330 /* GCHelper.m */,
+				505661621C562F1300F75330 /* Suspects */,
 				503AAD2B1A027D1E00602F0D /* NumbersCount */,
 				5010515A1B94AD3300D08C16 /* WordsViewController.h */,
 				5010515B1B94AD3300D08C16 /* WordsViewController.m */,
-				507E7C3B1BAC89DA005A012F /* AttentionViewController.h */,
-				507E7C3C1BAC89DA005A012F /* AttentionViewController.m */,
-				5058ABC71BAEAEC000EBD28B /* ATQuestionViewController.h */,
-				5058ABC81BAEAEC000EBD28B /* ATQuestionViewController.m */,
-				5058ABC41BAD921000EBD28B /* ATGame.h */,
-				5058ABC51BAD921000EBD28B /* ATGame.m */,
 				5058ABCA1BAF053200EBD28B /* Utils.h */,
 				5058ABCB1BAF053200EBD28B /* Utils.m */,
-				507E7C3E1BACA5EF005A012F /* ATShape.h */,
-				507E7C3F1BACA5EF005A012F /* ATShape.m */,
 			);
 			name = Games;
 			sourceTree = "<group>";
@@ -325,6 +303,22 @@
 			path = PiwikTracker;
 			sourceTree = "<group>";
 		};
+		505661621C562F1300F75330 /* Suspects */ = {
+			isa = PBXGroup;
+			children = (
+				505661631C562F1300F75330 /* ATGame.h */,
+				505661641C562F1300F75330 /* ATGame.m */,
+				505661651C562F1300F75330 /* ATQuestionViewController.h */,
+				505661661C562F1300F75330 /* ATQuestionViewController.m */,
+				505661691C562F1300F75330 /* ATShape.h */,
+				5056616A1C562F1300F75330 /* ATShape.m */,
+				5056616B1C562F1300F75330 /* AttentionViewController.h */,
+				5056616C1C562F1300F75330 /* AttentionViewController.m */,
+			);
+			name = Suspects;
+			path = Games/Suspects;
+			sourceTree = "<group>";
+		};
 		50B0CF2A19CDFB0200CCB9AB = {
 			isa = PBXGroup;
 			children = (
@@ -352,10 +346,11 @@
 				50CF3C821B3ABF6100B1CD4D /* Universal.storyboard */,
 				50CF3C7E1B3ABE0200B1CD4D /* Localizable.strings */,
 				50B0CF4619CDFB0200CCB9AB /* Images.xcassets */,
-				503AAD541A04E74300602F0D /* Images */,
 				50B0CF4819CDFB0200CCB9AB /* LaunchScreen.xib */,
 				50B0CF3D19CDFB0200CCB9AB /* attention.xcdatamodeld */,
 				50B0CF3619CDFB0200CCB9AB /* Supporting Files */,
+				5056611C1C562CEF00F75330 /* GCHelper.h */,
+				5056611D1C562CEF00F75330 /* GCHelper.m */,
 				504F858F19FC131700DAC9FF /* MainMenuViewController.h */,
 				504F859019FC131700DAC9FF /* MainMenuViewController.m */,
 			);
@@ -482,11 +477,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				503AAD561A04E7B300602F0D /* AppIcon.png in Resources */,
 				50CF3C7C1B3ABE0200B1CD4D /* Localizable.strings in Resources */,
 				50CF3C801B3ABF6100B1CD4D /* Universal.storyboard in Resources */,
 				5056611B1C55761400F75330 /* Settings.example.plist in Resources */,
-				507EBF8D1AD14B5C00AC8E5C /* AppIcon29.png in Resources */,
 				505661161C556B3400F75330 /* Settings.plist in Resources */,
 				50B0CF4A19CDFB0200CCB9AB /* LaunchScreen.xib in Resources */,
 				50B0CF4719CDFB0200CCB9AB /* Images.xcassets in Resources */,
@@ -541,26 +534,26 @@
 				505661581C562DF900F75330 /* PiwikDebugDispatcher.m in Sources */,
 				50A0A0B31B5D2FAD0096B38B /* LeaderboardTableViewController.m in Sources */,
 				501633FC1ADE90FA0073B60E /* UIPlotView.m in Sources */,
-				507E7C3D1BAC89DA005A012F /* AttentionViewController.m in Sources */,
 				503AAD501A027F5B00602F0D /* NCStatsViewController.m in Sources */,
 				50CF3C8C1B3B0F0200B1CD4D /* NCCell.m in Sources */,
 				5056614F1C562DF900F75330 /* AFHTTPRequestOperationManager.m in Sources */,
-				507E7C401BACA5EF005A012F /* ATShape.m in Sources */,
 				5056614E1C562DF900F75330 /* AFHTTPRequestOperation.m in Sources */,
 				5056615F1C562DF900F75330 /* PiwikTransactionBuilder.m in Sources */,
 				505661561C562DF900F75330 /* AFURLSessionManager.m in Sources */,
 				503AAD4D1A027F5B00602F0D /* NCGame.m in Sources */,
 				505661571C562DF900F75330 /* PiwikAFNetworking2Dispatcher.m in Sources */,
 				505661511C562DF900F75330 /* AFNetworkReachabilityManager.m in Sources */,
+				505661701C562F1300F75330 /* ATShape.m in Sources */,
 				505661551C562DF900F75330 /* AFURLResponseSerialization.m in Sources */,
 				505661541C562DF900F75330 /* AFURLRequestSerialization.m in Sources */,
+				5056616E1C562F1300F75330 /* ATQuestionViewController.m in Sources */,
 				50B0CF3919CDFB0200CCB9AB /* main.m in Sources */,
 				5056615B1C562DF900F75330 /* PiwikTrackedViewController.m in Sources */,
+				505661711C562F1300F75330 /* AttentionViewController.m in Sources */,
 				5056611E1C562CEF00F75330 /* GCHelper.m in Sources */,
 				5056615A1C562DF900F75330 /* PiwikNSURLSessionDispatcher.m in Sources */,
-				5058ABC91BAEAEC000EBD28B /* ATQuestionViewController.m in Sources */,
 				503AAD4E1A027F5B00602F0D /* NCSettings.m in Sources */,
-				5058ABC61BAD921000EBD28B /* ATGame.m in Sources */,
+				5056616D1C562F1300F75330 /* ATGame.m in Sources */,
 				5010515C1B94AD3300D08C16 /* WordsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
