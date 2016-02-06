@@ -15,8 +15,9 @@
 #import "GCHelper.h"
 #import "ATSettings.h"
 #import <iAd/iAd.h>
+#import "BannerViewController.h"
 
-@interface MainMenuViewController () <ADBannerViewDelegate>
+@interface MainMenuViewController ()
 
 @property (weak, nonatomic) IBOutlet UIButton *leaderboardButton;
 
@@ -28,8 +29,10 @@
 
 @property (weak, nonatomic) IBOutlet UIView *plot;
 @property (readwrite) UIView *imageOverlay;
+
 @property (strong, nonatomic) NSTimer *timer;
 @property (nonatomic) NSUInteger seqIdx;
+
 @end
 
 @implementation MainMenuViewController
@@ -49,7 +52,7 @@
     [self.numbersCountStats addTarget:self action:@selector(numbersCountStatsClick:) forControlEvents:UIControlEventTouchUpInside];
 //    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"bg2.jpg"]];
     
-//    [self setupLocalNotifications];
+    [self setupLocalNotifications];
     
 //    [self drawPlot];
     
@@ -58,18 +61,26 @@
     if (!self.timer) {
         self.timer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(timerTick) userInfo:nil repeats:YES];
     }
-    
-    [self.infoButton addTarget:self action:@selector(infoButtonClick) forControlEvents:UIControlEventTouchUpInside];
 }
+
 
 - (void) viewWillAppear:(BOOL)animated {
     [self.navigationController setNavigationBarHidden:YES animated:YES];
+    
+    BOOL bannerIsActive = [[[ATSettings sharedInstance] get:@(ATSettingsKeyBannerMain)] boolValue];
+    [[BannerViewController instance] setBannerActive:bannerIsActive];
+
+    NSLog(@"Will appear");
+//    if([[ATSettings sharedInstance] get:@(ATSettingsKeyBannerMain)]){
+//        _bannerView.hidden = NO;
+//    } else {
+//        _bannerView.hidden = YES;
+//    }
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
     [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
-
 
 - (void) viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -78,10 +89,10 @@
     
     //[NSTimer scheduledTimerWithTimeInterval:9 target:self selector:@selector(infoButtonMove) userInfo:nil repeats:YES];
     
-    if ([GCHelper sharedInstance].gameCenterAvailable) {
-        self.leaderboardButton.hidden = false;
+    if ([GCHelper sharedInstance].gameCenterAvailable && [GCHelper sharedInstance].userAuthenticated) {
+        self.leaderboardButton.hidden = NO;
     } else {
-        self.leaderboardButton.hidden = true;
+        self.leaderboardButton.hidden = YES;
     }
 }
 
@@ -103,41 +114,6 @@
     }];
 }
 
-- (void) infoButtonClick {
-    UIAlertView *alert = [[UIAlertView alloc] init];
-    alert.title = NSLocalizedString(@"Little info", nil);
-    alert.message = NSLocalizedString(@"about", nil);
-    [alert addButtonWithTitle:NSLocalizedString(@"info_ok", nil)];
-    [alert addButtonWithTitle:NSLocalizedString(@"Go to github!", nil)];
-    [alert addButtonWithTitle:NSLocalizedString(@"Rate us!", nil)];
-    alert.delegate = self;
-    [alert show];
-    
-    [[PiwikTracker sharedInstance] sendView:@"info"];
-}
-
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-
-    if (buttonIndex == 1) {
-        NSURL *url = [NSURL URLWithString: [[ATSettings sharedInstance] get:@"github"]];
-        [[PiwikTracker sharedInstance] sendOutlink:[url absoluteString]];
-
-        if ([[UIApplication sharedApplication] canOpenURL:url]) {
-            [[UIApplication sharedApplication] openURL:url];
-        }
-    } else if (buttonIndex == 2) {
-        NSString *appId = [[ATSettings sharedInstance] get:@"app_id"]; //Change this one to your ID
-        
-        NSString *iOS7AppStoreURLFormat = [[ATSettings sharedInstance] get:@"rate_url"];
-        NSString *iOSAppStoreURLFormat = [[ATSettings sharedInstance] get:@"rate_url_old"];
-        
-        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:([[UIDevice currentDevice].systemVersion floatValue] >= 7.0f)? iOS7AppStoreURLFormat: iOSAppStoreURLFormat, appId]]; // Would contain the right link
-
-        [[PiwikTracker sharedInstance] sendOutlink:[NSString stringWithFormat:@"https://itunes.apple.com/app/id%@", appId]];
-
-        [[UIApplication sharedApplication] openURL:url];
-    }
-}
 
 - (void) timerTick {
     if (!self.seqIdx) {
@@ -165,18 +141,6 @@
 
 }
 
-- (void) inspectView:(UIView*)rv {
-    for (UIView *sub in [rv subviews]) {
-        NSLog(@"%@", sub);
-        NSLog(@"%.2f x %.2f and %.2f x %.2f", sub.frame.origin.x, sub.frame.origin.y, sub.frame.size.width, sub.frame.size.height);
-        NSLog(@"%.2f x %.2f and %.2f x %.2f", sub.bounds.origin.x, sub.bounds.origin.y, sub.bounds.size.width, sub.bounds.size.height);
-        if ([sub isKindOfClass:[UINavigationBar class]]) {
-//            sub.alpha = .2;
-        }
-        [self inspectView:sub];
-    }
-}
-
 - (void)setupLocalNotifications {
 
     [[UIApplication sharedApplication] cancelAllLocalNotifications];
@@ -192,24 +156,24 @@
     
     
     int minutes = 42;
+    int hours = 14;
 
-    float tomorrow = 3600. * 24.;
-    NSDate *currDate = [NSDate dateWithTimeIntervalSinceNow:tomorrow];
-
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    NSDateComponents *components = [calendar components:NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit|NSHourCalendarUnit fromDate:currDate];
+    float tomorrow = 3600. * 24 * 4;
     
-    for (int i = 8; i < 20; i = i + 2) {
+    for (int i = 0; i < 8; i++) {
 
-        int hour = i;
+        int day = tomorrow * i;
 
-//        NSDateComponents *components = [[NSDateComponents alloc] init];
+        NSDate *currDate = [NSDate dateWithTimeIntervalSinceNow:day];
+        
+        NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+        NSDateComponents *components = [calendar components:NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit|NSHourCalendarUnit fromDate:currDate];
 
         [components setDay:components.day];
         [components setMonth:components.month];
         [components setYear:components.year];
         [components setMinute:minutes];
-        [components setHour:hour];
+        [components setHour:hours];
         
         NSDate *date = [calendar dateFromComponents:components];
         
@@ -256,6 +220,7 @@
 - (void) numbersCountStatsClick:(id)sender {
     [self performSegueWithIdentifier:@"numbers_count_stats" sender:self];
 }
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

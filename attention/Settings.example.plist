@@ -14,5 +14,9 @@
 	<string></string>
 	<key>piwik_url</key>
 	<string></string>
+	<key>feedback_url</key>
+	<string></string>
+	<key>website</key>
+	<string></string>
 </dict>
 </plist>

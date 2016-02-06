@@ -7,12 +7,16 @@
 //
 
 #import "NCStatsViewController.h"
+#import <iAd/iAd.h>
 #import "NCGame.h"
 #import "UIPlotView.h"
 #import "PiwikTracker.h"
+#import "ATSettings.h"
+#import "BannerViewController.h"
 
 
-@interface NCStatsViewController ()
+@interface NCStatsViewController () <ADBannerViewDelegate>
+@property (weak, nonatomic) IBOutlet ADBannerView *bannerView;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *statsSelector;
 @property (weak, nonatomic) IBOutlet UIScrollView *hourSelectorScroll;
@@ -24,7 +28,10 @@
     [super viewWillAppear:animated];
 //    self.scrollView.backgroundColor = [UIColor redColor];
     [[self navigationController] setNavigationBarHidden:NO animated:YES];
-
+    
+    
+    BOOL bannerIsActive = [[[ATSettings sharedInstance] get:@(ATSettingsKeyBannerStatistics)] boolValue];
+    [[BannerViewController instance] setBannerActive:bannerIsActive];
 }
 
 - (IBAction)selectStats:(id)sender {

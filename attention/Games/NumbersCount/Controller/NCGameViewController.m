@@ -13,7 +13,10 @@
 #import "NCStatsViewController.h"
 #import "NCSettings.h"
 #import <AudioToolbox/AudioServices.h>
+#import <iAd/iAd.h>
 #import "PiwikTracker.h"
+#import "ATSettings.h"
+#import "BannerViewController.h"
 
 @interface NCGameViewController ()
 @property (weak, nonatomic) IBOutlet UIView *headerCenter;
@@ -54,6 +57,9 @@
 @property (weak, nonatomic) IBOutlet UIView *popupAskAtEnd;
 
 @property (nonatomic, readwrite) NCSettings *settings;
+
+
+@property (nonatomic) UIView *lastTouchedCell;
 @end
 
 @implementation NCGameViewController
@@ -78,7 +84,10 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    NSLog(@"will appear");
+
+    BOOL bannerIsActive = [[[ATSettings sharedInstance] get:@(ATSettingsKeyBannerSequence)] boolValue];
+    [[BannerViewController instance] setBannerActive:bannerIsActive];
+    
     self.gameReverse = NO;
     self.gameWithLetters = NO;
     self.gameTimeLimit = 25;
@@ -96,7 +105,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [[PiwikTracker sharedInstance] sendView:@"game"];
-    NSLog(@"did appear");
+
     [super viewDidAppear:animated];
     [self.navigationController.interactivePopGestureRecognizer setEnabled:NO];
 
@@ -139,7 +148,7 @@
 
 -(void)onCellTouchUp:(UIButton*)sender {
     UILabel *l = [sender.subviews objectAtIndex:0];
-
+    _lastTouchedCell = [sender superview];
     BOOL result = [self.game select:sender.tag value:l.text];
 
     if (result) {
@@ -152,8 +161,9 @@
             [self endGame:YES];
         }
         
-        if (3 == self.difficultyLevel) {
-            self.cellItems = [NCGame randomize:self.cellItems];
+//        if (self.difficultyLevel > -1)
+        {
+            self.cellItems = (NSArray*)[NCGame randomize:[self.cellItems mutableCopy]];
             [self drawBoard];
         }
         
@@ -166,11 +176,12 @@
     }
     
     UIView *cellView = [sender superview];
-
+    CGAffineTransform transform = cellView.transform;
     if (result) {
         cellView.alpha = 0;
-//        bgv.alpha = 1;
+        cellView.transform = CGAffineTransformScale(transform, 0.8, 0.8);
     } else {
+        // shake
         [UIView animateWithDuration:.1
          animations:^{
              cellView.transform = CGAffineTransformRotate(cellView.transform, M_PI / 10.);
@@ -199,6 +210,7 @@
 //                         sender.backgroundColor = nil;
 //                         bgv.alpha = 0.6;
                          cellView.alpha = 1;
+                         cellView.transform = CGAffineTransformScale(transform, 1.0, 1.0);
                      }];
 
 
@@ -246,9 +258,6 @@
 - (void) restartGame {
     NSLog(@"restart game");
     
-//    [self performSelector:<#(SEL)#> withObject:<#(id)#>]
-    
-//    return;
     // remove old game data if needed
     [self endGame:NO];
     
@@ -372,21 +381,68 @@
         return;
     }
     
+    if(_lastTouchedCell) {
+        [UIView animateWithDuration:0.2 animations:^{
+            _lastTouchedCell.transform = CGAffineTransformScale(_lastTouchedCell.transform, 0.9, 0.9);
+        }];
+    }
+    
+    
     for (int i = 0; i < cellsCount; i++) {
-        NSLog(@" %li", cellsCount);
         UIView *cell = (UIView*)[[self.board subviews] objectAtIndex:i];
-        [UIView animateWithDuration:0.1 animations:^{
-            cell.alpha = 0.1;
-            cell.transform = CGAffineTransformScale(cell.transform, 0.1, 0.1);
+        if (_lastTouchedCell && _lastTouchedCell == cell) {
+//            [UIView animateWithDuration:1.2 animations:^{
+//                _lastTouchedCell.transform = CGAffineTransformScale(_lastTouchedCell.transform, 1.2, 1.2);
+//            }];
+            continue;
+        }
+        cell.layer.shouldRasterize = YES;
+        [UIView animateWithDuration:(arc4random() % 10 * (self.game.difficultyLevel + 1)) / 20.0
+                              delay:(arc4random() % 80) / 100.0
+                            options:UIViewAnimationOptionCurveLinear
+                         animations:^{
+                             cell.alpha = 0.0;
+                             if (_lastTouchedCell) {
+                                 cell.center = _lastTouchedCell.center;
+                                 cell.transform = CGAffineTransformRotate(cell.transform, 720);
+                             }
+
+                             cell.transform = CGAffineTransformScale(cell.transform, 0.1, 0.1);
+                             
         } completion:^(BOOL finished){
             [cell removeFromSuperview];
             cellsCount--;
+            if (_lastTouchedCell) {
+                [UIView animateWithDuration:0.2 animations:^{
+                    _lastTouchedCell.transform = CGAffineTransformScale(_lastTouchedCell.transform, 1.04, 1.04);
+                }];
+            }
+            
+            if (1 == cellsCount && _lastTouchedCell) {
 
-            if (0 == cellsCount) {
+                    [UIView animateWithDuration:0.4
+                                     animations:^{
+                                         _lastTouchedCell.alpha = 0.1;
+                                         _lastTouchedCell.transform = CGAffineTransformScale(_lastTouchedCell.transform, 0.01, 0.01);
+                                     }
+                                     completion:^(BOOL finished){
+                                         dispatch_async(dispatch_get_main_queue(), ^{
+                                             [_lastTouchedCell removeFromSuperview];
+                                             _lastTouchedCell = nil;
+                                             if (!self.game.isComplete) {
+                                                 [self drawNewCells];
+                                             }
+                                         });
+                                     }];
+            }
+            else if (0 == cellsCount) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self drawNewCells];
+                    if (!self.game.isComplete) {
+                        [self drawNewCells];
+                    }
                 });
             }
+
         }];
     }
     
@@ -395,14 +451,24 @@
 }
 
 - (void) drawNewCells {
+    float margin = 12.0;
     float width = self.board.bounds.size.width / self.cols;
     float height = self.board.bounds.size.height / self.rows;
-    float margin = 0.0;
-    float y = 0.0;
-    float x = 0.0;
     
-    float size = MIN(width, height); // + width / 10. + width;
-    size = size * 1.4;
+    float centerX = width / 2.0;
+    float centerY = height / 2.0;
+    NSLog(@"Center %f x %f", centerX, centerY);
+    CGPoint cellCenter = CGPointMake(centerX, centerY);
+    
+//    width = width - margin;
+//    height = width;
+    
+    float y = 0;
+    float x = 0;
+    
+    float min = MIN(width, height); // + width / 10. + width;
+    min = min - (min / 10.0);
+    float size = min * 1.4;
     
     NSArray *colors = @[
                         [UIColor redColor],
@@ -454,27 +520,57 @@
                              [NSNumber numberWithFloat:size/6],
                              ];
     
-    
+
     for (int i = 0; i < [self.cellItems count]; i++) {
         NCCell *cell = [self.cellItems objectAtIndex:i];
         
         if (0 == i % self.cols && i > 1) {
-            y = y + height + margin;
-            x = 0.0;
+            y = y + height;
+            x = 0;
         }
         
         UIView *cellView = [[UIView alloc] initWithFrame:CGRectMake(x, y, width, height)];
         
-        UIButton *v = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, width, height)];
+        cellView.backgroundColor = [UIColor clearColor];
+//        cellView.layer.shadowColor = [UIColor blackColor].CGColor;
+//        cellView.layer.shadowRadius = 4.0;
+//        cellView.layer.shadowOpacity = 0.4;
+//        cellView.layer.shadowOffset = CGSizeMake(2, 2);
+//        cellView.layer.shadowPath = [[UIBezierPath bezierPathWithRect:cellView.layer.bounds] CGPath];
         
-        UIView *vbg = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
         
-        [vbg setBackgroundColor:[UIColor whiteColor]];
+        UIButton *v = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, min, min)];
+        
+        v.center = cellCenter;
+        
+        UIView *vbg = [[UIView alloc] initWithFrame:CGRectMake(0, 0, min, min)];
+        vbg.center = cellCenter;
+//        vbg.layer.cornerRadius = min / 2.0;
+//        vbg.layer.masksToBounds = YES;
+        
+        
+        // border radius
+        [vbg.layer setCornerRadius:min / 2.0];
+        vbg.layer.masksToBounds = YES;
+        // border
+        [vbg.layer setBorderColor:[UIColor whiteColor].CGColor];
+        [vbg.layer setBorderWidth:1.0f];
+        
+        // drop shadow
+        [vbg.layer setShadowColor:[UIColor blackColor].CGColor];
+        [vbg.layer setShadowOpacity:0.4];
+        [vbg.layer setShadowRadius:3.0];
+        [vbg.layer setShadowOffset:CGSizeMake(2.0, 2.0)];
+
+        UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:v.bounds cornerRadius:min / 2.0];
+        [[vbg layer] setShadowPath:[path CGPath]];
+        
+        [vbg setBackgroundColor:[UIColor clearColor]];
         
         [cellView addSubview:vbg];
         [cellView addSubview:v];
         
-        UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(0, 2, width, height)];
+        UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(0, 2, min, min)];
         
         [l setTextAlignment:NSTextAlignmentCenter];
         [l setText: cell.text];
@@ -485,7 +581,7 @@
         }
         [v addSubview:l];
         
-        if (self.difficultyLevel > 0)
+//        if (self.difficultyLevel > 0)
         {
             UIColor *randomColor;
             
@@ -504,7 +600,7 @@
             
             cell.color = randomColor;
             [vbg setBackgroundColor:randomColor];
-            vbg.alpha = 0.6;
+            vbg.alpha = 0.5;
             
             if ([darkColors containsObject:v.backgroundColor]) {
                 l.textColor = [UIColor whiteColor];
@@ -532,7 +628,7 @@
         }
         
         
-        x = x + width + margin;
+        x = x + width;
         
         [v addTarget:self action:@selector(onCellTouchDown:) forControlEvents:UIControlEventTouchDown];
         [v addTarget:self action:@selector(onCellTouchUp:) forControlEvents:UIControlEventTouchUpInside];
@@ -547,16 +643,23 @@
         cellView.alpha = 0.0;
         cellView.transform = CGAffineTransformScale(transform, 0.1, 0.1);
         
-        [UIView animateWithDuration:0.1 animations:^{
+        cellView.layer.shouldRasterize = YES;
+        
+        [UIView animateWithDuration:0.4 delay:(arc4random() % 20) / 50.0
+                            options:UIViewAnimationOptionCurveLinear
+                         animations:^{
+                             
             cellView.transform = CGAffineTransformScale(transform, 1.0, 1.0);
             cellView.alpha = alpha;
-        }];
+                             
+                         } completion:^(BOOL finished){
+                         
+                         }];
     }
 }
 
 
 - (void) endGame:(BOOL) showResult{
-//    NSLog(@"endGame:%i", showResult);
     
     [self.timer invalidate];
     self.timer = nil;
@@ -568,6 +671,7 @@
         gameScore = [[NCGame getScore:result] floatValue];
         
     }
+    
     
     NSArray *winMsgs = @[@"win1", @"win2", @"win3"];
     NSArray *looseMsgs = @[@"loose1", @"loose2", @"loose3", @"loose4"];
@@ -814,6 +918,8 @@
         }
         
         [self.alertResult show];
+        
+//        [self performSegueWithIdentifier:@"nc_show_result" sender:self];
     }
 }
 

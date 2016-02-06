@@ -42,6 +42,7 @@
     
     
     [[GCHelper sharedInstance] authenticateLocalUser];
+    
     return YES;
 }
 

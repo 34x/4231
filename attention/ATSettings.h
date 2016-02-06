@@ -7,8 +7,19 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
+typedef enum {
+    ATSettingsKeyBannerMain = 0,
+    ATSettingsKeyBannerStatistics = 1,
+    ATSettingsKeyBannerSequence = 2,
+    ATSettingsKeyBannerSettings = 3,
+    
+} ATSettingsKey;
 
 @interface ATSettings : NSObject
 +(instancetype) sharedInstance;
--(NSString*) get:(NSString*)key;
+-(id) get:(id)key;
+- (void) setSettingValue:(id)obj forKey:(id)key;
+
 @end

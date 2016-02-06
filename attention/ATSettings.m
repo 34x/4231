@@ -11,6 +11,7 @@
 @implementation ATSettings
 {
     NSDictionary *settings;
+    NSArray *defaults;
 }
 
 
@@ -21,6 +22,11 @@ static ATSettings *sharedInstance;
     if (self) {
         NSString *settingsFilename = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"plist"];
         settings = [NSDictionary dictionaryWithContentsOfFile:settingsFilename];
+        defaults = @[
+                     @"feedback_draft",
+                     @(ATSettingsKeyBannerMain), @(ATSettingsKeyBannerSequence), @(ATSettingsKeyBannerStatistics),
+                     @(ATSettingsKeyBannerSettings)
+                     ];
     }
 
     return self;
@@ -35,8 +41,28 @@ static ATSettings *sharedInstance;
     return sharedInstance;
 }
 
+- (NSString*) keyString:(id)key {
+    return [NSString stringWithFormat:@"%@", key];
+}
 
-- (NSString*) get:(NSString *)key {
+- (id) get:(id)key {
+    if (NSNotFound != [defaults indexOfObject:key]) {
+        NSUserDefaults *def = [[NSUserDefaults alloc] init];
+        
+        id value = [def objectForKey:[self keyString:key]];
+        
+        return value;
+    }
+    
     return [settings objectForKey:key];
 }
+
+- (void) setSettingValue:(id)obj forKey:(id)key {
+    if (NSNotFound != [defaults indexOfObject:key]) {
+        NSUserDefaults *def = [[NSUserDefaults alloc] init];
+        [def setObject:obj forKey:[self keyString:key]];
+        [def synchronize];
+    }
+}
+
 @end
