@@ -82,8 +82,10 @@
         
         components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
         
-        [components setDay:([components day] - ([components weekday] - 1))];
-        fromDate  = [cal dateFromComponents:components];
+//        [components setDay:([components day] - ([components weekday] - 1))];
+        fromDate  = [[cal dateFromComponents:components] dateByAddingTimeInterval:-1 * (3600 * 24 * 7)];
+        
+        
         
     } else if ([type isEqualToString:@"month"]) {
         format = @"YYYY.MM";

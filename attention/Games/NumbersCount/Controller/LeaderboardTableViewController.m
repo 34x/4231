@@ -25,14 +25,6 @@
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    
-    [[GCHelper sharedInstance] getLeaderboardWithCompletionHandler:^(NSArray *scores){
-        self.scores = scores;
-        [self.tableView reloadData];
-        [UIView animateWithDuration:0.2 animations:^{
-            self.spinnerView.alpha = 0.0;
-        }];
-    }];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -53,7 +45,40 @@
         
         [spinner startAnimating];
     }
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    if (![[GCHelper sharedInstance] isGameCenterAvailable]){
+        [self.navigationController popViewControllerAnimated:YES];
+        return;
+    }
     
+    if (![GCHelper sharedInstance].userAuthenticated) {
+        [[GCHelper sharedInstance] authenicateLocalUserForce:^(BOOL askForAuth, NSError *error) {
+            if (error) {
+                NSLog(@"Leaderboard GC error");
+                [self.navigationController popViewControllerAnimated:YES];
+                return;
+            }
+            if (askForAuth){
+                [[GCHelper sharedInstance] showAuthControllerFrom:self];
+            } else {
+                [self updateUsersTable];
+            }
+        }];
+    } else {
+        [self updateUsersTable];
+    }
+}
+
+-(void)updateUsersTable {
+    [[GCHelper sharedInstance] getLeaderboardWithCompletionHandler:^(NSArray *scores){
+        self.scores = scores;
+        [self.tableView reloadData];
+        [UIView animateWithDuration:0.2 animations:^{
+            self.spinnerView.alpha = 0.0;
+        }];
+    }];
 }
 
 - (void)didReceiveMemoryWarning {

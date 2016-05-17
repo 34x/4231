@@ -37,11 +37,9 @@
 
     [PiwikTracker sharedInstanceWithSiteID:[[ATSettings sharedInstance] get:@"piwik_id"]
                                    baseURL:[NSURL URLWithString:[[ATSettings sharedInstance] get:@"piwik_url"]]];
-    
+    [PiwikTracker sharedInstance].userID = [ATSettings sharedInstance].userID;
     [PiwikTracker sharedInstance].appVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-    
-    
-    [[GCHelper sharedInstance] authenticateLocalUser];
+    NSLog(@"UserID: %@", [PiwikTracker sharedInstance].userID);
     
     return YES;
 }

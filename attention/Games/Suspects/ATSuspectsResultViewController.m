@@ -7,6 +7,7 @@
 //
 
 #import "ATSuspectsResultViewController.h"
+#import "PiwikTracker.h"
 
 @interface ATSuspectsResultViewController ()
 
@@ -20,6 +21,8 @@
 }
 
 - (void) viewWillAppear:(BOOL)animated {
+    [[PiwikTracker sharedInstance] sendViews: @"suspects", @"result", nil];
+    
     [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
 

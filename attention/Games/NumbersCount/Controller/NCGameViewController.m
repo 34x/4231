@@ -17,6 +17,9 @@
 #import "PiwikTracker.h"
 #import "ATSettings.h"
 #import "BannerViewController.h"
+#import "NCShapeView.h"
+
+NSInteger const ButtonTag = 718;
 
 @interface NCGameViewController ()
 @property (weak, nonatomic) IBOutlet UIView *headerCenter;
@@ -41,19 +44,16 @@
 @property (nonatomic) int duration;
 @property (nonatomic) int currentClickIndex;
 @property (nonatomic) NSMutableArray *digits;
-@property (nonatomic) int cols;
-@property (nonatomic) int rows;
+@property (nonatomic) NSUInteger cols;
+@property (nonatomic) NSUInteger rows;
 @property (nonatomic) BOOL gameReverse;
 @property (nonatomic) BOOL gameWithLetters;
 @property (nonatomic) NSUInteger gameTimeLimit;
 @property (nonatomic, readwrite) float lastResult;
 @property (nonatomic, readwrite) NSUInteger difficultyLevel;
 @property (nonatomic, readwrite) NSUInteger sequenceLevel;
-@property (nonatomic, readwrite) float nextLevelLimit;
 @property (nonatomic, readwrite) NSArray *cellItems;
 @property (weak, nonatomic) IBOutlet UIView *restartGameAlert;
-@property (weak, nonatomic) IBOutlet UIButton *sequencePreviewButton;
-@property (weak, nonatomic) IBOutlet UIButton *beginGameButton;
 @property (weak, nonatomic) IBOutlet UIView *popupAskAtEnd;
 
 @property (nonatomic, readwrite) NCSettings *settings;
@@ -64,19 +64,11 @@
 
 @implementation NCGameViewController
 
-- (void) viewDidLoad {
-    self.popupAskAtEnd.layer.cornerRadius = 8.0;
-    self.popupAskAtEnd.layer.masksToBounds = true;
-    self.popupAskAtEnd.backgroundColor = [UIColor whiteColor];
-    self.popupAskAtEnd.layer.borderColor = [UIColor grayColor].CGColor;
-    self.popupAskAtEnd.layer.borderWidth = 1.0;
-    self.popupAskAtEnd.hidden = true;
-}
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     self.restartGameAlert.hidden = YES;
-    NSLog(@"disappearing!");
+
     NCSettings *settings = [[NCSettings alloc] init];
     settings.sequence = (int)self.sequenceLevel;
     [settings save];
@@ -85,21 +77,18 @@
 
 - (void)viewWillAppear:(BOOL)animated {
 
-    BOOL bannerIsActive = [[[ATSettings sharedInstance] get:@(ATSettingsKeyBannerSequence)] boolValue];
-    [[BannerViewController instance] setBannerActive:bannerIsActive];
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
+    
+    [[BannerViewController instance] setBannerActive:NO];
     
     self.gameReverse = NO;
     self.gameWithLetters = NO;
     self.gameTimeLimit = 25;
     self.difficultyLevel = 0;
     self.sequenceLevel = 0;
-    self.nextLevelLimit = 60.; // %
-    
-    self.settings = [[NCSettings alloc] init];
     
     [super viewWillAppear:animated];
 //    [[self navigationController] setNavigationBarHidden:YES animated:NO];
-    
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -109,10 +98,6 @@
     [super viewDidAppear:animated];
     [self.navigationController.interactivePopGestureRecognizer setEnabled:NO];
 
-    NCSettings *settings = [[NCSettings alloc] init];
-    self.cols = settings.cols;
-    self.rows = settings.rows;
-    self.sequenceLevel = settings.sequence;
 
     self.headerRightButton.target = self;
     self.headerRightButton.action = @selector(headerRightButtonClick:);
@@ -129,27 +114,19 @@
         [self.headerCenter addSubview:self.headerCenterLabel];
     }
     [self updateHeaderLabel];
-    
-    [self.beginGameButton addTarget:self action:@selector(beginGame) forControlEvents:UIControlEventTouchUpInside];
-    [self.sequencePreviewButton addTarget:self action:@selector(restartGame) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void) headerRightButtonClick:(id)sender {
     [self selectGameType];
 }
 
-- (void) headerClick:(UIButton*)button {
-    [self openStats];
-}
-
--(void)onCellTouchDown:(UIButton*)sender {
-
-}
 
 -(void)onCellTouchUp:(UIButton*)sender {
     UILabel *l = [sender.subviews objectAtIndex:0];
     _lastTouchedCell = [sender superview];
-    BOOL result = [self.game select:sender.tag value:l.text];
+    
+
+    BOOL result = [self.game select:l.text];
 
     if (result) {
         [self updateHeaderLabel];
@@ -157,44 +134,47 @@
         float progress = (float)self.game.currentIndex / (float)self.game.sequenceLength;
         [self.progressBar setProgress:progress animated:YES];
         
-        if (self.game.isComplete) {
-            [self endGame:YES];
-        }
         
-//        if (self.difficultyLevel > -1)
+        
+        if (!self.game.isDone)
         {
             self.cellItems = (NSArray*)[NCGame randomize:[self.cellItems mutableCopy]];
             [self drawBoard];
         }
         
     } else {
-        // Vibarate if support, beep if not
+//        Vibarate if support, beep if not
 //        AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
-        // vibrate only if support
+//        vibrate only if support
         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-
     }
     
-    UIView *cellView = [sender superview];
-    CGAffineTransform transform = cellView.transform;
+    if (self.game.isDone) {
+        [self endGame:YES];
+    }
+    
+    
+    UIView *v = sender.superview;
+    
+    CGAffineTransform transform = v.transform;
     if (result) {
-        cellView.alpha = 0;
-        cellView.transform = CGAffineTransformScale(transform, 0.8, 0.8);
+        v.alpha = 0;
+        v.transform = CGAffineTransformScale(transform, 0.8, 0.8);
     } else {
         // shake
         [UIView animateWithDuration:.1
          animations:^{
-             cellView.transform = CGAffineTransformRotate(cellView.transform, M_PI / 10.);
+             v.transform = CGAffineTransformRotate(v.transform, M_PI / 10.);
              
          } completion: ^(BOOL finished) {
              [UIView animateWithDuration:.2
                   animations:^{
-                      cellView.transform = CGAffineTransformRotate(cellView.transform, M_PI / -5.);
+                      v.transform = CGAffineTransformRotate(v.transform, M_PI / -5.);
                       
                   } completion: ^(BOOL finished) {
                       [UIView animateWithDuration:.1
                                        animations:^{
-                                           cellView.transform = CGAffineTransformRotate(cellView.transform, M_PI / 10.);
+                                           v.transform = CGAffineTransformRotate(v.transform, M_PI / 5.);
                                            
                                        } completion: ^(BOOL finished) {
                                            
@@ -206,11 +186,8 @@
     }
     [UIView animateWithDuration:.8
                      animations:^{
-                         // do first animation
-//                         sender.backgroundColor = nil;
-//                         bgv.alpha = 0.6;
-                         cellView.alpha = 1;
-                         cellView.transform = CGAffineTransformScale(transform, 1.0, 1.0);
+                         v.alpha = 1;
+                         v.transform = CGAffineTransformScale(transform, 1.0, 1.0);
                      }];
 
 
@@ -218,23 +195,8 @@
 
 - (void) updateHeaderLabel
 {
-//    if (0 == self.game.duration % 2) {
-//        [self.headerCenterLabel setText:[self durationString]];
-//    } else {
-//        [self.headerCenterLabel setText:[NSString stringWithFormat:@"%lu", self.game.currentNumber]];
-//    }
-    
     NSUInteger left = self.game.timeLimit - [[self.game getDuration] floatValue];
     [self.headerCenterLabel setText:[NSString stringWithFormat:@"%lu", left]];
-    
-//    float diff = [self percentWithPrevious];
-//    if (diff > self.nextLevelLimit || (.0 == diff && 0 == self.difficultyLevel)) {
-//        [self.headerCenterLabel setTextColor:[UIColor greenColor]];
-//        [self.progressBar setTintColor:[UIColor blueColor]];
-//    } else {
-//        [self.headerCenterLabel setTextColor:[UIColor redColor]];
-//        [self.progressBar setTintColor:[UIColor redColor]];
-//    }
 }
 
 - (void) timerTick {
@@ -252,148 +214,74 @@
     NSUInteger minutes = [[self.game getDuration] intValue] / 60;
     NSUInteger seconds = [[self.game getDuration] intValue] - minutes*60;
 
-    return [NSString stringWithFormat:@"%02lu:%02lu", minutes, seconds];
+    return [NSString stringWithFormat:@"%02lu:%02lu", (unsigned long)minutes, (unsigned long)seconds];
 }
 
 - (void) restartGame {
     NSLog(@"restart game");
     
     // remove old game data if needed
-    [self endGame:NO];
+//    [self endGame:NO];
     
-    
-    // init new game
     
     self.progressBar.progress = 0.0;
     // Do any additional setup after loading the view, typically from a nib.
 
-    self.sequenceLevel = [NCGame checkSequenceLevel:self.sequenceLevel];
-    
-    NSDictionary *sequenceParams = [NCGame getSequenceParams:self.sequenceLevel];
-    NSMutableDictionary *ssettings = [self.settings getSequenceSettings:[sequenceParams objectForKey:@"id"]];
-
-    NSUInteger sequenceLength = [ssettings[@"sequenceLength"] integerValue];
-
-    NSInteger boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
-    NSInteger currentBoardIndex = [ssettings[@"currentBoard"] integerValue];
-    
-    
-    // if in some cases we have wrong board size, fix it here
-    if (currentBoardIndex < boardIndex) {
-        ssettings[@"currentBoard"] = [NSNumber numberWithInteger: boardIndex];
-    }
-    
-    self.sequenceId = sequenceParams[@"id"];
-    
-
-    [self.settings save];
-    
-    NSArray *boards = [NCSettings getBoardSizes];
-    NSArray *cBoard = [boards objectAtIndex:[ssettings[@"currentBoard"] integerValue]];
-//    sequenceLength = 2;
-//    cBoard = [boards objectAtIndex:8]; // 11 73, 12 91
-//    self.difficultyLevel = 2;
-    
-    self.cols = [cBoard[0] intValue];
-    self.rows = [cBoard[1] intValue];
     
     [[PiwikTracker sharedInstance] sendViews: @"game", @"start", self.sequenceId, nil];
+
     
-    self.game = [[NCGame alloc] initWithTotal: self.cols * self.rows ];
-    self.game.timeLimit = (self.gameTimeLimit * self.cols * self.rows);
-    self.game.difficultyLevel = self.difficultyLevel;
-    self.game.sequenceLevel = self.sequenceLevel;
-    self.game.sequenceLength = sequenceLength;
-    
-    if (0 == self.difficultyLevel) {
-        ssettings[@"lastResult"] = @0.0;
-        [self.settings save];
-    }
     
     [self updateHeaderLabel];
     
     
+    self.cols = self.game.cols;
+    self.rows = self.game.rows;
 
-    self.cellItems = [self.game getItems];
-
-//    NSString *sep;
-//    if ([self.game.sequence count] < 8) {
-//        sep = @"     ";
-//    } else if ([self.game.sequence count] < 12) {
-//        sep = @"   ";
-//    } else {
-//        sep = @" ";
-//    }
+    self.cellItems = self.game.items;
     
-//    show symbols horisontaly
-//    if (0 == arc4random() % 2) {
-//        sep = @"\n";
-//    }
+    [self drawBoard];
     
     
-//    NSMutableArray *seq = [[NSMutableArray alloc] init];
-//    
-//    for (int i = 0; i < sequenceLength; i++) {
-//        [seq addObject:[self.game.sequence objectAtIndex:i]];
-//
-////        if (5 == i % 5 && i > 0) {
-////            [seq addObject:@"\n+"];
-////        } else {
-//            [seq addObject:@"   "];
-////        }
-//    }
-    
-    NSString *msg = [self.game.sequence componentsJoinedByString:@"   "];
-    
-    
-    self.sequencePreviewButton.titleLabel.textAlignment = NSTextAlignmentCenter;
-    
-    [self.sequencePreviewButton setTitle:msg forState:UIControlStateNormal];
-
-    if (sequenceLength < 28) {
-        self.sequencePreviewButton.titleLabel.font = [UIFont systemFontOfSize:42];
-    } else {
-        self.sequencePreviewButton.titleLabel.font = [UIFont systemFontOfSize:32];
-    }
-    
-    if (!self.alertGameStart) {
-        self.alertGameStart = [[UIAlertView alloc]
-                          initWithTitle:@"Ready?"
-                          message: msg
-                          delegate:self
-                          cancelButtonTitle:@"Go"
-                          otherButtonTitles:nil];
-        self.alertGameStart.tag = 2;
-    } else {
-        [self.alertGameStart setMessage:msg];
-    }
-    
-    self.restartGameAlert.hidden = NO;
-
+    [self.game start];
 }
 
 - (void)drawBoard {
     
-    __block NSInteger cellsCount = [[self.board subviews] count];
+    NSInteger cellsCount = [[self.board subviews] count];
     
     if ( 0 == cellsCount) {
         [self drawNewCells];
         return;
     }
     
-    if(_lastTouchedCell) {
-        [UIView animateWithDuration:0.2 animations:^{
-            _lastTouchedCell.transform = CGAffineTransformScale(_lastTouchedCell.transform, 0.9, 0.9);
-        }];
+    
+    [self clearBoard:^{
+        [self drawNewCells];
+    }];
+    
+    
+}
+
+
+- (void)clearBoard:(void(^)())completion {
+    
+    __block NSInteger cellsCount = [[self.board subviews] count];
+    
+    if(!_lastTouchedCell) {
+        _lastTouchedCell = [self.board.subviews firstObject];
     }
+    
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        _lastTouchedCell.transform = CGAffineTransformScale(_lastTouchedCell.transform, 0.9, 0.9);
+    }];
+    
     
     
     for (int i = 0; i < cellsCount; i++) {
         UIView *cell = (UIView*)[[self.board subviews] objectAtIndex:i];
         if (_lastTouchedCell && _lastTouchedCell == cell) {
-//            [UIView animateWithDuration:1.2 animations:^{
-//                _lastTouchedCell.transform = CGAffineTransformScale(_lastTouchedCell.transform, 1.2, 1.2);
-//            }];
             continue;
         }
         cell.layer.shouldRasterize = YES;
@@ -402,84 +290,96 @@
                             options:UIViewAnimationOptionCurveLinear
                          animations:^{
                              cell.alpha = 0.0;
-                             if (_lastTouchedCell) {
-                                 cell.center = _lastTouchedCell.center;
-                                 cell.transform = CGAffineTransformRotate(cell.transform, 720);
-                             }
-
-                             cell.transform = CGAffineTransformScale(cell.transform, 0.1, 0.1);
                              
-        } completion:^(BOOL finished){
-            [cell removeFromSuperview];
-            cellsCount--;
-            if (_lastTouchedCell) {
-                [UIView animateWithDuration:0.2 animations:^{
-                    _lastTouchedCell.transform = CGAffineTransformScale(_lastTouchedCell.transform, 1.04, 1.04);
-                }];
-            }
-            
-            if (1 == cellsCount && _lastTouchedCell) {
-
-                    [UIView animateWithDuration:0.4
-                                     animations:^{
-                                         _lastTouchedCell.alpha = 0.1;
-                                         _lastTouchedCell.transform = CGAffineTransformScale(_lastTouchedCell.transform, 0.01, 0.01);
-                                     }
-                                     completion:^(BOOL finished){
-                                         dispatch_async(dispatch_get_main_queue(), ^{
-                                             [_lastTouchedCell removeFromSuperview];
-                                             _lastTouchedCell = nil;
-                                             if (!self.game.isComplete) {
-                                                 [self drawNewCells];
-                                             }
-                                         });
-                                     }];
-            }
-            else if (0 == cellsCount) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (!self.game.isComplete) {
-                        [self drawNewCells];
-                    }
-                });
-            }
-
-        }];
+                             cell.center = _lastTouchedCell.center;
+                             cell.transform = CGAffineTransformRotate(cell.transform, 720);
+                             
+                         } completion:^(BOOL finished){
+                             [cell removeFromSuperview];
+                             cellsCount--;
+                             
+                             [UIView animateWithDuration:0.2 animations:^{
+                                 _lastTouchedCell.transform = CGAffineTransformScale(_lastTouchedCell.transform, 1.04, 1.04);
+                             }];
+                             
+                             
+                             if (1 == cellsCount) {
+                                 [UIView animateWithDuration:0.4
+                                                  animations:^{
+                                                      _lastTouchedCell.alpha = 0.1;
+                                                      _lastTouchedCell.transform = CGAffineTransformScale(_lastTouchedCell.transform, 0.01, 0.01);
+                                                  }
+                                                  completion:^(BOOL finished){
+                                                      dispatch_async(dispatch_get_main_queue(), ^{
+                                                          [_lastTouchedCell removeFromSuperview];
+                                                          _lastTouchedCell = nil;
+                                                            completion();
+                                                          
+                                                      });
+                                                  }];
+                             }
+                             else if (0 == cellsCount) {
+                                 dispatch_async(dispatch_get_main_queue(), ^{
+                                    completion();
+                                 });
+                             }
+                             
+                         }];
     }
-    
-    
-    
 }
 
 - (void) drawNewCells {
-    float margin = 12.0;
+    
+    
     float width = self.board.bounds.size.width / self.cols;
     float height = self.board.bounds.size.height / self.rows;
     
     float centerX = width / 2.0;
     float centerY = height / 2.0;
-    NSLog(@"Center %f x %f", centerX, centerY);
+
     CGPoint cellCenter = CGPointMake(centerX, centerY);
     
-//    width = width - margin;
-//    height = width;
     
     float y = 0;
     float x = 0;
     
     float min = MIN(width, height); // + width / 10. + width;
-    min = min - (min / 10.0);
-    float size = min * 1.4;
+    min = min * 0.8;
+    float size = min * 0.9;
+    CGFloat iconSize = min * 0.5;
     
     NSArray *colors = @[
-                        [UIColor redColor],
-                        [UIColor orangeColor],
-                        [UIColor yellowColor],
-                        [UIColor greenColor],
-                        [UIColor blueColor],
-                        [UIColor purpleColor],
-                        [UIColor brownColor],
-                        [UIColor cyanColor],
-                        [UIColor magentaColor]
+                        
+                        [self colorWithRed:255 green:212 blue:65],
+                        [[self colorWithRed:255 green:212 blue:65] colorWithAlphaComponent:0.5],
+    
+                        [self colorWithRed:171 green:112 blue:255],
+                        [[self colorWithRed:171 green:112 blue:255] colorWithAlphaComponent:0.5],
+    
+                        [self colorWithRed:232 green:85 blue:64],
+                        [[self colorWithRed:232 green:85 blue:64] colorWithAlphaComponent:0.5],
+                        
+                        [self colorWithRed:90 green:221 blue:232],
+                        [[self colorWithRed:90 green:221 blue:232] colorWithAlphaComponent:0.5],
+            
+                        
+                        [self colorWithRed:184 green:255 blue:133],
+                        [[self colorWithRed:184 green:255 blue:133] colorWithAlphaComponent:0.5],
+                        
+                        
+                        
+                        
+//                        [UIColor redColor],
+//
+//                        [UIColor orangeColor],
+//                        
+//                        [UIColor yellowColor],
+//                        [UIColor greenColor],
+//                        [UIColor blueColor],
+//                        [UIColor purpleColor],
+//                        [UIColor brownColor],
+//                        [UIColor cyanColor],
+//                        [UIColor magentaColor]
                         ];
     
     
@@ -520,7 +420,41 @@
                              [NSNumber numberWithFloat:size/6],
                              ];
     
-
+    
+    NSLog(@"current game sequence: %@", [self.game.sequence componentsJoinedByString:@", "]);
+    
+    BOOL isTextSequence =  ![self.game.sequenceId isEqualToString:@"flags"]
+                        && ![self.game.sequenceId isEqualToString:@"emoji"]
+                        && ![self.game.sequenceId isEqualToString:@"faces"];
+    
+    BOOL useCrazy = self.game.difficultyLevel > 1;
+    
+    
+    NSArray<UIView*> *crazyCells;
+    if (useCrazy) {
+        crazyCells = [self.game getCrazyCellsForSize:self.board.bounds.size andCount:self.game.total];
+        crazyCells = [crazyCells sortedArrayUsingComparator:^NSComparisonResult(UIView *obj1, UIView *obj2) {
+            CGPoint o1 = obj1.frame.origin;
+            CGPoint o2 = obj2.frame.origin;
+            if ((o1.x > o2.x && o1.y >= o2.y) || o1.y > o2.y) {
+                return NSOrderedDescending;
+            } else if ((o1.x < o2.x && o1.y < o2.y) || o1.y < o2.y) {
+                return  NSOrderedAscending;
+            }
+            
+            return NSOrderedSame;
+        }];
+    }
+    
+    
+    if (useCrazy && crazyCells && crazyCells.count != self.cellItems.count) {
+        useCrazy = NO;
+        
+        NSLog(@"Could not use crazy because not enought cells %li/%li", crazyCells.count, self.cellItems.count);
+    }
+    
+    NSLog(@"Use crazy %i, difficulty: %li", useCrazy, self.game.difficultyLevel);
+    
     for (int i = 0; i < [self.cellItems count]; i++) {
         NCCell *cell = [self.cellItems objectAtIndex:i];
         
@@ -528,49 +462,66 @@
             y = y + height;
             x = 0;
         }
+
+        UIView *cellView;
+        if (useCrazy) {
+            cellView = crazyCells[i];
+            cellCenter = CGPointMake(cellView.frame.size.width / 2.0, cellView.frame.size.height / 2.0);
+        } else {
+            cellView = [[UIView alloc] initWithFrame:CGRectMake(x, y, width, height)];
+        }
         
-        UIView *cellView = [[UIView alloc] initWithFrame:CGRectMake(x, y, width, height)];
         
         cellView.backgroundColor = [UIColor clearColor];
-//        cellView.layer.shadowColor = [UIColor blackColor].CGColor;
-//        cellView.layer.shadowRadius = 4.0;
-//        cellView.layer.shadowOpacity = 0.4;
-//        cellView.layer.shadowOffset = CGSizeMake(2, 2);
-//        cellView.layer.shadowPath = [[UIBezierPath bezierPathWithRect:cellView.layer.bounds] CGPath];
         
-        
-        UIButton *v = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, min, min)];
-        
+        UIButton *v = [[UIButton alloc] initWithFrame:cellView.frame];
+        v.tag = ButtonTag;
         v.center = cellCenter;
         
-        UIView *vbg = [[UIView alloc] initWithFrame:CGRectMake(0, 0, min, min)];
+        
+        NSArray *types = @[
+            NCShapeViewTypeBox,
+//            NCShapeViewTypeTriangle,
+            NCShapeViewTypeCircle, NCShapeViewTypePyramid, NCShapeViewTypeOcto
+        ];
+        
+        
+        NCShapeView *vbg;
+        NSString *type = types[arc4random() % types.count];
+        if (useCrazy) {
+            min = MIN(cellView.frame.size.width, cellView.frame.size.height) * 0.8;
+            size = min * 1.2;
+            iconSize = min * 0.7;
+            
+            if (min > 52) {
+                NSArray *multiply = @[@0.8, @0.9, @1.0, @1.1, @1.2, @1.4];
+                size = min * [multiply[arc4random() % multiply.count] floatValue];
+                NSArray *multiplyIcon = @[@0.5, @0.6, @0.7, @0.8, @0.9];
+                iconSize = min * [multiplyIcon[arc4random() % multiplyIcon.count] floatValue];
+            }
+            
+            vbg = [[NCShapeView alloc] initWithFrame:CGRectMake(0, 0, min, min) andType:type];
+            vbg.drawShape = NO;
+        } else {
+            vbg = [[NCShapeView alloc] initWithFrame:CGRectMake(0, 0, min, min) andType:type];
+        }
+//        vbg = [[UIView alloc] initWithFrame:CGRectMake(0, 0, min, min)];
+//        UIView *vbg = [[UIView alloc] initWithFrame:CGRectMake(0, 0, min, min)];
         vbg.center = cellCenter;
 //        vbg.layer.cornerRadius = min / 2.0;
 //        vbg.layer.masksToBounds = YES;
         
         
-        // border radius
-        [vbg.layer setCornerRadius:min / 2.0];
-        vbg.layer.masksToBounds = YES;
-        // border
-        [vbg.layer setBorderColor:[UIColor whiteColor].CGColor];
-        [vbg.layer setBorderWidth:1.0f];
-        
-        // drop shadow
-        [vbg.layer setShadowColor:[UIColor blackColor].CGColor];
-        [vbg.layer setShadowOpacity:0.4];
-        [vbg.layer setShadowRadius:3.0];
-        [vbg.layer setShadowOffset:CGSizeMake(2.0, 2.0)];
-
-        UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:v.bounds cornerRadius:min / 2.0];
-        [[vbg layer] setShadowPath:[path CGPath]];
-        
-        [vbg setBackgroundColor:[UIColor clearColor]];
         
         [cellView addSubview:vbg];
         [cellView addSubview:v];
         
-        UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(0, 2, min, min)];
+        CGRect labelFrame;
+        
+        labelFrame = CGRectMake(0, 0, min, min);
+        
+        UILabel *l = [[UILabel alloc] initWithFrame:labelFrame];
+        l.center = CGPointMake(v.frame.size.width / 2.0, v.frame.size.height / 2.0);
         
         [l setTextAlignment:NSTextAlignmentCenter];
         [l setText: cell.text];
@@ -581,7 +532,9 @@
         }
         [v addSubview:l];
         
+        
 //        if (self.difficultyLevel > 0)
+        if(self.game.difficultyLevel > 0)
         {
             UIColor *randomColor;
             
@@ -598,16 +551,23 @@
                 break;
             }
             
-            cell.color = randomColor;
-            [vbg setBackgroundColor:randomColor];
-            vbg.alpha = 0.5;
-            
+            vbg.backgroundColor = randomColor;
+            if (useCrazy) {
+                cellView.backgroundColor = randomColor;
+            }
             if ([darkColors containsObject:v.backgroundColor]) {
                 l.textColor = [UIColor whiteColor];
             }
         }
         
-        if (self.difficultyLevel > 1)
+        
+        if (!isTextSequence) {
+            [l setFont:[UIFont systemFontOfSize:iconSize]];
+        } else if (self.game.difficultyLevel > 0) {
+                vbg.fill = 0 == arc4random() % 2;
+        }
+        
+        if (self.difficultyLevel > 1 && isTextSequence)
         {
             NSNumber *size;
             if ([cell.text length] > 2) {
@@ -622,15 +582,18 @@
             [l setFont:[UIFont fontWithName:@"Helvetica" size: [size floatValue]]];
         }
         
-        if (self.difficultyLevel > 2)
+        if (self.difficultyLevel > 1)
         {
-            l.alpha = [[opacity objectAtIndex:(arc4random() % [opacity count])] floatValue];
+            vbg.alpha = [[opacity objectAtIndex:(arc4random() % [opacity count])] floatValue];
         }
         
+        if (!isTextSequence) {
+            vbg.fill = NO;
+        }
         
         x = x + width;
         
-        [v addTarget:self action:@selector(onCellTouchDown:) forControlEvents:UIControlEventTouchDown];
+
         [v addTarget:self action:@selector(onCellTouchUp:) forControlEvents:UIControlEventTouchUpInside];
         
         v.tag = i;
@@ -640,17 +603,16 @@
         __block CGAffineTransform transform = cellView.transform;
         
         [self.board addSubview:cellView];
+        
         cellView.alpha = 0.0;
         cellView.transform = CGAffineTransformScale(transform, 0.1, 0.1);
-        
-        cellView.layer.shouldRasterize = YES;
         
         [UIView animateWithDuration:0.4 delay:(arc4random() % 20) / 50.0
                             options:UIViewAnimationOptionCurveLinear
                          animations:^{
                              
-            cellView.transform = CGAffineTransformScale(transform, 1.0, 1.0);
-            cellView.alpha = alpha;
+                             cellView.transform = CGAffineTransformScale(transform, 1.0, 1.0);
+                             cellView.alpha = alpha;
                              
                          } completion:^(BOOL finished){
                          
@@ -663,263 +625,14 @@
     
     [self.timer invalidate];
     self.timer = nil;
-
-    NSDictionary *result;
-    float gameScore = .0;
-    if (self.game) {
-        result = [self.game finish];
-        gameScore = [[NCGame getScore:result] floatValue];
-        
-    }
     
-    
-    NSArray *winMsgs = @[@"win1", @"win2", @"win3"];
-    NSArray *looseMsgs = @[@"loose1", @"loose2", @"loose3", @"loose4"];
     
     [self updateHeaderLabel];
     
-    NSString *msgTitle = NSLocalizedString(looseMsgs[arc4random() % [looseMsgs count]], nil);
-    
     if (showResult) {
-        NSMutableDictionary *ssettings = [self.settings getSequenceSettings:[NCGame getSequenceId:self.sequenceLevel]];
-
-        float lastResult = [ssettings[@"lastResult"] floatValue];
-        
-        float diff = .0;
-        if (gameScore > .0 && lastResult > .0) {
-            diff = gameScore / (lastResult / 100.);
-        }
-        
-        [[GCHelper sharedInstance] reportScore:gameScore*100];
-        
-        int solved = [[ssettings objectForKey:@"solved" ] intValue];
-        
-        int errorsLimit = 6;
-        int nextBoardLimitFactor = 6;
-        int sequenceLength = [ssettings[@"sequenceLength"] intValue];
-
-        [[PiwikTracker sharedInstance] sendViews: @"game", @"finish", self.sequenceId, nil];
-        
-        if (self.game.clickedWrong > 0) {
-            lastResult = 0;
-            int errors = [ssettings[@"errors"] intValue] + 1;
-            ssettings[@"errors"] = [NSNumber numberWithInt:errors];
-            
-            if (errors >= errorsLimit) {
-                ssettings[@"errors"] = [NSNumber numberWithInt:0];
-                ssettings[@"solved"] = [NSNumber numberWithInt:0];
-                
-                if (sequenceLength > 2) {
-                    
-                    NSUInteger boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
-                    NSUInteger currentIndex = [ssettings[@"currentBoard"] integerValue];
-                    
-                    // if we have not in initial board for this sequence. We decrase board size
-                    if (currentIndex > boardIndex) {
-                        boardIndex--;
-                        ssettings[@"currentBoard"] = [NSNumber numberWithInteger:boardIndex];
-                        
-                        [[PiwikTracker sharedInstance] sendEventWithCategory:@"game"
-                              action:@"decrease_board"
-                                name:self.sequenceId
-                               value:@1
-                         ];
-
-                    } else { // if we at start of board for this sequence length we decrase sequence length
-                        sequenceLength--;
-//                        boardIndex--;
-                        boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
-
-                        ssettings[@"currentBoard"] = [NSNumber numberWithInteger:boardIndex];
-                        ssettings[@"sequenceLength"] = [NSNumber numberWithInt:sequenceLength];
-                        
-                        [[PiwikTracker sharedInstance] sendEventWithCategory:@"game"
-                              action:@"decrease_sequence"
-                                name:self.sequenceId
-                               value:@1
-                         ];
-                    }
-
-
-                    
-                } else {
-                    NSUInteger currentIndex = [ssettings[@"currentBoard"] integerValue];
-
-                    if (currentIndex > 0) {
-                        currentIndex--;
-                        ssettings[@"currentBoard"] = [NSNumber numberWithInteger:currentIndex];
-                        
-                        [[PiwikTracker sharedInstance] sendEventWithCategory:@"game"
-                              action:@"decrease_board"
-                                name:self.sequenceId
-                               value:@1
-                         ];
-                        
-                    }
-                    
-                }
-                
-            }
-            
-        } else if (gameScore > 0. && (diff > self.nextLevelLimit || .0 == diff)) {
-            msgTitle = NSLocalizedString(winMsgs[arc4random()%[winMsgs count]], nil);
-            
-            lastResult = gameScore;
-            solved++;
-            ssettings[@"solved"] = [NSNumber numberWithInt:solved];
-            
-            if (self.difficultyLevel < 3) {
-                self.difficultyLevel++;
-            } else {
-                ssettings[@"errors"] = [NSNumber numberWithInt:0];
-                // next sequence length
-                if (self.game.total > self.game.sequenceLength * nextBoardLimitFactor) {
-
-                    ssettings[@"solved"] = [NSNumber numberWithInt:0];
-                    ssettings[@"sequenceLength"] = [NSNumber numberWithInt:++sequenceLength];
-
-                    NSUInteger boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
-                    ssettings[@"currentBoard"] = [NSNumber numberWithInteger:boardIndex];
-                    
-                    [[PiwikTracker sharedInstance] sendEventWithCategory:@"game"
-                        action:@"increase_sequence"
-                        name:self.sequenceId
-                        value:@1
-                     ];
-                    
-                } else { // increase the board size
-                    ssettings[@"currentBoard"] = [NSNumber numberWithInt:[ssettings[@"currentBoard"] intValue] + 1];
-                    
-                    [[PiwikTracker sharedInstance] sendEventWithCategory:@"game"
-                          action:@"increase_board"
-                            name:self.sequenceId
-                           value:@1
-                     ];
-                }
-                
-                // change sequence
-                self.sequenceLevel++;
-
-                self.difficultyLevel = 0;
-            }
-        }
-        
-        [self.settings save];
-        
-        NSString *nextLevelLimit = @"";
-        if (lastResult) {
-            float nextLimit = lastResult / 100. * self.nextLevelLimit;
-            nextLevelLimit = [NSString stringWithFormat:@"\nNext level limit: %.2f", nextLimit];
-        }
-        
-        ssettings[@"lastResult"] = [NSNumber numberWithFloat:lastResult];
-        
-        NSString *alertTitle = msgTitle;
-
-//        NSString *alertMessage = [NSString
-//                                  stringWithFormat:@"Score: %.2f\
-//                                  \nDuration: %@\
-//                                  \nSpeed: %.1f\
-//                                  \nDifficulty: %lu\
-//                                  \nSequence: %lu\
-//                                  \nClicked: %lu\
-//                                  \nWrong:%lu\
-//                                  \n%@\
-//                                  \nnextBoard %@",
-//                                  gameScore,
-//                                  [self durationString],
-//                                  [self.game getSpeed],
-//                                  dlevel,
-//                                  slevel,
-//                                  self.game.clicked,
-//                                  self.game.clickedWrong,
-//                                  nextLevelLimit,
-//                                  nextBoard
-//                                ];
-
-        
-        NSString *alertMessage = [NSString stringWithFormat:@"%@\n",
-                                  [NSString stringWithFormat:NSLocalizedString(@"you_score",nil), gameScore ]
-                ];
-//        NSLog(@"%@", self.sequenceId);
-        if ([@"randomFlags" isEqualToString:self.sequenceId]) {
-            NSDictionary *flags = @{
-                                    @"🇦🇺" : @"Australia",
-                                    @"🇦🇹" : @"Austria",
-                                    @"🇧🇪" : @"Belgium",
-                                    @"🇧🇷" : @"Brazil",
-                                    @"🇨🇦" : @"Canada",
-                                    @"🇨🇱" : @"Chile",
-                                    @"🇨🇳" : @"China",
-                                    @"🇨🇴" : @"Colombia",
-                                    @"🇩🇰" : @"Denmark",
-                                    @"🇫🇮" : @"Finland",
-                                    @"🇫🇷" : @"France",
-                                    @"🇩🇪" : @"Germany",
-                                    @"🇭🇰" : @"Hong Kong",
-                                    @"🇮🇳" : @"India",
-                                    @"🇮🇩" : @"Indonesia",
-                                    @"🇮🇪" : @"Ireland",
-                                    @"🇮🇱" : @"Israel",
-                                    @"🇮🇹" : @"Italy",
-                                    @"🇯🇵" : @"Japan",
-                                    @"🇰🇷" : @"Korea",
-                                    @"🇲🇴" : @"Macao",
-                                    @"🇲🇾" : @"Malaysia",
-                                    @"🇲🇽" : @"Mexico",
-                                    @"🇳🇱" : @"Netherland",
-                                    @"🇳🇿" : @"New Zealand",
-                                    @"🇳🇴" : @"Norway",
-                                    @"🇵🇭" : @"Philippines",
-                                    @"🇵🇱" : @"Poland",
-                                    @"🇵🇹" : @"Portugal",
-                                    @"🇵🇷" : @"Puerto Rico",
-                                    @"🇷🇺" : @"Russia",
-                                    @"🇸🇦" : @"Saudi Arabia",
-                                    @"🇸🇬" : @"Singapore",
-                                    @"🇿🇦" : @"South Africa",
-                                    @"🇪🇸" : @"Spain",
-                                    @"🇸🇪" : @"Sweden",
-                                    @"🇨🇭" : @"Switzerland",
-                                    @"🇹🇷" : @"Turkey",
-                                    @"🇬🇧" : @"Great Britain",
-                                    @"🇺🇸" : @"USA",
-                                    @"🇦🇪" : @"United Arab Emirates",
-                                    @"🇻🇳" : @"Vietnam"
-            };
-            
-//            NSLog(@"%@", self.game.sequence);
-            
-            for (int i = 0; i < [self.game.sequence count]; i++) {
-                NSString *flag = self.game.sequence[i];
-                NSString *country = [flags objectForKey:flag];
-                
-//                NSLog(@"flag %@", flag);
-
-                if (country) {
-                    alertMessage = [NSString stringWithFormat:@"%@\n%@ %s",
-                                    alertMessage, self.game.sequence[i], [country UTF8String]];
-                }
-                
-            }
-        }
-        
-        if (!self.alertResult) {
-        
-            self.alertResult = [[UIAlertView alloc] initWithTitle:alertTitle
-                                                    message:alertMessage
-                                                    delegate:self
-                                                    cancelButtonTitle:@"Go!"
-                                                    otherButtonTitles:nil];
-            self.alertResult.tag = 0;
-        } else {
-            [self.alertResult setTitle:alertTitle];
-            [self.alertResult setMessage:alertMessage];
-        }
-        
-        [self.alertResult show];
-        
-//        [self performSegueWithIdentifier:@"nc_show_result" sender:self];
+        [self clearBoard:^{
+            [self performSegueWithIdentifier:@"nc_show_result" sender:self];
+        }];
     }
 }
 
@@ -993,6 +706,7 @@
 
 }
 
+
 - (void) openStats {
     [self performSegueWithIdentifier:@"stats" sender:self];
 //    StatsViewController *c = [[StatsViewController alloc] init];
@@ -1008,6 +722,14 @@
 
 - (float) random:(float)min :(float)max {
     return (((float)arc4random()/0x100000000)*(max-min)+min);
+}
+
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
+- (UIColor*) colorWithRed:(NSInteger)red green:(NSInteger)green blue:(NSInteger)blue {
+    return [UIColor colorWithRed:red / 255.0 green:green / 255.0 blue:blue / 255.0 alpha:1.0];
 }
 
 @end

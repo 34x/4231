@@ -30,6 +30,8 @@
 - (void) viewWillAppear:(BOOL)animated {
     BOOL bannerIsActive = [[[ATSettings sharedInstance] get:@(ATSettingsKeyBannerSettings)] boolValue];
     [[BannerViewController instance] setBannerActive:bannerIsActive];
+    
+    [[PiwikTracker sharedInstance] sendView:@"settings"];
 }
 
 - (void) viewDidLayoutSubviews {
@@ -42,13 +44,12 @@
             return 4;
             break;
         case 1:
-            return 4;
+            return 1;
             break;
         default:
-            return 0;
+            return 4;
             break;
     }
-    return 2;
 }
 
 - (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
@@ -79,7 +80,11 @@
             default:
                 break;
         }
-        
+    } else if (1 == indexPath.section) {
+        cell = [tableView dequeueReusableCellWithIdentifier:@"LabelCell" forIndexPath:indexPath];
+        UILabel *label = (UILabel*)[cell viewWithTag:24];
+        label.text = @"Encrypted Quotes";
+
     } else {
         cell = [tableView dequeueReusableCellWithIdentifier:@"BannerCell" forIndexPath:indexPath];
         UILabel *label = (UILabel*)[cell viewWithTag:1];
@@ -129,6 +134,8 @@
             default:
                 break;
         }
+    } else if (1 == indexPath.section) {
+        [self openUrl:[[ATSettings sharedInstance] get:@"enquotes"]];
     } else {
         UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
         UISwitch *toggle = (UISwitch*)[cell viewWithTag:2];
@@ -167,7 +174,7 @@
             return @"About";
             break;
         case 1:
-            return @"Toggle banners";
+            return @"Other games and apps";
             break;
         default:
             return @"";
@@ -175,6 +182,14 @@
     }
 }
 
+- (void)openUrl:(NSString*)urlString {
+    NSURL *url = [NSURL URLWithString: urlString];
+    [[PiwikTracker sharedInstance] sendOutlink:[url absoluteString]];
+    
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        [[UIApplication sharedApplication] openURL:url];
+    }
+}
 
 - (void) openGithub {
     NSURL *url = [NSURL URLWithString: [[ATSettings sharedInstance] get:@"github"]];

@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface NCGame : NSObject
 @property (readonly, nonatomic) NSUInteger cols;
@@ -27,10 +28,15 @@
 @property (nonatomic, readwrite) NSUInteger difficultyLevel;
 @property (nonatomic, readwrite) NSUInteger sequenceLevel;
 @property (nonatomic, readwrite) NSMutableArray *sequence;
+@property (nonatomic) NSString *sequenceId;
 
 
++ (NCGame*) sharedInstance;
+
+- (instancetype) init;
 - (instancetype) initWithTotal:(NSUInteger)total;
-- (BOOL)select:(NSUInteger)index value:(NSString*)value;
+- (BOOL) select:(NSString*)value;
+- (void) preparForNewRound;
 - (void)start;
 - (NSDictionary*)finish;
 - (float)getSpeed;
@@ -49,5 +55,7 @@
 + (NSNumber*)getScore:(NSDictionary*)data;
 - (NSArray*)getRandomizedSequence:(NSArray*)sequenceOriginal;
 - (NSArray*)getItems;
+
+-(NSArray<UIView*>*) getCrazyCellsForSize:(CGSize)boardSize andCount:(NSInteger)targetCount;
 
 @end

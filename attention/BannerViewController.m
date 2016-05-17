@@ -35,6 +35,11 @@
 }
 
 - (void) setBannerActive:(BOOL)active {
+    BOOL bannerOff = YES;
+    
+    if (bannerOff) {
+        return;
+    }
     
     isBannerActive = active;
     
@@ -65,28 +70,32 @@
 }
 
 - (void) bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error {
-    NSLog(@"Shared banner did fail");
+//    NSLog(@"Shared banner did fail");
     [failTimer invalidate];
     failTimer = [NSTimer scheduledTimerWithTimeInterval:4.0 target:self selector:@selector(setBannerInactive) userInfo:nil repeats:NO];
 }
 
 - (void) bannerViewActionDidFinish:(ADBannerView *)banner {
-    NSLog(@"Shared banner did finish");
+//    NSLog(@"Shared banner did finish");
     [self setBannerActive:NO];
 }
 
 - (void) bannerViewDidLoadAd:(ADBannerView *)banner {
-    NSLog(@"Shared banner did load");
+//    NSLog(@"Shared banner did load");
     [self setBannerActive:isBannerActive];
 }
 
 - (void) bannerViewWillLoadAd:(ADBannerView *)banner {
-    NSLog(@"Shared banner will load");
+//    NSLog(@"Shared banner will load");
 }
 
 -( void) setBannerInactive {
     [self setBannerActive:NO];
     
+}
+
+-(BOOL) shouldAutorotate {
+    return NO;
 }
 
 @end

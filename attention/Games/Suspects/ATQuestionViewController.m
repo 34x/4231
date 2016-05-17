@@ -10,6 +10,7 @@
 #import "ATSuspectsResultViewController.h"
 #import "ATShape.h"
 #import "Utils.h"
+#import "PiwikTracker.h"
 
 @interface ATQuestionViewController ()
 @property (weak, nonatomic) IBOutlet UIScrollView *scroll;
@@ -38,6 +39,9 @@
 
 
 - (void) viewDidAppear:(BOOL)animated {
+    
+    [[PiwikTracker sharedInstance] sendViews: @"suspects", @"question", nil];
+    
     _scroll.alpha = 0.0;
     while (_scroll.subviews.count > 0) {
         [[_scroll.subviews lastObject] removeFromSuperview];

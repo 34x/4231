@@ -11,6 +11,7 @@
 #import "ATShape.h"
 #import "NCGame.h"
 #import "ATGame.h"
+#import "PiwikTracker.h"
 
 
 
@@ -73,6 +74,8 @@
 }
 
 - (void) viewDidAppear:(BOOL)animated {
+    
+    [[PiwikTracker sharedInstance] sendViews: @"suspects", @"main", nil];
     
     game.delegate = self;
     

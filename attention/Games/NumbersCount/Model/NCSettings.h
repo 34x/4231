@@ -7,16 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "NCSequenceSettings.h"
 
 @interface NCSettings : NSObject
 @property (nonatomic) int cols;
 @property (nonatomic) int rows;
-@property (nonatomic) int sequence;
+@property (nonatomic) NSInteger sequence;
 @property (nonatomic) NSMutableDictionary *sequencesSettings;
 
 -(id)init;
 -(void)save;
--(NSMutableDictionary*)getSequenceSettings:(NSString*)sid;
+-(NCSequenceSettings*)getSequenceSettings:(NSString*)sid;
 +(NSArray*)getBoardSizes;
 +(NSUInteger)getCloserBoardIndex:(NSInteger)size;
 @end

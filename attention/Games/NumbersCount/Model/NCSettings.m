@@ -7,6 +7,7 @@
 //
 
 #import "NCSettings.h"
+#import "NCSequenceSettings.h"
 
 @interface NCSettings()
 @property (nonatomic) NSString *key;
@@ -57,55 +58,62 @@
         id sequencesSettings = [settings objectForKey:@"sequencesSettings"];
         
         if (nil == sequencesSettings) {
-            self.sequencesSettings = [[NSMutableDictionary alloc] init];
+            self.sequencesSettings = [NSMutableDictionary new];
         } else {
             self.sequencesSettings = [sequencesSettings mutableCopy];
         }
-        
     }
     return self;
 }
 
-- (NSMutableDictionary*)getSequenceSettings:(NSString*)sid {
+- (NCSequenceSettings*)getSequenceSettings:(NSString*)sid {
     id obj = [self.sequencesSettings objectForKey:sid];
-    NSMutableDictionary *settings;
     
+    NCSequenceSettings *settings;
     if (!obj) {
-        settings = [[NSMutableDictionary alloc] initWithDictionary: @{
-                     @"currentBoard" : @0,
-                     @"maximumBoard" : @0,
-                     @"solved": @0,
-                     @"lastResult" : @0.0,
-                     }];
+        settings = [[NCSequenceSettings alloc] init];
+    } else if ([obj isKindOfClass:[NSDictionary class]]) {
+        settings = [[NCSequenceSettings alloc] init];
+        settings.boardIndex = [[obj valueForKey:@"currentBoard"] integerValue];
+        settings.solvedCount = [[obj valueForKey:@"solved"] integerValue];
+        settings.lastResult = [[obj valueForKey:@"lastResult"] floatValue];
+        settings.sequenceLength = [[obj valueForKey:@"sequenceLength"] integerValue];
+        settings.errorCount = [[obj valueForKey:@"errors"] integerValue];
+    } else if ([obj isKindOfClass:[NSData class]]) {
+        settings = [NSKeyedUnarchiver unarchiveObjectWithData:obj];
     } else {
-        settings = [obj mutableCopy];
+        NSLog(@"Wrong setting object");
     }
-    
-    if (![settings objectForKey:@"sequenceLength"]) {
-        [settings setObject:@2 forKey:@"sequenceLength"];
-    }
-    
-    if (![settings objectForKey:@"errors"]) {
-        [settings setObject:@0 forKey:@"errors"];
-    }
-    
     
     [self.sequencesSettings setObject:settings forKey:sid];
     
+    NSLog(@"SequenceSettings[%@]: %@", sid, settings);
     return settings;
 }
 
 -(void)save {
+    
+    __block NSDictionary *ssa = [NSMutableDictionary new];
+    
+    [self.sequencesSettings enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop){
+        if ([obj isKindOfClass:[NCSequenceSettings class]]) {
+            obj = [NSKeyedArchiver archivedDataWithRootObject:obj];
+        }
+        
+        [ssa setValue:obj forKey:key];
+    }];
+    
     NSDictionary *settings = @{
                                @"cols" : [NSNumber numberWithInt:self.cols],
                                @"rows" : [NSNumber numberWithInt:self.rows],
-                               @"sequence" : [NSNumber numberWithInt:self.sequence],
-                               @"sequencesSettings" : self.sequencesSettings
-                            };
-//    NSLog(@"%@", self.sequencesSettings);
+                               @"sequence" : [NSNumber numberWithInteger:self.sequence],
+                               @"sequencesSettings" : ssa
+                               };
+    
     NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
     
     [defaults setObject:settings forKey:self.key];
+    
     [defaults synchronize];
 }
 
@@ -116,7 +124,13 @@
              @[@3, @5], @[@4, @4], @[@4, @5],
              @[@4, @6], @[@5, @5], @[@5, @6],
              @[@5, @7], @[@6, @6], @[@5, @8],
-             @[@6, @7], @[@6, @8], @[@7, @7]
+             @[@6, @7], @[@6, @8], @[@7, @7],
+             @[@7, @8], @[@7, @9], @[@7, @10],
+             @[@7, @11], @[@7, @12], @[@8, @11],
+             @[@8, @12], @[@8, @13], @[@8, @14],
+             @[@9, @13], @[@9, @14], @[@9, @15],
+             @[@10, @14], @[@10, @15], @[@10, @16],
+             @[@10, @17], @[@10, @18]
     ];
 }
 
@@ -143,5 +157,6 @@
     
     return closer;
 }
+
 
 @end

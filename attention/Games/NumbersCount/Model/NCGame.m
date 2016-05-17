@@ -9,6 +9,7 @@
 #import "NCGame.h"
 #import "NCCell.h"
 #import "Utils.h"
+#import "NCSettings.h"
 
 @interface NCGame()
 @property (readwrite, nonatomic) NSUInteger total;
@@ -27,17 +28,30 @@
 @property (nonatomic, readwrite) NSMutableArray *randomizedSequence;
 @property (nonatomic, readwrite) NSDate *startTime;
 @property (nonatomic, readwrite) NSDictionary *result;
+
+@property (nonatomic, readwrite) NSUInteger cols;
+@property (nonatomic, readwrite) NSUInteger rows;
 @end
 
 @implementation NCGame
 
-- (instancetype) initWithTotal:(NSUInteger)total
-{
+static NCGame *sharedInstance;
+
++ (NCGame*) sharedInstance {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[NCGame alloc] init];
+    });
+    return sharedInstance;
+
+}
+
+- (instancetype) init {
     self = [super init];
     
     if (self) {
-        self.total = total;
-        self.sequenceLength = total;
+        self.total = 2;
+        self.sequenceLength = 2;
         self.timeLimit = 30;
         self.difficultyLevel = 0;
         self.sequenceLevel = 0;
@@ -50,9 +64,84 @@
         self.isComplete = NO;
         self.duration = [NSNumber numberWithFloat:.0];
     }
+    
+    return self;
+}
+
+
+- (instancetype) initWithTotal:(NSUInteger)total
+{
+    self = [self init];
+    
+    if (self) {
+        self.total = total;
+        self.sequenceLength = total;
+    }
 
     return self;
 }
+
+- (void) preparForNewRound {
+    NCSettings *settings = [[NCSettings alloc] init];
+    NSInteger sequenceLevel = settings.sequence;
+    
+    sequenceLevel = [NCGame checkSequenceLevel:sequenceLevel];
+    self.sequenceLevel = sequenceLevel;
+    
+    NSDictionary *sequenceParams = [NCGame getSequenceParams:self.sequenceLevel];
+    NCSequenceSettings *ssettings = [settings getSequenceSettings:[sequenceParams objectForKey:@"id"]];
+    
+    NSUInteger sequenceLength = ssettings.sequenceLength;
+
+    NSInteger boardIndex = [NCSettings getCloserBoardIndex:sequenceLength];
+    NSInteger currentBoardIndex = ssettings.boardIndex;
+    
+    self.difficultyLevel = ssettings.difficultyLevel;
+    
+    // if in some cases we have wrong board size, fix it here
+    if (currentBoardIndex < boardIndex) {
+        ssettings.boardIndex = boardIndex;
+    }
+    
+    
+    [settings save];
+    
+    
+    NSArray *boards = [NCSettings getBoardSizes];
+    NSArray *cBoard = [boards objectAtIndex:ssettings.boardIndex];
+    
+    self.cols = [cBoard[0] intValue];
+    self.rows = [cBoard[1] intValue];
+    self.sequenceLength = sequenceLength;
+    
+#if DEBUG
+    self.cols = 4;
+    self.rows = 6;
+    self.difficultyLevel = 2;
+//    self.sequenceLength = 4;
+#endif
+
+
+    self.sequenceId = [sequenceParams objectForKey:@"symbols"];
+    
+    if (0 == self.difficultyLevel) {
+        ssettings.lastResult = 0.0;
+        [settings save];
+    }
+    
+    self.currentIndex = 0;
+    self.clicked = 0;
+    self.clickedWrong = 0;
+    self.isStarted = NO;
+    self.isDone = NO;
+    self.isComplete = NO;
+    self.total = self.cols * self.rows;
+    
+    
+#warning need to eliminate this inconvinient call
+    [self getItems];
+}
+
 
 - (NSMutableArray*)items
 {
@@ -60,7 +149,7 @@
     return _items;
 }
 
-- (BOOL)select:(NSUInteger)index value:(NSString*)value
+- (BOOL)select:(NSString*)value
 {
     NSString *current = self.sequence[self.currentIndex];
     
@@ -85,7 +174,7 @@
     }
 }
 
-- (NSNumber*)getDuration {
+- (NSNumber*) getDuration {
 
     if (self.isStarted && !self.isDone) {
         NSDate *currentTime = [NSDate date];
@@ -120,12 +209,13 @@
     NSDictionary *symbols = @{
                               @"numbersFrom1" : numbersFrom1,
                               @"numbers" : numbersFrom0,
-                              @"numbers09": @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"],
+                              @"numbers09": @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"-"],
                               @"numbersLetters" : @[
                                                     @"A", @"B", @"C", @"D", @"E", @"F", @"G", @"H", @"I", @"J", @"K", @"L", @"M", @"N",
                                                     @"O", @"P", @"Q", @"R", @"S", @"T", @"U", @"V", @"W", @"X", @"Y", @"Z",
                                                     @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9",
                                                     @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9",
+                                                    @"%", @"&", @"-", @"@", @"#"
                                                     ],
                               
                               @"letters" : @[@"A", @"B", @"C", @"D", @"E", @"F", @"G", @"H", @"I",
@@ -137,7 +227,7 @@
                               
                               @"katakana" : @[@"ア",@"イ",@"ウ",@"エ",@"オ",@"カ",@"キ",@"ク",@"ケ",@"コ",@"サ",@"シ",@"ス",@"セ",@"ソ"],
                               @"flags" : @[@"🇦🇺", @"🇦🇹", @"🇧🇪", @"🇧🇷", @"🇨🇦", @"🇨🇱", @"🇨🇳", @"🇨🇴", @"🇩🇰", @"🇫🇮", @"🇫🇷", @"🇩🇪", @"🇭🇰", @"🇮🇳", @"🇮🇩", @"🇮🇪", @"🇮🇱", @"🇮🇹", @"🇯🇵", @"🇰🇷", @"🇲🇴", @"🇲🇾", @"🇲🇽", @"🇳🇱", @"🇳🇿", @"🇳🇴", @"🇵🇭", @"🇵🇱", @"🇵🇹", @"🇵🇷", @"🇷🇺", @"🇸🇦", @"🇸🇬", @"🇿🇦", @"🇪🇸", @"🇸🇪", @"🇨🇭", @"🇹🇷", @"🇬🇧", @"🇺🇸", @"🇦🇪", @"🇻🇳"],
-                              @"faces" : @[@"👰", @"👰🏻", @"👰🏼", @"👰🏽", @"👰🏾", @"👰🏿", @"👱", @"👱🏻", @"👱🏼", @"👱🏽", @"👱🏾", @"👱🏿", @"👲", @"👲🏻", @"👲🏼", @"👲🏽", @"👲🏾", @"👲🏿", @"👳", @"👳🏻", @"👳🏼", @"👳🏽", @"👳🏾", @"👳🏿", @"👴", @"👴🏻", @"👴🏼", @"👴🏽", @"👴🏾", @"👴🏿", @"👵", @"👵🏻", @"👵🏼", @"👵🏽", @"👵🏾", @"👵🏿", @"👮", @"👮🏻", @"👮🏼", @"👮🏽", @"👮🏾", @"👮🏿", @"👷", @"👷🏻", @"👷🏼", @"👷🏽", @"👷🏾", @"👷🏿", @"👸", @"👸🏻", @"👸🏼", @"👸🏽", @"👸🏾", @"👸🏿", @"💂", @"💂🏻", @"💂🏼", @"💂🏽", @"💂🏾", @"💂🏿", @"🎅", @"🎅🏻", @"🎅🏼", @"🎅🏽", @"🎅🏾", @"🎅🏿", @"🙇", @"🙇🏻", @"🙇🏼", @"🙇🏽", @"🙇🏾", @"🙇🏿", @"💁", @"💁🏻", @"💁🏼", @"💁🏽", @"💁🏾", @"💁🏿", @"🙅", @"🙅🏻", @"🙅🏼", @"🙅🏽", @"🙅🏾", @"🙅🏿", @"🙆", @"🙆🏻", @"🙆🏼", @"🙆🏽", @"🙆🏾", @"🙆🏿", @"🙋", @"🙋🏻", @"🙋🏼", @"🙋🏽", @"🙋🏾", @"🙋🏿", @"🙎", @"🙎🏻", @"🙎🏼", @"🙎🏽", @"🙎🏾", @"🙎🏿", @"🙍", @"🙍🏻", @"🙍🏼", @"🙍🏽", @"🙍🏾", @"🙍🏿"],
+                              @"faces" : @[@"👰🏼", @"👱🏾", @"👲🏾", @"👳🏾", @"👴🏻", @"👵🏼", @"👮🏼", @"👷", @"👸🏽", @"💂🏻",@"🎅🏼", @"🙇🏻", @"🙇🏼", @"💁🏻", @"💁🏼", @"🙅🏼", @"🙅🏽",  @"🙆🏻", @"🙆🏼", @"🙋", @"🙋🏻", @"🙎🏼", @"🙎🏿", @"🙍🏼", @"🙍🏾", @"🐼", @"🤖", @"🦁", @"🐸"],
                               };
 
     return symbols[key];
@@ -235,15 +325,17 @@
 - (NSMutableArray*)getSequence:(NSUInteger)sequenceLevel difficultyLevel:(NSUInteger)difficultyLevel {
     NSMutableArray *sequence;
 
-    NSDictionary *settings = [NCGame getSequenceParams:sequenceLevel];
+    NSDictionary *params = [NCGame getSequenceParams:sequenceLevel];
     
-    NSMutableArray *symbols = [NCGame getSymbols:[settings objectForKey:@"symbols"]];
+    NSMutableArray *symbols = [[NCGame getSymbols:[params objectForKey:@"symbols"]] mutableCopy];
     
-    if (nil == [settings objectForKey:@"generator"]) {
+    if (nil == [params objectForKey:@"generator"]) {
         sequence = [NCGame createLimitSequence:self.sequenceLength symbols:symbols];
     } else {
-        SEL selector = NSSelectorFromString([settings objectForKey:@"generator"]);
+        SEL selector = NSSelectorFromString([params objectForKey:@"generator"]);
+
         sequence = [self performSelector:selector withObject:symbols];
+
         sequence = [NCGame createLimitSequence:self.sequenceLength symbols:sequence];
     }
     
@@ -270,52 +362,47 @@
 
 - (void)generateItems:(BOOL)reverse {
 
-    NSDictionary *settings = [NCGame getSequenceParams:self.sequenceLevel];
+    self.items = [NSMutableArray new];
+    NSDictionary *params = [NCGame getSequenceParams:self.sequenceLevel];
     
-    NSMutableArray *symbols = [[NCGame getSymbols:[settings objectForKey:@"symbols"]] mutableCopy];
+    NSMutableArray *symbols = [[NCGame getSymbols:[params objectForKey:@"symbols"]] mutableCopy];
     
     symbols = [[self getRandomizedSequence:symbols] mutableCopy];
 
+
+    
     for (int i = 0; i < [self.sequence count]; i++) {
         NCCell *cell = [[NCCell alloc] init];
         
-        cell.value = i;
         cell.text = self.sequence[i];
         [self.items addObject:cell];
     }
 
     int idx = 0;
-    
+    int iterationCount = 0;
+
     while ([self.items count] < self.total) {
         if (idx >= [symbols count]) {
             idx = 0;
+            iterationCount++;
         }
-
-//        NSString *symbol = symbols[idx];
         
-//        if (NSNotFound == [self.sequence indexOfObject:symbol]) {
-            NCCell *cell = [[NCCell alloc] init];
-            
-            cell.value = idx;
-            cell.text = symbols[idx];
-            [self.items addObject:cell];
-//        }
-        
+        NSString *symbol = symbols[idx];
         idx++;
+        
+        if (iterationCount < 4 && NSNotFound != [self.sequence indexOfObject:symbol]) {
+            continue;
+        }
+        
+        NCCell *cell = [[NCCell alloc] init];
+        
+        cell.text = symbol;
+        [self.items addObject:cell];
     }
-    
-    
-//    [self.sequence enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop){
-//        NCCell *cell = [[NCCell alloc] init];
-//        
-//        cell.value = idx;
-//        cell.text = obj;
-//        [self.items addObject:cell];
-//    }];
 }
 
 + (NSMutableArray*)randomize:(NSMutableArray*)itemsOriginal {
-    NSMutableArray *items = itemsOriginal.mutableCopy;
+    NSMutableArray *items = [itemsOriginal mutableCopy];
     
     for (int i = 0; i < [items count]; i++) {
         NCCell *cell = [items objectAtIndex:i];
@@ -349,11 +436,10 @@
     return items;
 }
 
-- (NSArray*)getItems {
+- (NSArray*) getItems {
 
     // filling up
     self.sequence = [self getSequence:self.sequenceLevel difficultyLevel:self.difficultyLevel];
-
     [self generateItems:NO];
     
     //randomizing few times
@@ -371,9 +457,12 @@
 }
 - (NSDictionary*) finish
 {
+    [self getDuration];
+    
     if (self.isDone) {
         return self.result;
     }
+    
     self.isDone = YES;
     
     if (self.isComplete) {
@@ -409,7 +498,7 @@
                                 @"clicked" : [NSNumber numberWithInteger:self.clicked],
                                 @"clickedWrong" : [NSNumber numberWithInteger:self.clickedWrong],
                              };
-        
+
         [log addObject:self.result];
         
         [def setObject:log forKey:@"log"];
@@ -458,15 +547,18 @@
     }
 
     float duration = [[data objectForKey:@"duration"] floatValue];
-    float speed = sequenceCount / duration;
-    
+    float speed = 1.0;
+    if (duration > 0.0) {
+        speed = sequenceCount / duration;
+    }
+
     float speedBonus = speed + sequenceCount + total;
     float sizeBonus = (sequenceCount * sequenceCount * sequenceCount) + (total * total);
     
-//    NSLog(@"%f %f", speedBonus, sizeBonus);
+
     score = [NSNumber numberWithFloat:speedBonus + sizeBonus];
     
-//    NSLog(@"%@", score);
+
     float percent = [score floatValue] / 100.;
     float difficulty = [[data objectForKey:@"difficulty"] floatValue];
     
@@ -490,7 +582,6 @@
     score = [NSNumber numberWithFloat:[score floatValue] - (percent*10) * [[data objectForKey:@"clickedWrong"] floatValue] ];
 //    NSLog(@"SCORE wrong %@", score);
     
-//    NSLog(@"SCORE: %@", score);
     
     if (nil == score || isnan([score floatValue])) {
         score = [NSNumber numberWithFloat:0.0];
@@ -615,5 +706,103 @@
     
     return stats;
 }
+
+
+-(NSArray<UIView*>*) getCrazyCellsForSize:(CGSize)boardSize andCount:(NSInteger)targetCount {
+    
+    NSMutableArray<UIView*> *cells = [NSMutableArray new];
+    
+    NSInteger iteration = 0;
+    
+    UIView *cell = [[UIView alloc] initWithFrame:CGRectMake(0, 0, boardSize.width, boardSize.height)];
+    [cells addObject:cell];
+    CGFloat minWidth  = boardSize.width / (targetCount / 2.0);
+    CGFloat minHeight = boardSize.height / (targetCount / 2.0);
+    
+    minWidth = MAX(112, minWidth);
+    minHeight = MAX(112, minHeight);
+    
+    UIView *cell1;
+    UIView *cell2;
+    UIView *divideCell;
+    
+    while (cells.count < targetCount) {
+        if (iteration++ > 5000) {
+            break;
+        }
+        cell1 = nil;
+        cell2 = nil;
+        divideCell = nil;
+        
+        for(UIView *cell in cells) {
+            
+            divideCell = cell;
+            
+            CGFloat width = cell.frame.size.width;
+            CGFloat height = cell.frame.size.height;
+            
+            CGFloat randomWidth = width * 0.1;
+            CGFloat randomHeight = height * 0.1;
+            
+            NSInteger divideChance = 10;
+            NSInteger divideChance2 = 4;
+            BOOL divideHorisontal = NO;
+            BOOL divideVertical = NO;
+            
+            if (MIN(width, height) / MAX(width, height) < 0.5) {
+                divideChance = 4;
+                divideChance2 = divideChance - 2;
+            }
+            
+            if (width > height) {
+                divideHorisontal = YES;
+            } else {
+                divideVertical = YES;
+            }
+            
+            if (divideHorisontal && width >= minWidth && 0 == arc4random() % divideChance) {
+                randomWidth = randomWidth * -1;
+                width = width / 2.0 + randomWidth;
+                cell1 = [[UIView alloc] initWithFrame:CGRectMake(cell.frame.origin.x, cell.frame.origin.y, width, height)];
+                cell2 = [[UIView alloc] initWithFrame:CGRectMake(cell1.frame.origin.x + width, cell1.frame.origin.y, cell.frame.size.width - width, height)];
+                break;
+            } else if (divideVertical && height >= minHeight && 0 == arc4random() % divideChance) {
+                height = height / 2.0 + randomHeight;
+                cell1 = [[UIView alloc] initWithFrame:CGRectMake(cell.frame.origin.x, cell.frame.origin.y, width, height)];
+                cell2 = [[UIView alloc] initWithFrame:CGRectMake(cell1.frame.origin.x, cell1.frame.origin.y + height, width, cell.frame.size.height - height)];
+                break;
+            }
+            
+        }
+        
+        if (cell1 && cell2) {
+            NSUInteger idx = [cells indexOfObject:divideCell];
+            
+            [cells replaceObjectAtIndex:idx withObject:cell1];
+            [cells addObject:cell2];
+        }
+        
+        [cells sortUsingComparator:^NSComparisonResult(UIView *obj1, UIView  *obj2) {
+            CGFloat size1 = obj1.frame.size.width * obj1.frame.size.height;
+            CGFloat size2 = obj2.frame.size.width * obj2.frame.size.height;
+            
+            if (size1 > size2) {
+                return NSOrderedAscending;
+            } else if (size1 < size2) {
+                return NSOrderedDescending;
+            }
+            
+            return NSOrderedSame;
+            
+        }];
+    }
+    
+    if (targetCount != cells.count) {
+        NSLog(@"Total cells: %li / %li", cells.count, targetCount);
+    }
+    
+    return cells;
+}
+
 
 @end

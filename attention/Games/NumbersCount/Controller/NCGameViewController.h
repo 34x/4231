@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "NCGame.h"
+
 @interface NCGameViewController : UIViewController
 @property (strong, nonatomic) NCGame *game;
 - (void) restartGame;

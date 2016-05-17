@@ -8,6 +8,7 @@
 
 #import "FeedbackViewController.h"
 #import "ATSettings.h"
+#import "PiwikTracker.h"
 
 @interface FeedbackViewController()
 @property (weak, nonatomic) IBOutlet UITextView *textView;
@@ -57,6 +58,8 @@
     if (draft) {
         _textView.text = draft;
     }
+    
+    [[PiwikTracker sharedInstance] sendViews:@"settings", @"feedback", nil];
 }
 
 - (void) viewDidAppear:(BOOL)animated {
@@ -89,7 +92,7 @@
     button.enabled = NO;
     
     NSURL *url = [NSURL URLWithString: [[ATSettings sharedInstance] get:@"feedback_url"]];
-    url = [NSURL URLWithString:@"foobar"];
+
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
     
     req.HTTPMethod = @"POST";
@@ -113,6 +116,7 @@
                                             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                                 CGPoint center = _infoMessage.center;
                                                 if (error) {
+                                                    NSLog(@"Error: %@", error);
                                                     _infoMessage.text = @"Error happen,\nplease try again later\nor send feedback from the website.";
                                                     _infoMessage.frame = CGRectMake(0, 0, 312, 92);
                                                 

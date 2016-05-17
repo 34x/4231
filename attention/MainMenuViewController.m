@@ -16,6 +16,7 @@
 #import "ATSettings.h"
 #import <iAd/iAd.h>
 #import "BannerViewController.h"
+#import "GCHelper.h"
 
 @interface MainMenuViewController ()
 
@@ -32,6 +33,7 @@
 
 @property (strong, nonatomic) NSTimer *timer;
 @property (nonatomic) NSUInteger seqIdx;
+@property (weak, nonatomic) IBOutlet UIView *backgroundView;
 
 @end
 
@@ -57,10 +59,6 @@
 //    [self drawPlot];
     
 //    NSLog(@"%lu %lu %lu", UIImageOrientationDown, UIImageOrientationUp, UIImageOrientationRight);
-    
-    if (!self.timer) {
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(timerTick) userInfo:nil repeats:YES];
-    }
 }
 
 
@@ -80,20 +78,39 @@
 
 - (void) viewWillDisappear:(BOOL)animated {
     [self.navigationController setNavigationBarHidden:NO animated:YES];
+    
+    [self.timer invalidate];
 }
 
 - (void) viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    
+    
+    
     [[PiwikTracker sharedInstance] sendView:@"main_menu"];
+    
+    
+    [self drawNewBackground];
+    
+    [[GCHelper sharedInstance] authenticateLocalUser:^(BOOL askForAuth, NSError *error) {
+        if (askForAuth){
+            [[GCHelper sharedInstance] showAuthControllerFrom:self];
+        }
+    }];
+    
     
     
     //[NSTimer scheduledTimerWithTimeInterval:9 target:self selector:@selector(infoButtonMove) userInfo:nil repeats:YES];
     
-    if ([GCHelper sharedInstance].gameCenterAvailable && [GCHelper sharedInstance].userAuthenticated) {
+    if ([GCHelper sharedInstance].gameCenterAvailable) {
         self.leaderboardButton.hidden = NO;
     } else {
         self.leaderboardButton.hidden = YES;
     }
+    
+    
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:4 target:self selector:@selector(timerTick) userInfo:nil repeats:YES];
+    
 }
 
 - (void) infoButtonMove {
@@ -139,6 +156,74 @@
         self.seqIdx = 0;
     }
 
+    
+    
+    NSArray *oldViews = self.backgroundView.subviews;
+    
+    [self drawNewBackground];
+    
+    
+        for(UIView *sv in oldViews) {
+            double delay = arc4random() / 10000000000.0;
+            [UIView animateWithDuration:0.2
+                                  delay:delay
+                                options:UIViewAnimationOptionCurveLinear
+                             animations:^{
+                                 sv.alpha = 0.0;
+                             } completion:^(BOOL finished) {
+                                 [sv removeFromSuperview];
+//                                     svCount--;
+//                                     if (0 == svCount) {
+//                                         while (self.backgroundView.subviews.count > 0) {
+//                                             [self.backgroundView.subviews.lastObject removeFromSuperview];
+//                                         }
+//                                     }
+                                 
+                             }];
+        }
+    
+    
+}
+
+-(void)drawNewBackground {
+    
+    CGSize size = self.backgroundView.frame.size;
+    
+    NSArray *total = @[@(size.width / 10.0), @(size.width / 20.0), @(size.width / 50.0), @(size.width / 100.0)];
+    NSInteger count = [total[arc4random() % total.count] integerValue];
+    
+    NCGame *game = [[NCGame alloc] initWithTotal: 0];
+    
+    NSArray *views = [game getCrazyCellsForSize:size
+                                       andCount:count];
+    
+    NSArray *colors = @[
+                        
+                        [self colorWithRed:255 green:212 blue:65],
+                        [self colorWithRed:171 green:112 blue:255],
+                        [self colorWithRed:232 green:85 blue:64],
+                        
+                        [self colorWithRed:90 green:221 blue:232],
+                        
+                        
+                        [self colorWithRed:184 green:255 blue:133],
+                        ];
+    
+    for (UIView *sv in views) {
+        sv.alpha = 0.0;
+        [self.backgroundView addSubview:sv];
+        sv.backgroundColor = colors[arc4random() % colors.count];
+        
+        [UIView animateKeyframesWithDuration:0.4
+                                       delay:arc4random() / 10000000000.0
+                                     options:0
+                                  animations:^{
+                                      sv.alpha = 1.0;
+                                  }
+                                  completion:^(BOOL finished) {
+                                      
+                                  }];
+    }
 }
 
 - (void)setupLocalNotifications {
@@ -160,7 +245,7 @@
 
     float tomorrow = 3600. * 24 * 4;
     
-    for (int i = 0; i < 8; i++) {
+    for (int i = 1; i < 8; i++) {
 
         int day = tomorrow * i;
 
@@ -214,7 +299,7 @@
 }
 
 - (void) numbersCountClick:(id)sender {
-    [self performSegueWithIdentifier:@"numbers_count_game" sender:self];
+//    [self performSegueWithIdentifier:@"numbers_count_game" sender:self];
 }
 
 - (void) numbersCountStatsClick:(id)sender {
@@ -236,5 +321,10 @@
     // Pass the selected object to the new view controller.
 }
 */
+
+- (UIColor*) colorWithRed:(NSInteger)red green:(NSInteger)green blue:(NSInteger)blue {
+    return [UIColor colorWithRed:red / 255.0 green:green / 255.0 blue:blue / 255.0 alpha:1.0];
+}
+
 
 @end

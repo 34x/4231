@@ -8,6 +8,12 @@
 
 #import "ATSettings.h"
 
+NSString *const ATSettingsKeyUserID = @"ATSettingsKeyUserID";
+
+@interface ATSettings()
+@property (nonatomic, readwrite) NSString *userID;
+@end
+
 @implementation ATSettings
 {
     NSDictionary *settings;
@@ -25,7 +31,7 @@ static ATSettings *sharedInstance;
         defaults = @[
                      @"feedback_draft",
                      @(ATSettingsKeyBannerMain), @(ATSettingsKeyBannerSequence), @(ATSettingsKeyBannerStatistics),
-                     @(ATSettingsKeyBannerSettings)
+                     @(ATSettingsKeyBannerSettings), ATSettingsKeyUserID
                      ];
     }
 
@@ -63,6 +69,20 @@ static ATSettings *sharedInstance;
         [def setObject:obj forKey:[self keyString:key]];
         [def synchronize];
     }
+}
+
+- (NSString*)userID {
+    _userID = [self get:[self keyString:ATSettingsKeyUserID]];
+    
+    if (!_userID) {
+        CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+        _userID = (__bridge_transfer NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
+        CFRelease(uuid);
+        
+        [self setSettingValue:_userID forKey:ATSettingsKeyUserID];
+    }
+    
+    return _userID;
 }
 
 @end

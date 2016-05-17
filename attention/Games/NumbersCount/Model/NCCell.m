@@ -9,5 +9,7 @@
 #import "NCCell.h"
 
 @implementation NCCell
-
+- (NSString*) description {
+    return [NSString stringWithFormat:@"<NCCell: %@ (%lu)>", self.text, (unsigned long)self.value];
+}
 @end
